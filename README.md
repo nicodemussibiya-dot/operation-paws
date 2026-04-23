@@ -1,22 +1,40 @@
-# PAWS — Partnership for Animal Work & Service
+# Operation PAWS
 
-A welfare-first, traceable, auditable pipeline proposal to mobilise suitable working-dog candidates through official assessment pathways (pilot: PAWS-10, scale: PAWS-50/100/250/500).
+**PAWS = Partnership for Animal Work & Service**
 
-## PAWS Academy — Prospect Assessment & Work-readiness School
-A Tier 3 “development league” that standardises foundation training, objective tryouts (Combine Days), and readiness screening off SAPS premises, before candidates enter official donation/assessment processes.
+Operation PAWS is a public-interest initiative and open playbook for building a **welfare-first, traceable, auditable** pipeline to mobilise suitable working-dog candidates through official assessment pathways.
 
-## PAWS 1 → 500 Tracker
-We issue a case-style public reference for each registered candidate:
+## Official QR entry point (GitHub Pages)
+After you enable GitHub Pages (Settings → Pages → `/docs`), the QR hub lives at:
+
+- `/docs/start/` (start here)
+- `/docs/tracker/` (PAWS 1 → 500 tracker)
+- `/docs/verify/` (verify a PAWS reference)
+
+## PAWS public reference number (case-style + anti-fake)
+Each candidate receives a public reference like:
+
 `PAWS 000001/04/2026-T3-BR012-K7`
 
-The public tracker shows only anonymised references and stages (no microchips, no PII).
+- case-style serial/MM/YYYY
+- includes Tier (T1/T2/T3) and Source code (BR###/DN###)
+- ends with a 2-char checksum
 
-## Official Entry Point
-Scan our QR code or visit our start hub:
-`/docs/start/`
+See: `handbook/07_metrics_and_ids/01_paws_reference_spec.md`
 
-## Public Data Boundary (Non-Negotiable)
-This repo is PUBLIC and indexed. We strictly adhere to our `PUBLIC_DATA_BOUNDARY.md` policy. No personal data, microchip numbers tied to identities, or internal SAPS templates are stored here.
+## Non‑negotiable: public data boundary
+This repository is **public and indexed**.
+Never commit personal information, microchip numbers tied to identities, phone numbers, addresses, signed documents, or internal templates.
+
+See: `PUBLIC_DATA_BOUNDARY.md`
 
 ## Disclaimer
-**Not an official SAPS channel.** Operation PAWS is an independent public-interest initiative proposal. No SAPS endorsement is implied unless confirmed in writing. Use of SAPS insignia or badges is strictly prohibited without written permission from the National Commissioner.
+This is **not** an official SAPS channel. No endorsement implied unless confirmed in writing.
+See: `DISCLAIMER.md`
+
+## Repo map
+- `docs/` — GitHub Pages site (QR hub, tracker, verify)
+- `handbook/` — operational playbook (pipeline, academy, governance)
+- `templates/` — blank partner templates (MOUs, consent, traceability pack)
+- `ops/` — checklists/runbooks
+- `tech/` — architecture, Supabase schema, AI scaffolding
