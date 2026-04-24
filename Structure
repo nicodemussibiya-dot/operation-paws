@@ -11,6 +11,7 @@ operation-paws/
 ├─ docs/                    # GitHub Pages (Public Hub)
 │  ├─ index.html            # Root Redirect / Launchpad
 │  ├─ start/                # QR Landing Page
+│  ├─ admin/                # Field Intake App (Dumb-proof)
 │  ├─ chat/                 # AI Assistant UI
 │  ├─ tracker/              # Transparency Dashboard
 │  ├─ verify/               # Reference Verification Tool
