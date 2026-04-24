@@ -3,7 +3,7 @@
 Operation PAWS handles sensitive operational data and partner secrets. This document outlines our multi-layered security approach.
 
 ## 1. Secrets Management
-- **Environment Variables:** All API keys (OpenAI, Supabase, Telegram) are stored as encrypted environment variables in the Supabase Edge Runtime.
+- **Environment Variables:** All API keys (OpenAI, Gemini, OpenRouter, Supabase) are stored as encrypted environment variables in the Supabase Edge Runtime.
 - **No Secrets in Repo:** We use `.gitignore` to prevent any local `.env` files from being committed.
 - **Rotational Policy:** Keys are rotated every 90 days or immediately upon any suspected breach.
 
