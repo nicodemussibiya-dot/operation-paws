@@ -1,17 +1,17 @@
-// --- CONFIGURATION ---
+// --- CONFIGURATION (Zero Keys!) ---
 const PROJECT_REF = "dorihyvbgbhsxvdrtqqr";
-// NOTE: For a real app, you'd use the 'anon' key from your Supabase Dashboard
-const ANON_KEY = "YOUR_SUPABASE_ANON_KEY"; 
-const API_URL = `https://${PROJECT_REF}.supabase.co/rest/v1/paws_dogs`;
-const ADMIN_PIN = "1234"; // Standard PIN for noobies (Change this!)
+const INTAKE_URL = `https://${PROJECT_REF}.supabase.co/functions/v1/paws-intake`;
+
+let SAVED_PIN = ""; // Temporary storage for session
 
 function checkPin() {
-  const pin = document.getElementById('pin').value;
-  if (pin === ADMIN_PIN) {
+  const pinInput = document.getElementById('pin').value;
+  if (pinInput.length === 4) {
+    SAVED_PIN = pinInput;
     document.getElementById('gate').style.display = 'none';
     document.getElementById('form-wrap').style.display = 'block';
   } else {
-    alert("Incorrect PIN");
+    alert("PIN must be 4 digits");
   }
 }
 
@@ -20,7 +20,7 @@ document.getElementById('intakeForm').addEventListener('submit', async (e) => {
   const btn = e.target.querySelector('button');
   const resDiv = document.getElementById('result');
   
-  btn.innerText = "Processing...";
+  btn.innerText = "Encrypting & Saving...";
   btn.disabled = true;
 
   const payload = {
@@ -28,30 +28,24 @@ document.getElementById('intakeForm').addEventListener('submit', async (e) => {
     breed: document.getElementById('breed').value,
     microchip_id: document.getElementById('microchip').value,
     source_tier: parseInt(document.getElementById('source_tier').value),
-    status: 'Screening'
+    pin: SAVED_PIN // PIN is sent to be verified by the server
   };
 
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(INTAKE_URL, {
       method: "POST",
-      headers: {
-        "apikey": ANON_KEY,
-        "Authorization": `Bearer ${ANON_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "return=representation" // This tells Supabase to return the new row
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
     const data = await response.json();
 
-    if (!response.ok) throw new Error(data.message || "Failed to save dog");
+    if (!response.ok) throw new Error(data.error || "Failed to save dog");
 
-    const dog = data[0];
     resDiv.className = "success";
     resDiv.innerHTML = `
       SUCCESS! Dog Registered.<br>
-      <span class="paws-id">${dog.paws_ref}</span>
+      <span class="paws-id">${data.paws_ref}</span>
       <small>Write this on the physical folder</small>
     `;
     
@@ -60,6 +54,7 @@ document.getElementById('intakeForm').addEventListener('submit', async (e) => {
   } catch (err) {
     resDiv.className = "error";
     resDiv.innerText = "Error: " + err.message;
+    console.error(err);
   } finally {
     btn.innerText = "Register Dog";
     btn.disabled = false;
