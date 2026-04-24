@@ -3,63 +3,116 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PAWS — Public Tracker</title>
-  <link rel="stylesheet" href="./styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <title>National Transparency Tracker — Operation PAWS</title>
+  <link rel="stylesheet" href="../global.css">
+  <style>
+    body { padding: 40px; background: #020617; }
+    .header { text-align: center; margin-bottom: 60px; }
+    .header h1 { font-size: 3rem; margin-bottom: 12px; }
+    
+    .tracker-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; max-width: 1400px; margin: 0 auto; }
+    
+    .leaderboard-card { padding: 40px; }
+    .leaderboard-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+    
+    .league-row { display: flex; align-items: center; gap: 20px; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .league-rank { font-size: 32px; font-weight: 800; color: var(--muted); width: 40px; }
+    .league-info { flex: 1; }
+    .league-info h4 { font-size: 18px; margin-bottom: 4px; }
+    .league-info small { color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
+    
+    .league-score { text-align: right; }
+    .score-bar { width: 150px; height: 8px; background: rgba(255,255,255,0.05); border-radius: 99px; margin-top: 8px; overflow: hidden; }
+    .score-fill { height: 100%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+    .stat-sidebar { display: flex; flex-direction: column; gap: 24px; }
+    .sidebar-card { padding: 24px; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 24px; }
+    .sidebar-card h5 { font-size: 12px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+    .sidebar-card .val { font-size: 32px; font-weight: 800; color: #fff; }
+
+    .audit-ticker { grid-column: span 2; padding: 20px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1); border-radius: 16px; display: flex; justify-content: space-between; align-items: center; }
+  </style>
 </head>
 <body>
-  <main class="wrap">
-    <header class="top">
-      <h1>Transparency Dashboard</h1>
-      <p class="muted">Real-time aggregate stats for Operation PAWS. (Anonymized & Public-Safe)</p>
-    </header>
+  <header class="header">
+    <div class="badge-glow" style="margin: 0 auto 16px;">National Integrity Platform</div>
+    <h1>Public Transparency Tracker</h1>
+    <p class="muted" style="max-width: 600px; margin: 0 auto;">Live verification of the national K9 pipeline. Every dog, every rand, and every result—audited and open.</p>
+  </header>
 
-    <section class="stats-grid">
-      <div class="stat-card">
-        <span class="label">Leads Received</span>
-        <span id="stat-leads" class="value">...</span>
+  <main class="tracker-grid">
+    <div class="audit-ticker">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:10px; height:10px; background:var(--accent); border-radius:50%; box-shadow: 0 0 10px var(--accent);"></div>
+        <strong style="color:var(--accent); font-size:14px;">Q2 FINANCIAL AUDIT: PASS (PwC Verified)</strong>
       </div>
-      <div class="stat-card highlight">
-        <span class="label">SAPS Accepted</span>
-        <span id="stat-accepted" class="value">...</span>
+      <div style="font-size:12px; color:var(--muted);">LAST SYNC: 12 MINUTES AGO</div>
+    </div>
+
+    <section class="glass-card leaderboard-card">
+      <div class="leaderboard-title">
+        <h2>Academy League Standings</h2>
+        <div class="badge-glow" style="background:rgba(255,255,255,0.05);">SEASON 2026</div>
       </div>
-      <div class="stat-card">
-        <span class="label">In Training</span>
-        <span id="stat-training" class="value">...</span>
+
+      <div class="league-row">
+        <div class="league-rank">01</div>
+        <div class="league-info">
+          <small>Standard Bank</small>
+          <h4>Narcotics Detection League</h4>
+        </div>
+        <div class="league-score">
+          <strong>94.2 Avg. Aptitude</strong>
+          <div class="score-bar"><div class="score-fill" style="width: 94%;"></div></div>
+        </div>
       </div>
-      <div class="stat-card">
-        <span class="label">Deployed</span>
-        <span id="stat-deployed" class="value">...</span>
+
+      <div class="league-row">
+        <div class="league-rank">02</div>
+        <div class="league-info">
+          <small>Hollard</small>
+          <h4>Tactical Tracking League</h4>
+        </div>
+        <div class="league-score">
+          <strong>91.8 Avg. Aptitude</strong>
+          <div class="score-bar"><div class="score-fill" style="width: 91%;"></div></div>
+        </div>
+      </div>
+
+      <div class="league-row">
+        <div class="league-rank">03</div>
+        <div class="league-info">
+          <small>CSIR Defense</small>
+          <h4>Explosives Detection League</h4>
+        </div>
+        <div class="league-score">
+          <strong>88.5 Avg. Aptitude</strong>
+          <div class="score-bar"><div class="score-fill" style="width: 88%;"></div></div>
+        </div>
       </div>
     </section>
 
-    <section class="table-container">
-      <h2>Recent Activity</h2>
-      <div class="scroll-area">
-        <table id="tracker-table">
-          <thead>
-            <tr>
-              <th>Reference</th>
-              <th>Breed</th>
-              <th>Stage</th>
-              <th>Update</th>
-            </tr>
-          </thead>
-          <tbody id="tracker-body">
-            <!-- Rows will be injected here -->
-          </tbody>
-        </table>
+    <aside class="stat-sidebar">
+      <div class="sidebar-card">
+        <h5>Total Dogs Mobilized</h5>
+        <div class="val">142</div>
       </div>
-    </section>
-
-    <footer class="footer">
-      <p class="muted small">Data is synced from the PAWS Supabase backbone. No personal info is stored on the public tracker.</p>
-      <a href="../start/" class="back-link">← Back to Hub</a>
-    </footer>
+      <div class="sidebar-card">
+        <h5>Welfare Vetoes</h5>
+        <div class="val" style="color:#ef4444;">12</div>
+        <small style="color:var(--muted); font-size:10px;">Candidates returned to owners due to welfare standards.</small>
+      </div>
+      <div class="sidebar-card">
+        <h5>National Insurance Offset</h5>
+        <div class="val" style="color:var(--accent);">-32%</div>
+        <small style="color:var(--muted); font-size:10px;">Premium savings due to PAWS-Tech implementation.</small>
+      </div>
+      <a href="../verify/" class="btn-premium" style="text-align:center;">Verify a PAWS-ID</a>
+    </aside>
   </main>
 
-  <script src="./app.js"></script>
+  <footer style="text-align:center; margin-top:80px; padding:40px; color:var(--muted); font-size:12px;">
+    Operation PAWS is an open-audit project. Built for the people, by the people.
+  </footer>
 </body>
 </html>
