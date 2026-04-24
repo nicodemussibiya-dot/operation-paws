@@ -1,54 +1,141 @@
-// docs/chat/app.js  — PAWS-OS Terminal
-// Calls the paws-council Edge Function for grounded, anti-hallucination responses.
-const { SUPABASE_URL, SUPABASE_ANON_KEY, PROJECT_REF } = window.PAWS_CONFIG;
+// docs/chat/app.js — PAWS-OS v2: "Be Water"
+// Fluid, context-aware, graceful fallback. Never rigid.
+const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.PAWS_CONFIG;
 const COUNCIL_URL = `${SUPABASE_URL}/functions/v1/paws-council`;
 
-let userRole = null;
+// ── Conversation state ────────────────────────────────────────
+const state = {
+  role: null,
+  name: null,
+  history: [],   // [{role:'user'|'ai', text}]
+  councilOnline: null,  // null=untested, true, false
+};
 
-const ROLE_CONFIG = {
+// ── Role definitions ──────────────────────────────────────────
+const ROLES = {
   commissioner: {
-    label: "LEVEL 10 — NATIONAL COMMISSIONER",
-    link:  "../commissioner/",
-    cta:   "OPEN COMMAND CENTER",
-    greeting: "Commissioner. Your tactical queue is synced. 500 candidates in the registry. Ledger integrity: VERIFIED.",
+    label: "National Commissioner",
+    greeting: (n) => `Welcome back${n ? ', ' + n : ''}. The tactical queue is synchronized. 500 candidates in the national registry. Ledger integrity is clean. What do you need?`,
+    link: { url: "../commissioner/", label: "Open Command Center" },
   },
   elder: {
-    label: "COMMUNITY LEADER",
-    link:  "../community-briefing/",
-    cta:   "VIEW BRIEFING",
-    greeting: "It is an honour, Elder. I have prepared a plain-language briefing that explains our welfare commitments and community integrity. We are guided by Proverbs 12:10.",
+    label: "Community Leader",
+    greeting: (n) => `It is an honour${n ? ', ' + n : ''}. I have your community briefing ready. We operate by Proverbs 12:10 — every animal is cared for, every rand is accounted for. How can I serve you?`,
+    link: { url: "../community-briefing/", label: "Read Community Briefing" },
   },
   partner: {
-    label: "STRATEGIC SPONSOR",
-    link:  "../donate/",
-    cta:   "VIEW SPONSORSHIP HUB",
-    greeting: "Your investment is ring-fenced in escrow and tracked on the public ledger. Every release requires COP consensus sign-off.",
+    label: "Strategic Partner",
+    greeting: (n) => `Good to have you${n ? ', ' + n : ''}. Your contribution is ring-fenced in escrow and visible on the public ledger. Every release requires Council sign-off. What would you like to know?`,
+    link: { url: "../donate/", label: "View Sponsorship Hub" },
   },
   officer: {
-    label: "FIELD OPERATIVE",
-    link:  "../admin/",
-    cta:   "OPEN INTAKE TERMINAL",
-    greeting: "Terminal Node-042 is live. Ready for candidate registration. Microchip must be 15-digit ISO. Welfare check is mandatory before submission.",
+    label: "Field Officer",
+    greeting: (n) => `Terminal Node-042 is live${n ? ', ' + n : ''}. Ready for intake. All submissions require a 15-digit microchip and a welfare clearance. What do you need?`,
+    link: { url: "../admin/", label: "Open Intake Terminal" },
   },
   breeder: {
-    label: "LEAGUE PARTICIPANT",
-    link:  "../tracker/",
-    cta:   "VIEW LEAGUE TRACKER",
-    greeting: "The National Breeder Rivalry is live. Premier Partner status requires ≥10 SAPS-accepted dogs and ≥30% service rate. The system tracks this automatically — no lobbying.",
+    label: "League Participant",
+    greeting: (n) => `The rivalry is live${n ? ', ' + n : ''}. Premier Partner status requires ≥10 SAPS-accepted dogs at ≥30% service rate. The system tracks this — no lobbying. What's your question?`,
+    link: { url: "../tracker/", label: "View League Tracker" },
   },
 };
 
-// ── Boot ──────────────────────────────────────────────────────
-window.onload = () => {
-  appendAI(`
-    [BOOT: COMPLETE] [IDENTITY PROTOCOL: ACTIVE]<br><br>
-    I am <strong>PAWS-OS</strong> — the Central Tactical Intelligence for Operation PAWS.<br>
-    I only answer from grounded, provable facts in the national repository. I cannot be persuaded to invent audits, endorsements, or data.<br><br>
-    <strong>Who are you?</strong> Tell me your role: <em>Commissioner, Elder, Partner, Officer, or Breeder</em>.
-  `);
-};
+// ── Local intelligence (fluid fallback) ──────────────────────
+const LOCAL_BRAIN = [
+  { pattern: /\b(hi|hello|hey|howzit|sawubona|dumela)\b/i,
+    respond: () => `I'm here. Talk to me — ask about the registry, the league, security, or just tell me who you are.` },
 
-// ── Send message ──────────────────────────────────────────────
+  { pattern: /who are you|what are you|paws.?os/i,
+    respond: () => `I'm PAWS-OS — the tactical intelligence running Operation PAWS. I manage the national K9 registry, oversee the Breeder League, and ensure every decision is logged and auditable. I answer from facts, not guesses.` },
+
+  { pattern: /how are you|you good|you ok/i,
+    respond: () => `Functioning at capacity. The ledger is clean, the Council is armed, and the registry has 500 candidates on deck. We are ready to move. What do you need?` },
+
+  { pattern: /dead man|dms|commissioner offline|unreachable/i,
+    respond: () => `The Dead Man's Switch is armed. If the Commissioner is unreachable for 7 days, the AI Surrogate takes temporary control, locks destructive actions, and routes authority to the designated deputy. No single point of failure.` },
+
+  { pattern: /secure|hack|safe|github|public repo|corrupt/i,
+    respond: () => `The repo is public by design — transparency is the strategy. What's protected is the data and the keys. paws_dogs has zero anonymous access. Every action goes through cryptographic verification and lands in an append-only audit log. You cannot quietly corrupt this system.` },
+
+  { pattern: /league|tier|promote|breeder|rank/i,
+    respond: () => `The Breeder League is merit-only. Premier Partner: ≥10 SAPS-accepted dogs, ≥30% service rate. Gold: ≥5 and ≥20%. Silver: ≥2. Standard: everyone else. The Council of Paws runs the math automatically — no one can lobby their way up.` },
+
+  { pattern: /500|scale|demo|simulation/i,
+    respond: () => `The national tracker currently shows 500 simulation records marked is_demo=true — a proof-of-scale demonstration. Real operational data will replace these as intake occurs. It's clearly labelled on the tracker page.` },
+
+  { pattern: /escrow|money|fund|rand|financial/i,
+    respond: () => `Escrow funds are held in a ring-fenced account. Releases require Commissioner authorization AND Council of Paws consensus. The public tracker shows status — not individual amounts. No one person controls the money.` },
+
+  { pattern: /biometric|face|fingerprint|identity/i,
+    respond: () => `The Commissioner approval console requires biometric verification — a SHA-256 facial scan hash is stored server-side. The frontend captures the signal; the Edge Function validates it. No hash, no approval.` },
+
+  { pattern: /council|cop|agent|alpha|beta|gamma/i,
+    respond: () => `The Council of Paws has three agents: Alpha (data auditor), Beta (welfare officer), Gamma (strategist). Every major decision goes through all three. The Chair only acts if all three return VERIFIED. If any agent flags a concern, the action is blocked and the reason is logged.` },
+
+  { pattern: /welfare|spca|dog|animal|breed/i,
+    respond: () => `Welfare is non-negotiable in this system. The AI Welfare Officer (Agent Beta) vetoes any action that bypasses SPCA compliance. A single critical welfare violation causes immediate relegation from the Breeder League and a 24-month ban on T1 supply.` },
+
+  { pattern: /elder|church|community|pastor/i,
+    respond: () => `The Community Briefing was written specifically for church elders and community leaders — no jargon, just plain truth. It covers what we do, why it matters, and the questions officials might ask. Would you like me to take you there?` },
+
+  { pattern: /help|what can you do|capabilities/i,
+    respond: () => `I can brief you on the national registry, the Breeder League standings, security architecture, escrow status, or the Council of Paws governance. I can also route you to the right dashboard. What do you need?` },
+
+  { pattern: /.+/,  // catch-all
+    respond: (text) => `I hear you. I don't have a specific fact for "${text.length > 40 ? text.slice(0,40)+'…' : text}" in the grounded repository yet — but I won't make something up. Ask me about security, the league, the registry, escrow, or governance and I'll give you a straight answer.` },
+];
+
+function localResponse(text) {
+  for (const rule of LOCAL_BRAIN) {
+    if (rule.pattern.test(text)) {
+      return rule.respond(text);
+    }
+  }
+  return null;
+}
+
+// ── Role detection ────────────────────────────────────────────
+function detectRole(text) {
+  const t = text.toLowerCase();
+  if (/commissioner|general|national head|brigadier/.test(t)) return 'commissioner';
+  if (/elder|pastor|church|reverend|bishop/.test(t))           return 'elder';
+  if (/partner|sponsor|bank|investor|funder/.test(t))          return 'partner';
+  if (/officer|constable|admin|intake|field/.test(t))          return 'officer';
+  if (/breeder|kennel|trainer|handler|league/.test(t))         return 'breeder';
+  return null;
+}
+
+function extractName(text) {
+  const m = text.match(/(?:i(?:'m| am)|name(?:'s| is)|call me)\s+([A-Z][a-z]+)/i);
+  return m ? m[1] : null;
+}
+
+// ── Council call (with timeout + graceful fallback) ───────────
+async function callCouncil(text) {
+  if (state.councilOnline === false) return null;
+
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 5000);
+
+    const res = await fetch(COUNCIL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY },
+      body: JSON.stringify({ query: text, role: state.role, history: state.history.slice(-4) }),
+      signal: ctrl.signal,
+    });
+    clearTimeout(timer);
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    state.councilOnline = true;
+    return await res.json();
+  } catch {
+    state.councilOnline = false;
+    return null;
+  }
+}
+
+// ── Core message handler ──────────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById('user-input');
   const text  = input.value.trim();
@@ -56,73 +143,62 @@ async function sendMessage() {
 
   appendUser(text);
   input.value = '';
+  state.history.push({ role: 'user', text });
 
-  const thinkingEl = appendAI("[COUNCIL OF PAWS: CONVENING...]");
+  // Show typing indicator
+  const bubble = appendAI('<span class="typing-dots"><span></span><span></span><span></span></span>');
 
-  // 1. Identity detection (client-side, no AI needed)
-  if (!userRole) {
-    const detected = detectRole(text.toLowerCase());
-    if (detected) {
-      userRole = detected;
-      const cfg = ROLE_CONFIG[detected];
-      thinkingEl.innerHTML = `
-        [ACCESS: ${cfg.label}]<br>
-        ${cfg.greeting}<br><br>
-        <strong>→ <a href="${cfg.link}" style="color:var(--accent);">${cfg.cta}</a></strong>
-      `;
-      return;
-    } else {
-      thinkingEl.innerHTML = `[IDENTIFICATION FAILED]<br>Please state your role: Commissioner, Elder, Partner, Officer, or Breeder.`;
-      return;
-    }
+  // Give the UI a moment to render the typing indicator
+  await sleep(600);
+
+  // 1. Extract name if given
+  const name = extractName(text);
+  if (name) state.name = name;
+
+  // 2. Detect or confirm role
+  const detectedRole = detectRole(text);
+  if (detectedRole && !state.role) {
+    state.role = detectedRole;
+    const cfg = ROLES[state.role];
+    const response = cfg.greeting(state.name) + 
+      `<br><br>→ <a href="${cfg.link.url}" style="color:var(--accent); font-weight:700; text-decoration:none;">${cfg.link.label} ↗</a>`;
+    await typeInto(bubble, response, true);
+    state.history.push({ role: 'ai', text: cfg.greeting(state.name) });
+    return;
   }
 
-  // 2. Council query for all follow-up questions
-  try {
-    const res = await fetch(COUNCIL_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", apikey: SUPABASE_ANON_KEY },
-      body: JSON.stringify({ query: text, role: userRole }),
-    });
-    const data = await res.json();
+  // 3. Try Council (async, with fallback)
+  const councilData = await callCouncil(text);
 
-    if (data.chair === "BLOCKED") {
-      thinkingEl.innerHTML = `
-        [COUNCIL OF PAWS: ACTION BLOCKED]<br>
-        ${data.reason}<br><br>
-        <em>I will not generate unverifiable claims. Confidence: 0%</em><br>
-        → <a href="${data.safe_next_step_url}" style="color:var(--accent);">Go to safe page</a>
-      `;
-    } else {
-      const cites = data.citations?.length
-        ? `<br><small style="color:var(--muted);">Sources: ${data.citations.join(', ')}</small>`
-        : '';
-      thinkingEl.innerHTML = `
-        [COP: ALL AGENTS VERIFIED — CHAIR APPROVED]<br>
-        ${data.answer}${cites}<br>
-        <small style="color:var(--muted);">Confidence: ${Math.round(data.confidence * 100)}%</small>
-      `;
-    }
-  } catch (e) {
-    thinkingEl.innerHTML = `[NETWORK ERROR] Cannot reach Council endpoint. Check Edge Function deployment.<br><small>${e.message}</small>`;
+  let responseHtml = '';
+
+  if (councilData && councilData.chair === 'APPROVED' && councilData.answer) {
+    const cites = councilData.citations?.length
+      ? `<br><span style="color:var(--muted); font-size:11px; margin-top:6px; display:block;">Sources: ${councilData.citations.join(', ')}</span>`
+      : '';
+    responseHtml = councilData.answer + cites;
+    state.history.push({ role: 'ai', text: councilData.answer });
+
+  } else if (councilData && councilData.chair === 'BLOCKED') {
+    responseHtml = `That's outside what I can verify. ${councilData.reason || ''}<br><span style="color:var(--muted); font-size:11px;">I won't speculate.</span>`;
+    state.history.push({ role: 'ai', text: responseHtml });
+
+  } else {
+    // Fallback: local intelligence
+    const local = localResponse(text);
+    responseHtml = local;
+    state.history.push({ role: 'ai', text: local });
   }
+
+  await typeInto(bubble, responseHtml, true);
 }
 
-// ── Helpers ───────────────────────────────────────────────────
-function detectRole(t) {
-  if (t.includes('commissioner'))          return 'commissioner';
-  if (t.includes('elder') || t.includes('church') || t.includes('pastor')) return 'elder';
-  if (t.includes('partner') || t.includes('sponsor') || t.includes('bank')) return 'partner';
-  if (t.includes('officer') || t.includes('admin') || t.includes('intake')) return 'officer';
-  if (t.includes('breeder') || t.includes('kennel') || t.includes('league')) return 'breeder';
-  return null;
-}
-
+// ── UI Helpers ────────────────────────────────────────────────
 function appendUser(text) {
   const box = document.getElementById('chat-box');
   const el  = document.createElement('div');
   el.className = 'message user';
-  el.innerText  = `> ${text}`;
+  el.innerText  = text;
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
 }
@@ -130,9 +206,47 @@ function appendUser(text) {
 function appendAI(html) {
   const box = document.getElementById('chat-box');
   const el  = document.createElement('div');
-  el.className   = 'message ai';
-  el.innerHTML   = html;
+  el.className  = 'message ai';
+  el.innerHTML  = html;
   box.appendChild(el);
-  box.scrollTop  = box.scrollHeight;
+  box.scrollTop = box.scrollHeight;
   return el;
 }
+
+// Smooth character-by-character typing effect
+async function typeInto(el, html, isHtml = false) {
+  el.innerHTML = '';
+  if (isHtml) {
+    // For HTML content, reveal word by word rather than char by char
+    const words = html.split(/(?<=\s)/);
+    let built = '';
+    for (const word of words) {
+      built += word;
+      el.innerHTML = built;
+      const box = document.getElementById('chat-box');
+      box.scrollTop = box.scrollHeight;
+      await sleep(18);
+    }
+  } else {
+    for (const ch of html) {
+      el.textContent += ch;
+      await sleep(14);
+    }
+  }
+}
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+// ── Boot sequence ─────────────────────────────────────────────
+window.onload = async () => {
+  // Allow Enter key
+  document.getElementById('user-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  const el = appendAI('');
+  await sleep(300);
+  await typeInto(el, `PAWS-OS online. I'm your tactical intelligence for Operation PAWS — I work from facts, not guesses.\n\nTell me who you are or just ask me anything.`, false);
+};
