@@ -17,7 +17,7 @@
     .stat-card .bg-icon { position: absolute; bottom: -10px; right: -10px; font-size: 50px; opacity: 0.05; pointer-events: none; }
 
     .dossier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 32px; }
-    .dossier { display: flex; flex-direction: column; overflow: hidden; padding: 0; position: relative; }
+    .dossier { display: flex; flex-direction: column; overflow: hidden; padding: 0; position: relative; transition: all 0.5s ease; }
     .dossier-image { height: 300px; background-size: cover; background-position: center; position: relative; }
     .dossier-image .risk-badge { position: absolute; top: 20px; right: 20px; padding: 6px 12px; background: #991b1b; color: #fff; border-radius: 6px; font-size: 10px; font-weight: 800; }
     .dossier-image .league-banner { position: absolute; top: 20px; left: 0; padding: 6px 16px; background: #1e3a8a; color: #fff; font-size: 10px; font-weight: 800; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
@@ -37,10 +37,16 @@
     .academy-log h4 { font-size: 12px; margin-bottom: 12px; color: var(--accent); }
     
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto; padding: 24px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--card-border); }
-    .btn-approve { background: var(--accent); color: #020617; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
+    .btn-approve { background: var(--accent); color: #020617; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+    .btn-approve:hover { transform: scale(1.02); background: #34d399; }
     .btn-reject { background: #1e293b; color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
     
     .intl-badge { position: absolute; top: 60px; right: 20px; padding: 4px 8px; background: #6366f1; color: #fff; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+
+    .success-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--accent); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 10; border-radius: 32px; }
+    .success-overlay span { font-size: 80px; transform: scale(0.5); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: #020617; }
+    .dossier.approved .success-overlay { opacity: 1; pointer-events: auto; }
+    .dossier.approved .success-overlay span { transform: scale(1); }
   </style>
 </head>
 <body>
@@ -80,7 +86,13 @@
 
   <main class="dossier-grid" id="dossier-list">
     <!-- CANDIDATE DOSSIER: REX -->
-    <article class="glass-card dossier">
+    <article class="glass-card dossier" id="rex-dossier">
+      <div class="success-overlay">
+        <div style="text-align:center;">
+          <span>✅</span>
+          <div style="font-weight:800; font-size:24px; color:#020617; margin-top:20px;">SAPS FRONT-LINE DEPLOYED</div>
+        </div>
+      </div>
       <div class="dossier-image" style="background-image: url('https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?auto=format&fit=crop&q=80&w=800')">
         <div class="league-banner">HOLLARD TRACKING LEAGUE</div>
         <div class="risk-badge">HIGH RISK</div>
@@ -106,13 +118,13 @@
 
         <div class="academy-log">
           <h4>LEAGUE PROGRESS LOG</h4>
-          <p class="small" style="line-height:1.4">"Rex has dominated the Tracking League finals. Performance exceeds all national benchmarks. Featured in the 'Invisible Hunter' viral deterrent clip (1.2M views)."</p>
+          <p class="small" style="line-height:1.4">"Rex has dominated the Tracking League finals. Featured in the 'Invisible Hunter' viral deterrent clip (1.2M views)."</p>
           <div style="margin-top:10px; font-weight:800; font-size:18px;">League Aptitude: 99%</div>
         </div>
       </div>
       <div class="actions">
-        <button class="btn-reject">RETAIN IN ACADEMY</button>
-        <button class="btn-approve">APPROVE FOR NATIONAL DEPLOYMENT</button>
+        <button class="btn-reject" onclick="alert('Retaining for further R&D Training')">RETAIN IN ACADEMY</button>
+        <button class="btn-approve" onclick="approveDog()">APPROVE FOR DEPLOYMENT</button>
       </div>
     </article>
   </main>
@@ -121,5 +133,14 @@
     <p class="muted" style="font-size:12px; letter-spacing:2px; text-transform:uppercase;">Operation PAWS • Partnership for Animal Work & Service • Strategic Command v2.5</p>
   </footer>
 
+  <script>
+    function approveDog() {
+      const dossier = document.getElementById('rex-dossier');
+      dossier.classList.add('approved');
+      
+      // Update global stats visually
+      document.querySelector('.stat-card:nth-child(2) div').innerText = "7 Dogs (1 Deployed)";
+    }
+  </script>
 </body>
 </html>
