@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PAWS — Web Chat (AI)</title>
+  <meta name="robots" content="index,follow" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="background-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <main class="wrap">
+    <header class="top">
+      <div class="logo">
+        <span class="paws-icon">🐾</span>
+        <h1>PAWS Assistant</h1>
+      </div>
+      <p class="muted">
+        Instant FAQ & Routing. <br>
+        <strong>Safety Note:</strong> Never share sensitive details (ID, address, microchips) here.
+      </p>
+    </header>
+
+    <section class="chat-container">
+      <div id="log" class="log" aria-live="polite">
+        <!-- Messages will appear here -->
+      </div>
+
+      <div class="input-area">
+        <form id="form" class="row">
+          <input id="msg" class="input" placeholder="Ask about PAWS (e.g. How to sponsor?)" autocomplete="off" />
+          <button class="btn" type="submit">
+            <span class="btn-text">Send</span>
+            <svg class="send-icon" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="footer-note">
+        <p class="muted small">
+          Public-safe informational AI. For intake, use WhatsApp/Telegram from the <a href="../start/">hub</a>.
+        </p>
+      </div>
+    </section>
+
+    <nav class="bottom-nav">
+      <a href="../start/" class="back-link">
+        <svg class="back-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Back to Hub
+      </a>
+    </nav>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>

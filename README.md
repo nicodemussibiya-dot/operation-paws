@@ -1,40 +1,51 @@
 # Operation PAWS
-
 **PAWS = Partnership for Animal Work & Service**
 
 Operation PAWS is a public-interest initiative and open playbook for building a **welfare-first, traceable, auditable** pipeline to mobilise suitable working-dog candidates through official assessment pathways.
 
-## Official QR entry point (GitHub Pages)
-After you enable GitHub Pages (Settings → Pages → `/docs`), the QR hub lives at:
+## 🚀 Quick Start (Reading Order)
+1. **[01_GOVERNANCE.md](01_GOVERNANCE.md)** — Core principles and project rules.
+2. **[02_ROADMAP.md](02_ROADMAP.md)** — Execution milestones (Phase A to E).
+3. **[03_DATA_BOUNDARY.md](03_DATA_BOUNDARY.md)** — Non-negotiable PII and security rules.
+4. **[04_DISCLAIMER.md](04_DISCLAIMER.md)** — Official legal boundaries.
+5. **[05_PRIVACY.md](05_PRIVACY.md)** — POPIA compliance framework.
+6. **[06_SECURITY.md](06_SECURITY.md)** — Tech security and AI guardrails.
 
-- `/docs/start/` (start here)
-- `/docs/tracker/` (PAWS 1 → 500 tracker)
-- `/docs/verify/` (verify a PAWS reference)
+## 📍 QR Entry Points (Public Hub)
+The project is hosted via GitHub Pages and interacts with a Supabase backend:
+- **[Start Hub](/docs/start/)** — The central landing page for donors.
+- **[Web Chat (AI)](/docs/chat/)** — Instant FAQ and intake routing.
+- **[Public Tracker](/docs/tracker/)** — Real-time aggregate transparency dashboard.
+- **[Verification](/docs/verify/)** — Verify any PAWS Reference Number.
 
-## PAWS public reference number (case-style + anti-fake)
-Each candidate receives a public reference like:
-
+## 🐾 Traceability & Anti-Smuggling
+Every dog is anchored to a verified microchip and a public reference:
 `PAWS 000001/04/2026-T3-BR012-K7`
+See: **[09_traceability/01_anti_smuggling_protocol.md](handbook/09_traceability/01_anti_smuggling_protocol.md)**
 
-- case-style serial/MM/YYYY
-- includes Tier (T1/T2/T3) and Source code (BR###/DN###)
-- ends with a 2-char checksum
+## 📂 Repository Map
 
-See: `handbook/07_metrics_and_ids/01_paws_reference_spec.md`
+### 📘 Operational Handbook (01-10)
+The end-to-end playbook for running the initiative:
+- **01_pipeline/** — The 3-Tier model (Digital → Combine → Academy).
+- **02_academy/** — Selection criteria, curriculum, and scorecard.
+- **03_governance_and_ethics/** — Welfare Charter and Humane Outcomes.
+- **04_ops_and_logistics/** — Physical Intake Day runbooks.
+- **05_partner_management/** — Roles for SAPS, SPCA, and GotG.
+- **06_comms_and_media/** — Filming rules and CRISIS comms.
+- **07_metrics_and_ids/** — ID System and checksum spec.
+- **08_saps_alignment/** — SAPS 505(a) and official policy notes.
+- **09_traceability/** — Anti-Smuggling Protocol.
+- **10_partner_walkthroughs/** — Guides for SAPS, SPCA, and Sponsors.
 
-## Non‑negotiable: public data boundary
-This repository is **public and indexed**.
-Never commit personal information, microchip numbers tied to identities, phone numbers, addresses, signed documents, or internal templates.
+### 📄 Templates & Forms
+- **MOUs (01-10)** — Standardized agreements for all stakeholders.
+- **Forms** — Owner Consent, Return of Custody, and Poster templates.
 
-See: `PUBLIC_DATA_BOUNDARY.md`
+### 🛠️ Technology Stack
+- **Frontend:** HTML5 / Vanilla CSS (Premium Glassmorphism) / JS.
+- **Backend:** Supabase (PostgreSQL, Edge Functions, RLS).
+- **AI:** Hybrid (Gemini 1.5 Flash Free-Tier + Static FAQ Fallback).
 
-## Disclaimer
-This is **not** an official SAPS channel. No endorsement implied unless confirmed in writing.
-See: `DISCLAIMER.md`
-
-## Repo map
-- `docs/` — GitHub Pages site (QR hub, tracker, verify)
-- `handbook/` — operational playbook (pipeline, academy, governance)
-- `templates/` — blank partner templates (MOUs, consent, traceability pack)
-- `ops/` — checklists/runbooks
-- `tech/` — architecture, Supabase schema, AI scaffolding
+---
+**Disclaimer:** This is NOT an official SAPS channel. No endorsement implied unless confirmed in writing. See **04_DISCLAIMER.md**.

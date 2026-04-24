@@ -8,7 +8,7 @@ Operation PAWS (PAWS — Partnership for Animal Work & Service) is a public-inte
 ## 2) Non-negotiables
 - Welfare-first: no coercion, no dumping, no unsafe handling.
 - Official process ownership: any official acceptance decisions are made by the authorised agency (e.g., SAPS) only.
-- Traceability: every candidate must be trackable through a clear chain of custody (without exposing PII publicly).
+- Traceability & Anti-Diversion: every candidate must be trackable through a clear chain of custody (without exposing PII publicly) to ensure animals are not diverted from their designated programme.
 - Privacy-by-design: public repo stays newspaper-safe; sensitive records are ring-fenced.
 - No misrepresentation: no implying endorsements without written confirmation.
 - No operational compromise: no filming/posting tactics, layouts, call signs, deployments.

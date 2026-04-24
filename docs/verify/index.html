@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PAWS — Verify Reference</title>
+  <style>
+    :root{--bg:#0b1220;--card:#111a2e;--text:#e9eefc;--muted:#a8b3d6;--accent:#7af0c7;}
+    body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;height:100vh;}
+    .wrap{width:100%;max-width:500px;padding:20px;}
+    .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);padding:40px;border-radius:24px;text-align:center;}
+    h1{margin-top:0;font-size:1.75rem;}
+    p{color:var(--muted);margin-bottom:24px;}
+    .input-group{display:flex;gap:10px;margin-bottom:20px;}
+    input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);padding:12px;border-radius:12px;color:white;font-family:monospace;}
+    button{background:var(--accent);color:#041014;border:none;padding:12px 24px;border-radius:12px;font-weight:700;cursor:pointer;}
+    #result{margin-top:20px;padding:15px;border-radius:12px;display:none;}
+    .success{background:rgba(16,185,129,0.1);border:1px solid var(--accent);color:var(--accent);}
+    .fail{background:rgba(239,68,68,0.1);border:1px solid #ef4444;color:#ef4444;}
+    .back{margin-top:20px;display:block;color:var(--muted);text-decoration:none;font-size:0.9rem;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Verify Reference</h1>
+      <p>Enter a PAWS reference number to verify its authenticity and current stage.</p>
+      
+      <div class="input-group">
+        <input type="text" id="ref-input" placeholder="PAWS 000001/..." />
+        <button onclick="verify()">Verify</button>
+      </div>
+
+      <div id="result"></div>
+      
+      <a href="../start/" class="back">← Back to Hub</a>
+    </div>
+  </div>
+
+  <script>
+    async function verify() {
+      const ref = document.getElementById('ref-input').value.trim();
+      const resDiv = document.getElementById('result');
+      if (!ref) return;
+
+      resDiv.style.display = 'block';
+      resDiv.innerText = 'Verifying...';
+      resDiv.className = '';
+
+      try {
+        // Fetch from public view
+        const response = await fetch(`YOUR_SUPABASE_URL/rest/v1/paws_public_tracker?paws_ref=eq.${encodeURIComponent(ref)}`, {
+          headers: {
+            "apikey": "YOUR_SUPABASE_ANON_KEY",
+            "Authorization": "Bearer YOUR_SUPABASE_ANON_KEY"
+          }
+        });
+        const data = await response.json();
+
+        if (data.length > 0) {
+          const dog = data[0];
+          resDiv.className = 'success';
+          resDiv.innerHTML = `<strong>VALID REFERENCE</strong><br>Stage: ${dog.status}<br>Updated: ${dog.intake_date}`;
+        } else {
+          resDiv.className = 'fail';
+          resDiv.innerText = 'Reference not found in public registry.';
+        }
+      } catch (e) {
+        resDiv.innerText = 'Verification error. Please try again.';
+      }
+    }
+  </script>
+</body>
+</html>

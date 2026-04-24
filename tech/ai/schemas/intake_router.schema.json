@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Intake Router",
+  "type": "object",
+  "properties": {
+    "intent": {
+      "type": "string",
+      "enum": ["donate_dog", "sponsor", "volunteer", "general_faq", "refusal"]
+    },
+    "reasoning": {
+      "type": "string"
+    },
+    "next_step": {
+      "type": "string"
+    }
+  },
+  "required": ["intent", "reasoning", "next_step"]
+}

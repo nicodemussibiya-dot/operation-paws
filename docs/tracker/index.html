@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PAWS — Public Tracker</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <h1>Transparency Dashboard</h1>
+      <p class="muted">Real-time aggregate stats for Operation PAWS. (Anonymized & Public-Safe)</p>
+    </header>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <span class="label">Leads Received</span>
+        <span id="stat-leads" class="value">...</span>
+      </div>
+      <div class="stat-card highlight">
+        <span class="label">SAPS Accepted</span>
+        <span id="stat-accepted" class="value">...</span>
+      </div>
+      <div class="stat-card">
+        <span class="label">In Training</span>
+        <span id="stat-training" class="value">...</span>
+      </div>
+      <div class="stat-card">
+        <span class="label">Deployed</span>
+        <span id="stat-deployed" class="value">...</span>
+      </div>
+    </section>
+
+    <section class="table-container">
+      <h2>Recent Activity</h2>
+      <div class="scroll-area">
+        <table id="tracker-table">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Breed</th>
+              <th>Stage</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody id="tracker-body">
+            <!-- Rows will be injected here -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p class="muted small">Data is synced from the PAWS Supabase backbone. No personal info is stored on the public tracker.</p>
+      <a href="../start/" class="back-link">← Back to Hub</a>
+    </footer>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>

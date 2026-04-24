@@ -9,8 +9,6 @@ Deliverables:
 - GitHub Pages hub: `/docs/start/`
 - Public tracker skeleton: `/docs/tracker/`
 - PAWS reference spec + checksum
-- Public/private data boundary policies
-- Media and consent templates (blank)
 
 Exit criteria:
 - QR hub is live and stable
