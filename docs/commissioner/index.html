@@ -36,6 +36,8 @@
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; padding: 24px; background: rgba(0,0,0,0.3); }
     .btn-approve { background: var(--success); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
     .btn-reject { background: #991b1b; color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
+    
+    .brics-badge { padding: 4px 8px; background: #1e3a8a; color: #fff; border-radius: 4px; font-size: 9px; font-weight: 800; }
   </style>
 </head>
 <body>
@@ -56,12 +58,12 @@
       <div id="count-pending">1</div>
     </div>
     <div class="stat-card">
-      <small>Active in Academy</small>
-      <div>14</div>
+      <small>BRICS Interchange Ready</small>
+      <div>4</div>
     </div>
     <div class="stat-card">
-      <small>Insured Value</small>
-      <div>R 1.4M</div>
+      <small>NDB Infrastructure Fund</small>
+      <div style="color:#60a5fa;">$ 4.5M (Allocated)</div>
     </div>
     <div class="stat-card">
       <small>Tech Offset (R&D)</small>
@@ -77,7 +79,7 @@
         <div class="tech-overlay">
           <div class="tech-tag">DRONE-SYNCED</div>
           <div class="tech-tag">NIJ-IIIA VEST</div>
-          <div class="tech-tag">BIO-SENSORS</div>
+          <span class="brics-badge">BRICS BUCS CERTIFIED</span>
         </div>
       </div>
       <div class="dossier-content">
@@ -86,23 +88,22 @@
             <h3>REX</h3>
             <small style="color:var(--accent)">PAWS-26-00402</small>
           </div>
-          <div class="badge-glow">ACADEMY WEEK 6</div>
+          <div class="badge-glow">ACADEMY WEEK 12 (FINAL)</div>
         </div>
 
-        <div class="info-row"><span>Assigned Job</span> <strong>Patrol & Tracker (Overwatch Support)</strong></div>
-        <div class="info-row"><span>Insurance Status</span> <strong style="color:var(--accent)">Covered (CSIR Tech Offset Applied)</strong></div>
-        <div class="info-row"><span>Gear Status</span> <strong style="color:#fff;">Drone Pair #402 (Active Defense)</strong></div>
-        <div class="info-row"><span>Microchip</span> <strong>900123456789012</strong></div>
+        <div class="info-row"><span>Deployment Scope</span> <strong>International (BRICS-Ready)</strong></div>
+        <div class="info-row"><span>Universal Commands</span> <strong style="color:var(--accent)">100% Accuracy (BUCS v1)</strong></div>
+        <div class="info-row"><span>Insurance Status</span> <strong style="color:var(--accent)">Global Coverage Active</strong></div>
 
         <div class="academy-log">
           <h4>ACADEMY PROGRESS LOG</h4>
-          <p class="small" style="line-height:1.4">"Rex has successfully integrated with the CSIR Overwatch Drone. High responsiveness to pepper-spray deployment cues. Ready for final evaluation."</p>
-          <div style="margin-top:10px; font-weight:800; font-size:18px;">Aptitude: 96%</div>
+          <p class="small" style="line-height:1.4">"Rex has successfully completed the BRICS Interoperability module. Responds flawlessly to commands from three different member-state instructors."</p>
+          <div style="margin-top:10px; font-weight:800; font-size:18px;">Final Aptitude: 98%</div>
         </div>
       </div>
       <div class="actions">
         <button class="btn-reject">DECLINE CANDIDATE</button>
-        <button class="btn-approve">APPROVE FOR SAPS</button>
+        <button class="btn-approve">APPROVE FOR DEPLOYMENT</button>
       </div>
     </article>
   </main>
