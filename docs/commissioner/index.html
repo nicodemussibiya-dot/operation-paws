@@ -14,42 +14,26 @@
     .stat-card { padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 16px; position: relative; overflow: hidden; }
     .stat-card small { color: var(--muted); text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
     .stat-card div { font-size: 24px; font-weight: 800; color: var(--accent); }
-    .stat-card .bg-icon { position: absolute; bottom: -10px; right: -10px; font-size: 50px; opacity: 0.05; pointer-events: none; }
 
     .dossier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 32px; }
     .dossier { display: flex; flex-direction: column; overflow: hidden; padding: 0; position: relative; transition: all 0.5s ease; }
     .dossier-image { height: 300px; background-size: cover; background-position: center; position: relative; }
-    .dossier-image .risk-badge { position: absolute; top: 20px; right: 20px; padding: 6px 12px; background: #991b1b; color: #fff; border-radius: 6px; font-size: 10px; font-weight: 800; }
-    .dossier-image .league-banner { position: absolute; top: 20px; left: 0; padding: 6px 16px; background: #1e3a8a; color: #fff; font-size: 10px; font-weight: 800; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
     
     .tech-overlay { position: absolute; bottom: 0; width: 100%; padding: 12px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; gap: 8px; }
     .tech-tag { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; background: var(--accent); color: #020617; }
 
     .dossier-content { padding: 24px; }
-    .dossier-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-    .dossier-header h3 { font-size: 1.5rem; }
-    
     .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
-    .info-row span { color: var(--muted); }
-    .info-row strong { color: #fff; }
-
-    .academy-log { margin-top: 20px; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 12px; }
-    .academy-log h4 { font-size: 12px; margin-bottom: 12px; color: var(--accent); }
     
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto; padding: 24px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--card-border); }
-    .btn-approve { background: var(--accent); color: #020617; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
-    .btn-approve:hover { transform: scale(1.02); background: #34d399; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 24px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--card-border); }
+    .btn-approve { background: var(--accent); color: #020617; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
     .btn-reject { background: #1e293b; color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
     
-    .intl-badge { position: absolute; top: 60px; right: 20px; padding: 4px 8px; background: #6366f1; color: #fff; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
-
-    .success-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--accent); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 10; border-radius: 32px; }
-    .success-overlay span { font-size: 80px; transform: scale(0.5); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: #020617; }
-    .dossier.approved .success-overlay { opacity: 1; pointer-events: auto; }
-    .dossier.approved .success-overlay span { transform: scale(1); }
-
-    .audit-badge { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 99px; font-size: 10px; display: flex; align-items: center; gap: 10px; }
-    .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
+    /* 2FA MODAL */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+    .modal { background: #0f172a; border: 1px solid #ef4444; padding: 40px; border-radius: 24px; width: 400px; text-align: center; }
+    .modal h2 { color: #ef4444; margin-bottom: 20px; }
+    .modal input { width: 100%; padding: 16px; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; color: #fff; font-size: 1.5rem; text-align: center; margin-bottom: 20px; letter-spacing: 8px; }
   </style>
 </head>
 <body>
@@ -60,90 +44,76 @@
     </div>
     <div class="user-profile" style="text-align:right;">
       <strong>National Commissioner</strong><br>
-      <small style="color:var(--muted)">Authorization Level: 10 (PRESIDENTIAL OVERWATCH)</small>
+      <small style="color:var(--muted)">Strategic Authorization Level 10</small>
     </div>
   </header>
 
   <div class="stats-bar">
-    <div class="stat-card">
-      <small>Audit Status</small>
-      <div style="color:var(--accent);">CLEAN (Q2)</div>
-      <span class="bg-icon">📋</span>
-    </div>
-    <div class="stat-card">
-      <small>Escrow Funds</small>
-      <div>R 12.8M (Secured)</div>
-      <span class="bg-icon">🏦</span>
-    </div>
-    <div class="stat-card">
-      <small>Logistics Dispatch</small>
-      <div style="color:#60a5fa;">Priority Lane Active</div>
-      <span class="bg-icon">✈️</span>
-    </div>
-    <div class="stat-card">
-      <small>Deterrence Reach</small>
-      <div>4.2M Impacts</div>
-      <span class="bg-icon">📢</span>
-    </div>
+    <div class="stat-card"><small>Audit Status</small><div style="color:var(--accent);">CLEAN (Q2)</div></div>
+    <div class="stat-card"><small>Escrow Funds</small><div>R 12.8M (Secured)</div></div>
+    <div class="stat-card"><small>Logistics Dispatch</small><div id="dispatch-stat">Priority Lane Active</div></div>
+    <div class="stat-card"><small>2FA Status</small><div style="color:#60a5fa;">ENABLED</div></div>
   </div>
 
   <main class="dossier-grid" id="dossier-list">
-    <!-- CANDIDATE DOSSIER: REX -->
-    <article class="glass-card dossier" id="rex-dossier">
-      <div class="success-overlay">
-        <div style="text-align:center;">
-          <span>✅</span>
-          <div style="font-weight:800; font-size:24px; color:#020617; margin-top:20px;">SAPS FRONT-LINE DEPLOYED</div>
-        </div>
-      </div>
+    <!-- CANDIDATE DOSSIER: REX (Sample Live Record) -->
+    <article class="glass-card dossier" id="dossier-rex">
       <div class="dossier-image" style="background-image: url('https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?auto=format&fit=crop&q=80&w=800')">
-        <div class="league-banner">HOLLARD TRACKING LEAGUE</div>
-        <div class="risk-badge">HIGH RISK</div>
-        <div class="intl-badge">INTL DONOR (GER)</div>
-        <div class="tech-overlay">
-          <div class="tech-tag">DRONE-SYNCED</div>
-          <div class="tech-tag">NIJ-IIIA VEST</div>
-          <div class="tech-tag">BRICS-READY</div>
-        </div>
+        <div class="tech-overlay"><div class="tech-tag">DRONE-SYNCED</div><div class="tech-tag">BRICS-READY</div></div>
       </div>
       <div class="dossier-content">
-        <div class="dossier-header">
-          <div>
-            <h3>REX</h3>
-            <small style="color:var(--accent)">PAWS-26-00402</small>
-          </div>
-          <div class="badge-glow">ACADEMY WEEK 12 (FINALS)</div>
-        </div>
-
-        <div class="info-row"><span>Logistics Status</span> <strong>Priority Air-Freight Dispatched</strong></div>
-        <div class="info-row"><span>Compliance</span> <strong style="color:var(--accent)">ENSafrica Verified</strong></div>
-        <div class="info-row"><span>Audited Cost/Dog</span> <strong style="color:#fff;">R 42,500 (Transparent)</strong></div>
-
-        <div class="academy-log">
-          <h4>LEAGUE PROGRESS LOG</h4>
-          <p class="small" style="line-height:1.4">"Rex has dominated the Tracking League finals. Featured in the 'Invisible Hunter' viral deterrent clip (1.2M views)."</p>
-          <div style="margin-top:10px; font-weight:800; font-size:18px;">League Aptitude: 99%</div>
-        </div>
+        <h3>REX</h3>
+        <div class="info-row"><span>PAWS-ID</span> <strong>PAWS-26-00402</strong></div>
+        <div class="info-row"><span>Microchip</span> <strong>900123456789012</strong></div>
+        <div class="info-row"><span>Compliance</span> <strong style="color:var(--accent);">Verified</strong></div>
       </div>
       <div class="actions">
-        <button class="btn-reject" onclick="alert('Retaining for further R&D Training')">RETAIN IN ACADEMY</button>
-        <button class="btn-approve" onclick="approveDog()">APPROVE FOR DEPLOYMENT</button>
+        <button class="btn-reject" onclick="triggerDelete('PAWS-26-00402')">DELETE RECORD</button>
+        <button class="btn-approve" onclick="alert('Asset Approved')">APPROVE ASSET</button>
       </div>
     </article>
   </main>
 
-  <div class="audit-badge">
-    <div class="dot"></div>
-    <span>FINANCIALS AUDITED BY PwC • LEGAL OVERSIGHT BY ENSAFRICA</span>
+  <!-- 2FA MODAL -->
+  <div class="modal-overlay" id="modal-2fa">
+    <div class="modal">
+      <div style="font-size: 40px; margin-bottom: 20px;">⚠️</div>
+      <h2>Strategic Deletion</h2>
+      <p class="muted" style="margin-bottom: 30px;">Action: Permanent deletion of National Asset record. Enter Master 2FA Code to authorize.</p>
+      <input type="password" id="2fa-code" maxlength="4" placeholder="••••">
+      <div style="display:flex; gap:12px;">
+        <button class="btn-premium" style="flex:1; background:#1e293b; color:#fff;" onclick="closeModal()">CANCEL</button>
+        <button class="btn-premium" style="flex:1; background:#ef4444; color:#fff;" onclick="authorizeDelete()">AUTHORIZE</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    function approveDog() {
-      const dossier = document.getElementById('rex-dossier');
-      dossier.classList.add('approved');
-      
-      // Update global stats visually
-      document.querySelector('.stat-card:nth-child(3) div').innerText = "Priority Lane Active (1 Dispatched)";
+    let pendingDeleteId = null;
+
+    function triggerDelete(id) {
+      pendingDeleteId = id;
+      document.getElementById('modal-2fa').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('modal-2fa').style.display = 'none';
+      document.getElementById('2fa-code').value = '';
+    }
+
+    function authorizeDelete() {
+      const code = document.getElementById('2fa-code').value;
+      if (code === '9999') {
+        // ACTUAL DATABASE LOGIC (Simulated for this live view)
+        document.getElementById('dossier-rex').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('dossier-rex').remove();
+          alert('SYSTEM ALERT: National Record ' + pendingDeleteId + ' has been permanently purged from the registry.');
+        }, 500);
+        closeModal();
+      } else {
+        alert('SECURITY ERROR: INVALID 2FA CODE. ATTEMPT LOGGED.');
+      }
     }
   </script>
 </body>
