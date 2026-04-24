@@ -22,7 +22,7 @@ Routing: Use /start for WhatsApp, /donate for funding, /tracker for stats.
 
 // Static Fallback Responses if APIs fail
 const FALLBACK_ANSWERS: Record<string, string> = {
-  "default": "I'm having trouble connecting to my AI brain right now. Please use the 'Start Hub' to find official links for WhatsApp, Telegram, and our Transparency Tracker.",
+  "default": "I'm having trouble connecting to my AI brain right now. Please use the 'Start Hub' to find official links for WhatsApp and our Transparency Tracker.",
   "intake": "To donate a dog, please scan our QR code or visit the Start Hub to join our WhatsApp intake channel. This ensures 100% traceability.",
   "welfare": "Operation PAWS is welfare-first. Every dog is screened by an independent SPCA inspector to ensure they are healthy and suitable for service.",
   "traceability": "We use verified microchips and unique PAWS Reference numbers to ensure no dog is smuggled or diverted."

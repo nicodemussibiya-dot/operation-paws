@@ -6,6 +6,10 @@ const STATE = {
   thread: [] 
 };
 
+// --- CONFIGURATION ---
+// Replace with your actual Supabase Function URL after deployment
+// For local testing: "http://127.0.0.1:54321/functions/v1/paws-chat"
+const ENDPOINT = "https://your-project-id.supabase.co/functions/v1/paws-chat";
 
 function addBubble(text, cls) {
   const div = document.createElement('div');
