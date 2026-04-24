@@ -1,27 +1,32 @@
 # Operation PAWS
 **PAWS = Partnership for Animal Work & Service**
 
-Operation PAWS is a **National Strategic System** and open playbook for building a **welfare-first, traceable, and technologically advanced** pipeline to mobilise high-drive K9 assets for the SAPS and BRICS allies.
+Operation PAWS is a **National Strategic Command System** designed to be run by **Autonomous AI Agents**. It is an "unfuckwithable" pipeline for mobilising high-drive K9 assets, where the AI does the majority of the auditing, sorting, and management.
 
-## 🏛️ Strategic Command (The "Press-Button" Suite)
-The system is fully automated and ready for National Deployment:
-- **[Commissioner's Command Center](/docs/commissioner/)** — High-level Tactical Approval Portal.
-- **[Strategic Command Manual](handbook/11_commissioner_briefing/01_system_manual.md)** — The Chief Commissioner's Guide.
-- **[Field Intake App](/docs/admin/)** — "Dumb-Proof" on-the-ground registration (PIN required).
+## 🤖 The AI Handbooks (How the System Runs Itself)
+The system is governed by specialized AI Agents, each with a specific "Handbook" that defines their logic, browser-access protocols, and authority to **offer pushback**:
+- **[AI Commissioner Agent](/tech/ai/prompts/01_commissioner_agent.md)** — High-level tactical auditing and secure 2FA approvals.
+- **[AI Breeder League Agent](/tech/ai/prompts/02_breeder_league_agent.md)** — Manages rivalry, tier promotions, and youth education.
+- **[AI Intake & Welfare Agent](/tech/ai/prompts/03_intake_agent.md)** — SPCA compliance gatekeeper and microchip registry.
+
+## 🏆 The National Breeder Rivalry (The League)
+The "Academy" is a competitive league for **Breeders**, not just a training school.
+- **Tier 1 (T1)**: "Bragging Rights" for sponsored breeders supplying the SAPS with elite assets.
+- **Tier 2 (T2)**: Commercial-grade protection breeders.
+- **Tier 3 (T3)**: Grassroots and Youth Academy initiatives where kids learn to train and handle dogs.
+- **Rivalry**: Tiers are fluid—T3 breeders can rise to T1 based on aptitude scores, creating a national standard of excellence.
+
+## 🏛️ Strategic Command (The Portals)
+- **[Commissioner's Command Center](/docs/commissioner/)** — Secure Tactical Approval Portal (Auth Required).
+- **[National Transparency Tracker](/docs/tracker/)** — Real-time Breeder Leaderboard and Audit Feed.
+- **[Field Intake Terminal](/docs/admin/)** — High-speed on-the-ground registration for officers and breeders.
 
 ## 🚀 Key Strategic Features
-1.  **Academy Leagues**: Branded training streams (Narcotics, Explosives, etc.) sponsored by national corporate partners.
-2.  **Tactical Tech (R&D)**: Ballistic protection and Autonomous Drone Overwatch integrated via CSIR.
-3.  **Global Intake**: Strategic MOUs for intaking high-drive genetics from international police lines.
-4.  **BRICS Interoperability**: Standardized "Universal Commands" for deployment across all BRICS member states.
-5.  **Strategic Insurance**: Role-based risk profiling and tech-offset premium reductions.
-
-## 🐾 Traceability & Integrity
-Every dog is anchored to a verified microchip and a public reference:
-`PAWS 000001/04/2026-T3-BR012-K7`
-- **[Public Hub](/docs/start/)** — Central landing page for all project entry points.
-- **[AI Assistant](/docs/chat/)** — Professional instant FAQ and routing.
+1.  **Immutable Audit Logs**: Every action is etched into a tamper-proof ledger.
+2.  **SPCA Welfare First**: Integrated animal welfare checkpoints at every stage of the pipeline.
+3.  **BRICS Interoperability**: Standardized commands and deployment protocols for member states.
+4.  **Youth Empowerment**: A dedicated stream for kids to learn vocational skills in dog training and tech.
 
 ---
-**Status: PRODUCTION READY / TURN-KEY DEPLOYMENT**
-*Approved by Strategic Command*
+**Status: AI-COMMAND READY**
+*System is designed to be autonomous. Humans approve; AI executes.*
