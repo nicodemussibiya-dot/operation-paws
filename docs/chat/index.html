@@ -4,34 +4,34 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>PAWS Assistant — Instant Help</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="chat-container">
-    <header class="chat-header">
-      <div class="header-content">
-        <span class="paws-logo">🐾</span>
-        <div class="title-wrap">
-          <h1>PAWS Assistant</h1>
-          <p class="subtitle">Instant FAQ & Routing.</p>
-        </div>
+  <!-- Premium Background Blobs -->
+  <div class="background-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <div class="wrap">
+    <header class="top">
+      <div class="logo">
+        <span class="paws-icon">🐾</span>
+        <h1>PAWS Assistant</h1>
       </div>
+      <p class="muted">Instant FAQ & Routing. <br><small>Safety Note: Never share sensitive details (ID, address, microchips) here.</small></p>
     </header>
 
-    <div class="chat-warning">
-      <strong>Safety Note:</strong> Never share sensitive details (ID, address, microchips) here.
-    </div>
-
-    <section class="chat-view">
-      <div id="log" class="chat-log">
+    <main class="chat-container">
+      <div id="log" class="log">
         <!-- Messages appear here -->
       </div>
 
-      <div class="chat-input-area">
-        <form id="form">
-          <input type="text" id="msg" autocomplete="off" placeholder="Ask about PAWS (e.g. How to sponsor?)" required>
-          <button type="submit" class="send-btn" id="send">
-            <span class="btn-text">Send</span>
+      <div class="input-area">
+        <form id="form" class="row">
+          <input type="text" id="msg" class="input" autocomplete="off" placeholder="Ask about PAWS (e.g. How to sponsor?)" required>
+          <button type="submit" class="btn" id="send">
+            <span>Send</span>
             <svg class="send-icon" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
         </form>
@@ -42,7 +42,7 @@
           Public-safe informational AI. For official intake, use WhatsApp from the <a href="../start/">hub</a>.
         </p>
       </div>
-    </section>
+    </main>
 
     <nav class="bottom-nav">
       <a href="../start/" class="back-link">
@@ -50,7 +50,7 @@
         Back to Hub
       </a>
     </nav>
-  </main>
+  </div>
 
   <script src="app.js"></script>
 </body>
