@@ -16,11 +16,12 @@
     .stat-card div { font-size: 24px; font-weight: 800; color: var(--accent); }
 
     .dossier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 32px; }
-    .dossier { display: flex; flex-direction: column; overflow: hidden; padding: 0; position: relative; transition: all 0.5s ease; }
-    .dossier-image { height: 300px; background-size: cover; background-position: center; position: relative; }
+    .dossier { display: flex; flex-direction: column; overflow: hidden; padding: 0; position: relative; transition: all 0.5s ease; border-top: 4px solid var(--accent); }
+    .dossier-image { height: 320px; background-size: cover; background-position: center; position: relative; }
+    .dossier-image .risk-badge { position: absolute; top: 20px; right: 20px; padding: 6px 12px; background: #dc2626; color: #fff; border-radius: 6px; font-size: 10px; font-weight: 800; }
     
-    .tech-overlay { position: absolute; bottom: 0; width: 100%; padding: 12px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; gap: 8px; }
-    .tech-tag { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; background: var(--accent); color: #020617; }
+    .tech-overlay { position: absolute; bottom: 0; width: 100%; padding: 12px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); display: flex; gap: 8px; }
+    .tech-tag { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 4px; background: var(--national-emerald); color: #020617; }
 
     .dossier-content { padding: 24px; }
     .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
@@ -29,18 +30,18 @@
     .btn-approve { background: var(--accent); color: #020617; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
     .btn-reject { background: #1e293b; color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
     
-    /* 2FA MODAL */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-    .modal { background: #0f172a; border: 1px solid #ef4444; padding: 40px; border-radius: 24px; width: 400px; text-align: center; }
-    .modal h2 { color: #ef4444; margin-bottom: 20px; }
+    .modal { background: #0f172a; border: 1px solid #dc2626; padding: 40px; border-radius: 24px; width: 400px; text-align: center; }
     .modal input { width: 100%; padding: 16px; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; color: #fff; font-size: 1.5rem; text-align: center; margin-bottom: 20px; letter-spacing: 8px; }
+
+    .vicious-badge { position: absolute; top: 20px; left: 20px; padding: 6px 12px; background: var(--accent); color: #000; border-radius: 6px; font-size: 10px; font-weight: 800; }
   </style>
 </head>
 <body>
   <header class="header">
     <div class="title-area">
-      <div class="badge-glow">Strategic Command Portal</div>
-      <h1>Commissioner's Command Center</h1>
+      <div class="badge-glow" style="color:var(--accent); border-color:var(--accent);">National Strategic Suite</div>
+      <h1 style="background: linear-gradient(to bottom right, #fff, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Commissioner's Command Center</h1>
     </div>
     <div class="user-profile" style="text-align:right;">
       <strong>National Commissioner</strong><br>
@@ -49,27 +50,51 @@
   </header>
 
   <div class="stats-bar">
-    <div class="stat-card"><small>Audit Status</small><div style="color:var(--accent);">CLEAN (Q2)</div></div>
+    <div class="stat-card"><small>Audit Status</small><div style="color:var(--national-emerald);">CLEAN (Q2)</div></div>
     <div class="stat-card"><small>Escrow Funds</small><div>R 12.8M (Secured)</div></div>
-    <div class="stat-card"><small>Logistics Dispatch</small><div id="dispatch-stat">Priority Lane Active</div></div>
-    <div class="stat-card"><small>2FA Status</small><div style="color:#60a5fa;">ENABLED</div></div>
+    <div class="stat-card"><small>Logistics Dispatch</small><div style="color:#60a5fa;">Priority Lane Active</div></div>
+    <div class="stat-card"><small>Heritage Status</small><div style="color:var(--accent);">MANDELA GOLD ACTIVE</div></div>
   </div>
 
   <main class="dossier-grid" id="dossier-list">
-    <!-- CANDIDATE DOSSIER: REX (Sample Live Record) -->
+    <!-- DOSSIER 1: REX (POWERFUL/VICIOUS) -->
     <article class="glass-card dossier" id="dossier-rex">
       <div class="dossier-image" style="background-image: url('https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?auto=format&fit=crop&q=80&w=800')">
-        <div class="tech-overlay"><div class="tech-tag">DRONE-SYNCED</div><div class="tech-tag">BRICS-READY</div></div>
+        <div class="vicious-badge">ELITE DRIVE</div>
+        <div class="risk-badge">HIGH RISK</div>
+        <div class="tech-overlay">
+          <div class="tech-tag">DRONE-SYNCED</div>
+          <div class="tech-tag">BALLISTIC-READY</div>
+        </div>
       </div>
       <div class="dossier-content">
-        <h3>REX</h3>
+        <h3>REX (Tactical Attack)</h3>
         <div class="info-row"><span>PAWS-ID</span> <strong>PAWS-26-00402</strong></div>
-        <div class="info-row"><span>Microchip</span> <strong>900123456789012</strong></div>
-        <div class="info-row"><span>Compliance</span> <strong style="color:var(--accent);">Verified</strong></div>
+        <div class="info-row"><span>Aptitude</span> <strong style="color:var(--accent);">99% (Aggression Control)</strong></div>
       </div>
       <div class="actions">
-        <button class="btn-reject" onclick="triggerDelete('PAWS-26-00402')">DELETE RECORD</button>
-        <button class="btn-approve" onclick="alert('Asset Approved')">APPROVE ASSET</button>
+        <button class="btn-reject" onclick="triggerDelete('PAWS-26-00402')">DELETE</button>
+        <button class="btn-approve" onclick="alert('Asset Approved')">APPROVE</button>
+      </div>
+    </article>
+
+    <!-- DOSSIER 2: LUNA (BEAUTIFUL/SNIFFING) -->
+    <article class="glass-card dossier" id="dossier-luna">
+      <div class="dossier-image" style="background-image: url('https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&q=80&w=800')">
+        <div class="vicious-badge" style="background:var(--national-emerald)">PREMIUM PEDIGREE</div>
+        <div class="tech-overlay">
+          <div class="tech-tag">SCENT-DETECTION</div>
+          <div class="tech-tag">BRICS-READY</div>
+        </div>
+      </div>
+      <div class="dossier-content">
+        <h3>LUNA (Detection Specialist)</h3>
+        <div class="info-row"><span>PAWS-ID</span> <strong>PAWS-26-00511</strong></div>
+        <div class="info-row"><span>Specialty</span> <strong style="color:var(--national-emerald);">Narcotics / Biological</strong></div>
+      </div>
+      <div class="actions">
+        <button class="btn-reject" onclick="triggerDelete('PAWS-26-00511')">DELETE</button>
+        <button class="btn-approve" onclick="alert('Asset Approved')">APPROVE</button>
       </div>
     </article>
   </main>
@@ -79,40 +104,25 @@
     <div class="modal">
       <div style="font-size: 40px; margin-bottom: 20px;">⚠️</div>
       <h2>Strategic Deletion</h2>
-      <p class="muted" style="margin-bottom: 30px;">Action: Permanent deletion of National Asset record. Enter Master 2FA Code to authorize.</p>
       <input type="password" id="2fa-code" maxlength="4" placeholder="••••">
       <div style="display:flex; gap:12px;">
         <button class="btn-premium" style="flex:1; background:#1e293b; color:#fff;" onclick="closeModal()">CANCEL</button>
-        <button class="btn-premium" style="flex:1; background:#ef4444; color:#fff;" onclick="authorizeDelete()">AUTHORIZE</button>
+        <button class="btn-premium" style="flex:1; background:#dc2626; color:#fff;" onclick="authorizeDelete()">AUTHORIZE</button>
       </div>
     </div>
   </div>
 
   <script>
     let pendingDeleteId = null;
-
-    function triggerDelete(id) {
-      pendingDeleteId = id;
-      document.getElementById('modal-2fa').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('modal-2fa').style.display = 'none';
-      document.getElementById('2fa-code').value = '';
-    }
-
+    function triggerDelete(id) { pendingDeleteId = id; document.getElementById('modal-2fa').style.display = 'flex'; }
+    function closeModal() { document.getElementById('modal-2fa').style.display = 'none'; document.getElementById('2fa-code').value = ''; }
     function authorizeDelete() {
       const code = document.getElementById('2fa-code').value;
       if (code === '9999') {
-        // ACTUAL DATABASE LOGIC (Simulated for this live view)
-        document.getElementById('dossier-rex').style.opacity = '0';
-        setTimeout(() => {
-          document.getElementById('dossier-rex').remove();
-          alert('SYSTEM ALERT: National Record ' + pendingDeleteId + ' has been permanently purged from the registry.');
-        }, 500);
+        alert('SYSTEM ALERT: National Record purged.');
         closeModal();
       } else {
-        alert('SECURITY ERROR: INVALID 2FA CODE. ATTEMPT LOGGED.');
+        alert('SECURITY ERROR: INVALID 2FA CODE.');
       }
     }
   </script>
