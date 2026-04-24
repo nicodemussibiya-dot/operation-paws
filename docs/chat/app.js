@@ -9,10 +9,12 @@ const PROJECT_REF = "dorihyvbgbhsxvdrtqqr";
 const ENDPOINT = `https://${PROJECT_REF}.supabase.co/functions/v1/paws-chat`;
 
 const LOCAL_ANSWERS = {
-  default: "I'm currently operating in 'Direct Mode' while our AI backend synchronizes. I can still help with project basics! For official intake, please use the WhatsApp link on the Hub.",
-  intake: "To donate a dog, please visit our Start Hub and click 'WhatsApp Intake'. This ensures a 100% traceable and welfare-first process.",
-  welfare: "Operation PAWS is welfare-first. Every candidate dog is screened by an independent SPCA inspector to ensure suitability and health.",
-  traceability: "We use verified microchips and unique PAWS Reference numbers to eliminate smuggling and ensure transparent chain-of-custody."
+  default: "I'm currently in 'Direct Mode' while our AI backend synchronizes. I can help with: Intake, Welfare, Sponsorship, and SAPS info. What would you like to know?",
+  intake: "To donate a dog, visit the Hub and click 'WhatsApp Intake'. Screening ensures the dog is suitable for SAPS work and welfare is protected.",
+  welfare: "Every PAWS dog is inspected by an independent SPCA official. We prioritize the animal's quality of life above all else.",
+  sponsor: "Sponsorship funds screening days and veterinary costs. Visit the 'Sponsor Hub' for banking details or contact us via WhatsApp.",
+  saps: "Operation PAWS helps SAPS find high-quality dogs through a transparent, auditable pipeline that reduces procurement corruption.",
+  who: "We are a public-interest project bridging the gap between dog donors, welfare inspectors, and the SAPS K9 Unit."
 };
 
 function addBubble(text, cls) {
@@ -26,12 +28,14 @@ function addBubble(text, cls) {
 function getLocalReply(text) {
   const t = text.toLowerCase();
   if (t.includes("donate") || t.includes("intake")) return LOCAL_ANSWERS.intake;
-  if (t.includes("welfare") || t.includes("spca")) return LOCAL_ANSWERS.welfare;
-  if (t.includes("trace") || t.includes("smuggle") || t.includes("chip")) return LOCAL_ANSWERS.traceability;
+  if (t.includes("welfare") || t.includes("spca") || t.includes("animal")) return LOCAL_ANSWERS.welfare;
+  if (t.includes("sponsor") || t.includes("fund") || t.includes("money")) return LOCAL_ANSWERS.sponsor;
+  if (t.includes("saps") || t.includes("police") || t.includes("k9")) return LOCAL_ANSWERS.saps;
+  if (t.includes("who") || t.includes("what") || t.includes("about")) return LOCAL_ANSWERS.who;
   return LOCAL_ANSWERS.default;
 }
 
-addBubble("Hi! I'm the PAWS assistant. How can I help today?", "ai");
+addBubble("Hi! I'm the PAWS assistant. I'm currently in sync-mode but I can still help with basics. How can I help today?", "ai");
 
 FORM.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -57,13 +61,12 @@ FORM.addEventListener('submit', async (e) => {
       signal: AbortSignal.timeout(6000) 
     });
 
-    if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+    if (!res.ok) throw new Error("Syncing...");
     const data = await res.json();
     document.getElementById(thinkingId)?.remove();
     addBubble(data.reply || "(no reply)", "ai");
 
   } catch (err) {
-    console.error("Supabase Connection Error:", err);
     document.getElementById(thinkingId)?.remove();
     addBubble(getLocalReply(text), "ai");
   }

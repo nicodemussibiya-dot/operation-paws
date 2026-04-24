@@ -3,40 +3,34 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PAWS — Web Chat (AI)</title>
-  <meta name="robots" content="index,follow" />
-  <link rel="stylesheet" href="./styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <title>PAWS Assistant — Instant Help</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="background-blobs">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-  </div>
-
-  <main class="wrap">
-    <header class="top">
-      <div class="logo">
-        <span class="paws-icon">🐾</span>
-        <h1>PAWS Assistant</h1>
+  <main class="chat-container">
+    <header class="chat-header">
+      <div class="header-content">
+        <span class="paws-logo">🐾</span>
+        <div class="title-wrap">
+          <h1>PAWS Assistant</h1>
+          <p class="subtitle">Instant FAQ & Routing.</p>
+        </div>
       </div>
-      <p class="muted">
-        Instant FAQ & Routing. <br>
-        <strong>Safety Note:</strong> Never share sensitive details (ID, address, microchips) here.
-      </p>
     </header>
 
-    <section class="chat-container">
-      <div id="log" class="log" aria-live="polite">
-        <!-- Messages will appear here -->
+    <div class="chat-warning">
+      <strong>Safety Note:</strong> Never share sensitive details (ID, address, microchips) here.
+    </div>
+
+    <section class="chat-view">
+      <div id="log" class="chat-log">
+        <!-- Messages appear here -->
       </div>
 
-      <div class="input-area">
-        <form id="form" class="row">
-          <input id="msg" class="input" placeholder="Ask about PAWS (e.g. How to sponsor?)" autocomplete="off" />
-          <button class="btn" type="submit">
+      <div class="chat-input-area">
+        <form id="form">
+          <input type="text" id="msg" autocomplete="off" placeholder="Ask about PAWS (e.g. How to sponsor?)" required>
+          <button type="submit" class="send-btn" id="send">
             <span class="btn-text">Send</span>
             <svg class="send-icon" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
@@ -45,7 +39,7 @@
 
       <div class="footer-note">
         <p class="muted small">
-          Public-safe informational AI. For intake, use WhatsApp/Telegram from the <a href="../start/">hub</a>.
+          Public-safe informational AI. For official intake, use WhatsApp from the <a href="../start/">hub</a>.
         </p>
       </div>
     </section>
@@ -58,6 +52,6 @@
     </nav>
   </main>
 
-  <script src="./app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
