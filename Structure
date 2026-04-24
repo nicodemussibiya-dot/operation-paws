@@ -9,6 +9,7 @@ operation-paws/
 ├─ 07_DONATIONS.md          # Funding Channels
 │
 ├─ docs/                    # GitHub Pages (Public Hub)
+│  ├─ index.html            # Root Redirect / Launchpad
 │  ├─ start/                # QR Landing Page
 │  ├─ chat/                 # AI Assistant UI
 │  ├─ tracker/              # Transparency Dashboard
@@ -29,7 +30,7 @@ operation-paws/
 │  └─ 10_partner_walkthroughs/ # Persona-based Guides
 │
 ├─ templates/               # Legal & Admin Assets
-│  ├─ MOU_01...10           # Stakeholder Agreements
+│  ├─ MOU_01...11           # Stakeholder Agreements
 │  ├─ FORM_01_Owner_Consent.md
 │  ├─ FORM_02_Return_of_Custody.md
 │  ├─ REF_01_SAPS_505a_Summary.md
