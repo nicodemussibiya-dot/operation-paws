@@ -1,158 +1,49 @@
 operation-paws/
-├─ README.md
-├─ LICENSE
-├─ DISCLAIMER.md
-├─ ROADMAP.md
-├─ PUBLIC_DATA_BOUNDARY.md
-├─ PRIVACY.md
-├─ SECURITY.md
-├─ DONATIONS.md
-├─ GOVERNANCE.md
-├─ CITATIONS.md
-├─ CODE_OF_CONDUCT.md
-├─ CONTRIBUTING.md
+├─ README.md                # Launchpad & Quick Start
+├─ 01_GOVERNANCE.md         # Core Principles
+├─ 02_ROADMAP.md            # Execution Phases (A-E)
+├─ 03_DATA_BOUNDARY.md      # Non-Negotiable Privacy Rules
+├─ 04_DISCLAIMER.md         # Legal Boundaries
+├─ 05_PRIVACY.md            # POPIA Framework
+├─ 06_SECURITY.md           # Secrets & AI Guardrails
+├─ 07_DONATIONS.md          # Funding Channels
 │
-├─ docs/                                # GitHub Pages site (QR destination)
-│  ├─ index.html                        # landing (simple)
-│  ├─ robots.txt
-│  ├─ sitemap.xml
-│  ├─ assets/
-│  │  ├─ brand/
-│  │  │  ├─ logo.svg                    # Paws own logo only (no SAPS marks)
-│  │  │  └─ style.md                    # colors/typography rules
-│  │  ├─ images/
-│  │  └─ posters/
-│  │     ├─ operation-paws-qr-a4.pdf     # later (exported from design)
-│  │     └─ operation-paws-qr-a5.pdf
-│  │
-│  ├─ start/
-│  │  └─ index.html                     # QR hub (WhatsApp/Telegram/Web)
-│  ├─ tracker/
-│  │  ├─ index.html                     # PAWS 1→500 tracker page
-│  │  ├─ app.js                         # reads from Supabase public view
-│  │  └─ styles.css
-│  ├─ verify/
-│  │  ├─ index.html                     # paste PAWS ref → verify status
-│  │  └─ app.js
-│  ├─ donate/
-│  │  └─ index.html                     # sponsor options (no wallet addresses yet)
-│  ├─ academy/
-│  │  └─ index.html                     # public-friendly Tier 3 academy explainer
-│  ├─ media/
-│  │  └─ index.html                     # filming rules + consent approach
-│  ├─ faq/
-│  │  └─ index.html
-│  └─ legal/
-│     ├─ privacy-notice.html            # short web version
-│     └─ terms.html                     # lightweight terms/disclaimer
+├─ docs/                    # GitHub Pages (Public Hub)
+│  ├─ start/                # QR Landing Page
+│  ├─ chat/                 # AI Assistant UI
+│  ├─ tracker/              # Transparency Dashboard
+│  ├─ verify/               # Reference Verification Tool
+│  ├─ donate/               # Sponsor Hub
+│  └─ media/                # Media Consent Hub
 │
-├─ handbook/                            # operational playbook (markdown)
-│  ├─ 00_executive/
-│  │  ├─ 00_one_page_summary.md
-│  │  ├─ 01_paws_1_to_500_overview.md
-│  │  ├─ 02_pilot_paws_10.md
-│  │  └─ 03_scale_paws_50_100_250_500.md
-│  │
-│  ├─ 01_principles_and_governance/
-│  │  ├─ 00_principles.md               # welfare-first, transparency, anti-corruption
-│  │  ├─ 01_roles_and_responsibilities.md
-│  │  ├─ 02_risk_register.md            # smuggling allegation controls
-│  │  ├─ 03_anti_diversion_chain_of_custody.md
-│  │  ├─ 04_branding_and_misrepresentation.md
-│  │  └─ 05_public_comms_rules.md
-│  │
-│  ├─ 02_pipeline/
-│  │  ├─ 00_pipeline_overview.md
-│  │  ├─ 01_tier_1_funded_breeder_sourced.md
-│  │  ├─ 02_tier_2_public_donations.md
-│  │  ├─ 03_tier_3_paws_academy.md
-│  │  ├─ 04_outcomes_not_selected_withdrawn.md
-│  │  └─ 05_data_flow_map_public_vs_private.md
-│  │
-│  ├─ 03_paws_academy/
-│  │  ├─ 00_academy_model.md            # “soccer academy” design (off SAPS premises)
-│  │  ├─ 01_curriculum_public.md        # owner + dog foundation curriculum
-│  │  ├─ 02_combine_day_scorecard.md
-│  │  ├─ 03_coach_playbook.md
-│  │  └─ 04_welfare_and_safety.md
-│  │
-│  ├─ 04_legal_and_policy_alignment/
-│  │  ├─ 00_saps_alignment.md           # references NI 6/2018 + SAPS 505(a) (no form upload)
-│  │  ├─ 01_popia_approach.md
-│  │  ├─ 02_crypto_donation_controls.md
-│  │  └─ 03_filming_permissions_framework.md
-│  │
-│  ├─ 05_media_and_influencers/
-│  │  ├─ 00_media_rules.md
-│  │  ├─ 01_embedded_creator_program.md
-│  │  ├─ 02_shotlist_safe.md
-│  │  └─ 03_tiktok_script_examples.md
-│  │
-│  ├─ 06_funding/
-│  │  ├─ 00_sponsor_pack.md
-│  │  ├─ 01_domain_sponsorship_pitch.md
-│  │  ├─ 02_why_not_kickstarter.md
-│  │  ├─ 03_ringfenced_money_flow.md
-│  │  └─ 04_in_kind_sponsorship.md
-│  │
-│  └─ 07_metrics_and_ids/
-│     ├─ 00_metrics_definitions.md
-│     ├─ 01_paws_reference_spec.md       # PAWS ref format + checksum + tier/source
-│     ├─ 02_public_dashboard_spec.md
-│     └─ 03_breeder_source_stats_spec.md
+├─ handbook/                # The Operational Playbook
+│  ├─ 01_pipeline/          # The 3-Tier Model
+│  ├─ 02_academy/           # Curriculum & Scorecard
+│  ├─ 03_governance_and_ethics/
+│  ├─ 04_ops_and_logistics/ # Intake Day Runbooks
+│  ├─ 05_partner_management/ # Partner Roles
+│  ├─ 06_comms_and_media/   # Filming Rules
+│  ├─ 07_metrics_and_ids/   # ID Specs & Leaderboards
+│  ├─ 08_saps_alignment/    # SAPS 505(a) Reference
+│  ├─ 09_traceability/      # Anti-Smuggling Protocol
+│  └─ 10_partner_walkthroughs/ # Persona-based Guides
 │
-├─ templates/                           # BLANK templates only
-│  ├─ mou_spca_blank.md
-│  ├─ mou_breeder_blank.md
-│  ├─ mou_sponsor_cash_blank.md
-│  ├─ mou_sponsor_in_kind_blank.md
-│  ├─ mou_influencer_blank.md
-│  ├─ consent_filming_blank.md
-│  ├─ dog_traceability_pack_blank.md
-│  ├─ screening_intake_questions_blank.md
-│  └─ incident_report_blank.md
+├─ templates/               # Legal & Admin Assets
+│  ├─ MOU_01...10           # Stakeholder Agreements
+│  ├─ FORM_01_Owner_Consent.md
+│  ├─ FORM_02_Return_of_Custody.md
+│  ├─ REF_01_SAPS_505a_Summary.md
+│  └─ 03_posters/           # Marketing Assets
 │
-├─ ops/                                 # checklists (public-safe)
-│  ├─ 00_screening_day_runbook.md
-│  ├─ 01_tryout_day_runbook.md
-│  ├─ 02_transport_safety_checklist.md
-│  ├─ 03_microchip_scan_protocol.md
-│  ├─ 04_data_entry_sop.md
-│  └─ 05_incident_response.md
+├─ ops/                     # Ground Runbooks
+│  └─ 01_screening_day_checklist.md
 │
-├─ tech/                                # “CV flex” technical system
-│  ├─ 00_architecture.md
-│  ├─ 01_threat_model.md                # anti-scam, data leaks, QR tampering
-│  ├─ 02_data_model.md
-│  ├─ 03_public_private_split.md
-│  │
-│  ├─ supabase/
-│  │  ├─ schema.sql                     # public tracker tables/views + ref generator
-│  │  ├─ rls_plan.md                    # RLS policy design (anon read-only)
-│  │  ├─ rls_policies.sql               # optional later
-│  │  ├─ migrations/                    # optional later
-│  │  └─ seed_fake_data.sql             # for demo only (no PII)
-│  │
-│  ├─ ai/
-│  │  ├─ chatbot_policy.md              # hard refusals (no tactics, no sensitive ops)
-│  │  ├─ intake_schemas/                # JSON schemas for structured intake
-│  │  │  ├─ dog_intake.schema.json
-│  │  │  ├─ sponsor_intake.schema.json
-│  │  │  └─ volunteer_intake.schema.json
-│  │  └─ prompts/
-│  │     ├─ system_prompt.md
-│  │     └─ faq_knowledge.md
-│  │
-│  └─ integrations/
-│     ├─ qr_strategy.md                 # QR → hub → channels
-│     ├─ whatsapp_click_to_chat.md      # wa.me patterns (placeholders only)
-│     ├─ telegram_deeplinks.md          # t.me deep link tokens
-│     └─ github_pages_setup.md
+├─ tech/                    # Technical Scaffolding
+│  ├─ ai/                   # Prompts & Schemas
+│  └─ supabase/             # DB Schema (Reference)
 │
-└─ .github/
-   ├─ ISSUE_TEMPLATE/
-   │  ├─ bug_report.yml
-   │  ├─ security_issue.yml
-   │  └─ question.yml
-   ├─ PULL_REQUEST_TEMPLATE.md
-   └─ dependabot.yml
+└─ supabase/                # Active Supabase Deployment
+   ├─ functions/            # Edge Functions (Deno)
+   │  ├─ paws-chat/         # AI API Proxy
+   │  └─ telegram-webhook/  # Automated Routing
+   └─ migrations/           # SQL Migration Files
