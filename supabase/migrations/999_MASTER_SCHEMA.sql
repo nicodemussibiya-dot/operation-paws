@@ -133,3 +133,49 @@ CREATE TABLE IF NOT EXISTS paws_academy_logs (
   logged_by   UUID REFERENCES auth.users(id),
   logged_at   TIMESTAMPTZ DEFAULT now()
 );
+
+-- ── 8. NATIONAL ESCROW & FINANCIALS ────────────────────────
+CREATE TABLE IF NOT EXISTS public.paws_escrow (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sponsor_name TEXT NOT NULL,
+  amount_zar   NUMERIC(15,2) NOT NULL,
+  status       TEXT DEFAULT 'SECURED', -- SECURED | RELEASED | PENDING
+  purpose      TEXT, -- e.g. 'BREEDER_LEAGUE_PRIZE_POOL'
+  audited_at   TIMESTAMPTZ DEFAULT now(),
+  created_at   TIMESTAMPTZ DEFAULT now()
+);
+
+-- ── 9. DEAD MAN'S SWITCH (DMS) ──────────────────────────────
+-- Continuity of Government (CoG) protocol.
+CREATE TABLE IF NOT EXISTS public.paws_dead_mans_switch (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  commissioner_id UUID REFERENCES auth.users(id),
+  last_check_in   TIMESTAMPTZ DEFAULT now(),
+  trigger_delay   INTERVAL DEFAULT '7 days',
+  deputy_id       UUID REFERENCES auth.users(id), -- Designated successor
+  status          TEXT DEFAULT 'ARMED', -- ARMED | TRIGGERED | DISARMED
+  triggered_at    TIMESTAMPTZ
+);
+
+-- ── 10. SYSTEM FALLBACKS & ALERTS ──────────────────────────
+CREATE TABLE IF NOT EXISTS public.paws_fallbacks (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_type  TEXT NOT NULL, -- e.g. 'ESCROW_LOW', 'COMMISSIONER_OFFLINE'
+  severity    TEXT CHECK (severity IN ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL')),
+  action_taken TEXT,
+  resolved    BOOLEAN DEFAULT false,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- RLS for new tables
+ALTER TABLE public.paws_escrow ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.paws_dead_mans_switch ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.paws_fallbacks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "escrow_read_all" ON public.paws_escrow FOR SELECT TO authenticated USING (true);
+CREATE POLICY "dms_commissioner_manage" ON public.paws_dead_mans_switch 
+  FOR ALL TO authenticated USING (auth.uid() = commissioner_id);
+CREATE POLICY "fallbacks_read_commissioner" ON public.paws_fallbacks
+  FOR SELECT TO authenticated USING (
+    EXISTS (SELECT 1 FROM paws_user_roles WHERE user_id = auth.uid() AND role = 'commissioner')
+  );

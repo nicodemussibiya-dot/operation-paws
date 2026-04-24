@@ -9,6 +9,11 @@ The system is governed by specialized AI Agents, each with a specific "Handbook"
 - **[AI Breeder League Agent](/tech/ai/prompts/02_breeder_league_agent.md)** — Manages rivalry, tier promotions, and youth education.
 - **[AI Intake & Welfare Agent](/tech/ai/prompts/03_intake_agent.md)** — SPCA compliance gatekeeper and microchip registry.
 
+## 🛡️ Continuity of Command (The Dead Man's Switch)
+Operation PAWS includes a **Continuity of Government (CoG)** protocol:
+- **Dead Man's Switch (DMS)**: If the National Commissioner fails to check in for 7 days, the system triggers a secure handover.
+- **AI Surrogate Activation**: Upon DMS trigger, the AI Tactical Assistant takes temporary control, locking destructive actions and maintaining project transparency until a designated successor is verified.
+
 ## 🏆 The National Breeder Rivalry (The League)
 The "Academy" is a competitive league for **Breeders**, not just a training school.
 - **Tier 1 (T1)**: "Bragging Rights" for sponsored breeders supplying the SAPS with elite assets.
