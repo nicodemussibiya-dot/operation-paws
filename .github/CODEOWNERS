@@ -1,0 +1,22 @@
+# CODEOWNERS — Operation PAWS
+# Every change to sensitive paths requires owner review before merging.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global: all files require owner approval
+*                                   @nicodemussibiya-dot
+
+# Extra strict: CI/CD pipelines
+/.github/workflows/                 @nicodemussibiya-dot
+
+# Extra strict: Supabase schema + Edge Functions (financial/security critical)
+/supabase/                          @nicodemussibiya-dot
+
+# Extra strict: Public-facing docs (no fake claims can slip in)
+/docs/                              @nicodemussibiya-dot
+
+# Extra strict: Governance documents
+/01_GOVERNANCE.md                   @nicodemussibiya-dot
+/03_DATA_BOUNDARY.md                @nicodemussibiya-dot
+/docs/MASTER_MOU_v2.md              @nicodemussibiya-dot
+/docs/league-rules.md               @nicodemussibiya-dot
+/tech/ai/prompts/MASTER_SYSTEM_PROMPT.md  @nicodemussibiya-dot
