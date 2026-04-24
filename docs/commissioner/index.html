@@ -47,6 +47,9 @@
     .success-overlay span { font-size: 80px; transform: scale(0.5); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: #020617; }
     .dossier.approved .success-overlay { opacity: 1; pointer-events: auto; }
     .dossier.approved .success-overlay span { transform: scale(1); }
+
+    .audit-badge { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 99px; font-size: 10px; display: flex; align-items: center; gap: 10px; }
+    .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
   </style>
 </head>
 <body>
@@ -63,24 +66,24 @@
 
   <div class="stats-bar">
     <div class="stat-card">
+      <small>Audit Status</small>
+      <div style="color:var(--accent);">CLEAN (Q2)</div>
+      <span class="bg-icon">📋</span>
+    </div>
+    <div class="stat-card">
+      <small>Escrow Funds</small>
+      <div>R 12.8M (Secured)</div>
+      <span class="bg-icon">🏦</span>
+    </div>
+    <div class="stat-card">
+      <small>Logistics Dispatch</small>
+      <div style="color:#60a5fa;">Priority Lane Active</div>
+      <span class="bg-icon">✈️</span>
+    </div>
+    <div class="stat-card">
       <small>Deterrence Reach</small>
       <div>4.2M Impacts</div>
       <span class="bg-icon">📢</span>
-    </div>
-    <div class="stat-card">
-      <small>International Intake</small>
-      <div>8 Dogs (EU/Asia)</div>
-      <span class="bg-icon">🌍</span>
-    </div>
-    <div class="stat-card">
-      <small>League Sponsorships</small>
-      <div style="color:#60a5fa;">R 12.8M (Current)</div>
-      <span class="bg-icon">💰</span>
-    </div>
-    <div class="stat-card">
-      <small>Campaign Anthem</small>
-      <div style="font-size: 16px; margin-top:5px;">"Sync of the Hunter"</div>
-      <span class="bg-icon">🎵</span>
     </div>
   </div>
 
@@ -112,9 +115,9 @@
           <div class="badge-glow">ACADEMY WEEK 12 (FINALS)</div>
         </div>
 
-        <div class="info-row"><span>Candidate Source</span> <strong>Bavarian Police Line (GER)</strong></div>
-        <div class="info-row"><span>Media Presence</span> <strong>"Deterrence Series" Featured</strong></div>
-        <div class="info-row"><span>Universal Commands</span> <strong style="color:var(--accent)">100% Accuracy</strong></div>
+        <div class="info-row"><span>Logistics Status</span> <strong>Priority Air-Freight Dispatched</strong></div>
+        <div class="info-row"><span>Compliance</span> <strong style="color:var(--accent)">ENSafrica Verified</strong></div>
+        <div class="info-row"><span>Audited Cost/Dog</span> <strong style="color:#fff;">R 42,500 (Transparent)</strong></div>
 
         <div class="academy-log">
           <h4>LEAGUE PROGRESS LOG</h4>
@@ -129,9 +132,10 @@
     </article>
   </main>
 
-  <footer style="margin-top:60px; text-align:center; padding-top:40px; border-top: 1px solid var(--card-border);">
-    <p class="muted" style="font-size:12px; letter-spacing:2px; text-transform:uppercase;">Operation PAWS • Partnership for Animal Work & Service • Strategic Command v2.5</p>
-  </footer>
+  <div class="audit-badge">
+    <div class="dot"></div>
+    <span>FINANCIALS AUDITED BY PwC • LEGAL OVERSIGHT BY ENSAFRICA</span>
+  </div>
 
   <script>
     function approveDog() {
@@ -139,7 +143,7 @@
       dossier.classList.add('approved');
       
       // Update global stats visually
-      document.querySelector('.stat-card:nth-child(2) div').innerText = "7 Dogs (1 Deployed)";
+      document.querySelector('.stat-card:nth-child(3) div').innerText = "Priority Lane Active (1 Dispatched)";
     }
   </script>
 </body>
