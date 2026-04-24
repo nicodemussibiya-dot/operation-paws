@@ -5,16 +5,25 @@
 
 -- ── 1. ROLES TABLE ──────────────────────────────────────────
 -- Maps Supabase Auth users to application roles.
--- Only a service_role migration can insert here.
-CREATE TABLE IF NOT EXISTS paws_roles (
+CREATE TABLE IF NOT EXISTS paws_user_roles (
   user_id    UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  role       TEXT NOT NULL CHECK (role IN ('officer', 'commissioner', 'auditor')),
+  email      TEXT,
+  role       TEXT NOT NULL CHECK (role IN ('officer', 'commissioner', 'auditor', 'breeder', 'intake_admin')),
   granted_at TIMESTAMPTZ DEFAULT now(),
   granted_by UUID REFERENCES auth.users(id)
 );
 
 -- ── 2. DOGS TABLE ───────────────────────────────────────────
 ALTER TABLE public.paws_dogs
+  ADD COLUMN IF NOT EXISTS photo_urls        TEXT[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS intake_notes      TEXT,
+  ADD COLUMN IF NOT EXISTS commissioner_decision    TEXT,
+  ADD COLUMN IF NOT EXISTS commissioner_notes       TEXT,
+  ADD COLUMN IF NOT EXISTS commissioner_decision_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS commissioner_decision_by UUID REFERENCES auth.users(id);
+
+ALTER TABLE public.paws_dogs
+  ADD COLUMN IF NOT EXISTS source_tier       TEXT DEFAULT 'T3',
   ADD COLUMN IF NOT EXISTS assigned_job      TEXT,
   ADD COLUMN IF NOT EXISTS risk_level        TEXT CHECK (risk_level IN ('LOW','MEDIUM','HIGH','EXTREME')),
   ADD COLUMN IF NOT EXISTS insurance_status  TEXT DEFAULT 'PENDING',
@@ -54,7 +63,7 @@ CREATE POLICY "audit_select_commissioner"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM paws_roles
+      SELECT 1 FROM paws_user_roles
       WHERE user_id = auth.uid() AND role = 'commissioner'
     )
   );
@@ -74,8 +83,8 @@ CREATE POLICY "dogs_officer_insert"
   TO authenticated
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM paws_roles
-      WHERE user_id = auth.uid() AND role IN ('officer', 'commissioner')
+      SELECT 1 FROM paws_user_roles
+      WHERE user_id = auth.uid() AND role IN ('officer', 'commissioner', 'intake_admin')
     )
   );
 
@@ -84,7 +93,7 @@ CREATE POLICY "dogs_commissioner_update"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM paws_roles
+      SELECT 1 FROM paws_user_roles
       WHERE user_id = auth.uid() AND role = 'commissioner'
     )
   );

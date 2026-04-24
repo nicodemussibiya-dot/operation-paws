@@ -121,30 +121,7 @@
     </section>
   </main>
 
-  <script>
-    // Simulate real-time updates
-    const events = [
-      "New Candidate Registered: PAWS-26-0912",
-      "League Update: Hollard +0.4% Aptitude",
-      "Logistics Dispatch: BRICS Asset #402",
-      "Audit Sync: Standard Bank Escrow Verified",
-      "Welfare Veto: Candidate 0812 (Resilience Test Fail)"
-    ];
-
-    setInterval(() => {
-      const container = document.getElementById('feed-container');
-      const item = document.createElement('div');
-      item.className = 'feed-item';
-      item.innerHTML = `<span>${events[Math.floor(Math.random() * events.length)]}</span> <strong>JUST NOW</strong>`;
-      container.prepend(item);
-      if(container.children.length > 5) container.lastChild.remove();
-      
-      // Bump the total count randomly
-      if(Math.random() > 0.8) {
-        const count = document.getElementById('total-count');
-        count.innerText = parseInt(count.innerText) + 1;
-      }
-    }, 5000);
-  </script>
+  <script src="../config.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>

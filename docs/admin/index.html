@@ -89,24 +89,7 @@
     <button class="btn-premium" style="margin-top:40px;" onclick="window.location.reload()">NEXT INTAKE</button>
   </div>
 
-  <script>
-    // ── SUPABASE AUTH SESSION CHECK ──
-    const SUPABASE_URL = 'https://dorihyvbgbhsxvdrtqqr.supabase.co';
-    const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
-
-    // Simulate session check (In prod: supabase.auth.getSession())
-    // For the test drive, we just check if they came through the auth flow.
-    window.onload = () => {
-      document.getElementById('app-ui').style.display = 'block';
-    };
-
-    function submitForm(e) {
-      e.preventDefault();
-      const id = "PAWS-26-" + Math.floor(1000 + Math.random() * 9000);
-      document.getElementById('receipt-paws-id').innerText = id;
-      document.getElementById('app-ui').style.display = 'none';
-      document.getElementById('success-gate').style.display = 'flex';
-    }
-  </script>
+  <script src="../config.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

@@ -33,5 +33,7 @@ jobs:
           
           supabase functions deploy paws-chat --project-ref "$PROJECT_ID" --no-verify-jwt
           supabase functions deploy paws-intake --project-ref "$PROJECT_ID" --no-verify-jwt
+          supabase functions deploy paws-2fa-verify --project-ref "$PROJECT_ID"
+          supabase functions deploy paws-secure-action --project-ref "$PROJECT_ID"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

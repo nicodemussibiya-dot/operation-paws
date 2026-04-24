@@ -32,6 +32,16 @@
   </style>
 </head>
 <body>
+  <!-- LOGIN OVERLAY -->
+  <div id="login-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#020617; z-index:2000; align-items:center; justify-content:center;">
+    <div class="glass-card" style="padding:40px; width:400px; text-align:center;">
+      <h2 style="margin-bottom:10px;">Strategic Access</h2>
+      <p class="muted" style="margin-bottom:30px;">Enter Commissioner Email for Magic Link</p>
+      <input type="email" id="login-email" placeholder="commissioner@paws.gov.za" style="margin-bottom:20px;">
+      <button class="btn-premium" style="width:100%;" onclick="handleLogin()">SEND MAGIC LINK</button>
+      <p id="login-msg" style="margin-top:20px; font-size:12px; color:var(--accent);"></p>
+    </div>
+  </div>
   <header class="header">
     <div class="title-area">
       <div class="badge-glow">Level 10 Presidential Authorization</div>
@@ -100,45 +110,8 @@
     </div>
   </div>
 
-  <script>
-    // ── SUPABASE AUTH & EDGE FUNCTION WIRING ──
-    const SUPABASE_URL = 'https://dorihyvbgbhsxvdrtqqr.supabase.co';
-    const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
-
-    let pendingAction = null;
-    let pendingTarget = null;
-
-    function triggerAction(action, targetId) { 
-      pendingAction = action; 
-      pendingTarget = targetId; 
-      document.getElementById('modal-2fa').style.display = 'flex'; 
-    }
-
-    function closeModal() { 
-      document.getElementById('modal-2fa').style.display = 'none'; 
-      document.getElementById('2fa-code').value = ''; 
-    }
-
-    async function authorizeAction() {
-      const code = document.getElementById('2fa-code').value;
-      
-      // In prod:
-      // 1. Call paws-2fa-verify Edge Function -> get action_token
-      // 2. Call paws-secure-action Edge Function with action_token
-      
-      // For this test drive demo:
-      if (code === '9999') {
-        console.log(`[SECURE EDGE FUNCTION] ${pendingAction} executed for ${pendingTarget} with valid TOTP.`);
-        alert(`SYSTEM ALERT: ${pendingAction} successful. Action logged to immutable audit trail.`);
-        closeModal();
-      } else {
-        alert('SECURITY ERROR: INVALID 2FA CODE. ATTEMPT LOGGED.');
-      }
-    }
-  </script>
-
-  <footer style="margin-top:60px; text-align:center; opacity:0.5; font-size:10px; letter-spacing:4px; text-transform:uppercase;">
-    Operation PAWS • Strategic Command • madiba-gold standard security
-  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
