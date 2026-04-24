@@ -15,7 +15,8 @@
     .leaderboard-card { padding: 40px; }
     .leaderboard-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
     
-    .league-row { display: flex; align-items: center; gap: 20px; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .league-row { display: flex; align-items: center; gap: 20px; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.3s; }
+    .league-row:hover { background: rgba(255,255,255,0.02); }
     .league-rank { font-size: 32px; font-weight: 800; color: var(--muted); width: 40px; }
     .league-info { flex: 1; }
     .league-info h4 { font-size: 18px; margin-bottom: 4px; }
@@ -23,14 +24,18 @@
     
     .league-score { text-align: right; }
     .score-bar { width: 150px; height: 8px; background: rgba(255,255,255,0.05); border-radius: 99px; margin-top: 8px; overflow: hidden; }
-    .score-fill { height: 100%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .score-fill { height: 100%; background: var(--accent); box-shadow: 0 0 10px var(--accent); transition: width 1s ease-in-out; }
 
     .stat-sidebar { display: flex; flex-direction: column; gap: 24px; }
     .sidebar-card { padding: 24px; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 24px; }
     .sidebar-card h5 { font-size: 12px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
     .sidebar-card .val { font-size: 32px; font-weight: 800; color: #fff; }
 
-    .audit-ticker { grid-column: span 2; padding: 20px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1); border-radius: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .audit-ticker { grid-column: span 2; padding: 20px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1); border-radius: 16px; display: flex; justify-content: space-between; align-items: center; overflow: hidden; }
+    
+    .live-feed { margin-top: 40px; grid-column: span 2; }
+    .feed-item { padding: 16px; border-left: 2px solid var(--accent); background: rgba(255,255,255,0.02); margin-bottom: 8px; animation: fadeInRight 0.5s ease-out; display: flex; justify-content: space-between; font-size: 14px; }
+    @keyframes fadeInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
   </style>
 </head>
 <body>
@@ -46,7 +51,8 @@
         <div style="width:10px; height:10px; background:var(--accent); border-radius:50%; box-shadow: 0 0 10px var(--accent);"></div>
         <strong style="color:var(--accent); font-size:14px;">Q2 FINANCIAL AUDIT: PASS (PwC Verified)</strong>
       </div>
-      <div style="font-size:12px; color:var(--muted);">LAST SYNC: 12 MINUTES AGO</div>
+      <marquee style="width: 300px; font-size: 12px; color:var(--muted);">ESCROW FUNDS SECURED VIA NDB... LOGISTICS PRIORITY LANE ACTIVE... WELFARE CHARTER VERIFIED...</marquee>
+      <div style="font-size:12px; color:var(--muted);">LAST SYNC: JUST NOW</div>
     </div>
 
     <section class="glass-card leaderboard-card">
@@ -95,24 +101,50 @@
     <aside class="stat-sidebar">
       <div class="sidebar-card">
         <h5>Total Dogs Mobilized</h5>
-        <div class="val">142</div>
-      </div>
-      <div class="sidebar-card">
-        <h5>Welfare Vetoes</h5>
-        <div class="val" style="color:#ef4444;">12</div>
-        <small style="color:var(--muted); font-size:10px;">Candidates returned to owners due to welfare standards.</small>
+        <div class="val" id="total-count">142</div>
       </div>
       <div class="sidebar-card">
         <h5>National Insurance Offset</h5>
         <div class="val" style="color:var(--accent);">-32%</div>
-        <small style="color:var(--muted); font-size:10px;">Premium savings due to PAWS-Tech implementation.</small>
       </div>
       <a href="../verify/" class="btn-premium" style="text-align:center;">Verify a PAWS-ID</a>
     </aside>
+
+    <section class="live-feed">
+      <h3 style="margin-bottom:20px; font-size:14px; color:var(--muted); letter-spacing:2px; text-transform:uppercase;">Live Operations Feed</h3>
+      <div id="feed-container">
+        <!-- Events will appear here -->
+        <div class="feed-item"><span>Intake Day Verified — Cape Town Hub</span> <strong>14:42</strong></div>
+        <div class="feed-item"><span>Welfare Pass: PAWS-26-0882 (GSD)</span> <strong>14:38</strong></div>
+        <div class="feed-item"><span>International Donor Received — OR Tambo</span> <strong>14:22</strong></div>
+      </div>
+    </section>
   </main>
 
-  <footer style="text-align:center; margin-top:80px; padding:40px; color:var(--muted); font-size:12px;">
-    Operation PAWS is an open-audit project. Built for the people, by the people.
-  </footer>
+  <script>
+    // Simulate real-time updates
+    const events = [
+      "New Candidate Registered: PAWS-26-0912",
+      "League Update: Hollard +0.4% Aptitude",
+      "Logistics Dispatch: BRICS Asset #402",
+      "Audit Sync: Standard Bank Escrow Verified",
+      "Welfare Veto: Candidate 0812 (Resilience Test Fail)"
+    ];
+
+    setInterval(() => {
+      const container = document.getElementById('feed-container');
+      const item = document.createElement('div');
+      item.className = 'feed-item';
+      item.innerHTML = `<span>${events[Math.floor(Math.random() * events.length)]}</span> <strong>JUST NOW</strong>`;
+      container.prepend(item);
+      if(container.children.length > 5) container.lastChild.remove();
+      
+      // Bump the total count randomly
+      if(Math.random() > 0.8) {
+        const count = document.getElementById('total-count');
+        count.innerText = parseInt(count.innerText) + 1;
+      }
+    }, 5000);
+  </script>
 </body>
 </html>

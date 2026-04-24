@@ -3,103 +3,118 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PAWS Admin — Field Intake</title>
+  <title>PAWS Field Intake — Secure Terminal</title>
+  <link rel="stylesheet" href="../global.css">
   <style>
-    :root{--bg:#f8fafc;--card:#ffffff;--text:#1e293b;--accent:#0f172a;--success:#22c55e;--warn:#f59e0b;}
-    body{margin:0;font-family:ui-sans-serif,system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;justify-content:center;padding:20px;}
-    .app{width:100%;max-width:400px;}
-    header{margin-bottom:24px;text-align:center;}
-    .badge{display:inline-block;padding:4px 12px;background:var(--accent);color:#fff;border-radius:99px;font-size:12px;font-weight:700;margin-bottom:8px;}
-    h1{font-size:24px;margin:0;letter-spacing:-0.03em;}
+    body { background: #020617; padding: 20px; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .gate-wrap { width: 100%; max-width: 450px; text-align: center; }
+    .pin-input { font-size: 3rem; text-align: center; width: 100%; background: none; border: none; border-bottom: 2px solid var(--accent); color: #fff; outline: none; margin: 30px 0; letter-spacing: 1rem; }
     
-    .card{background:var(--card);padding:24px;border-radius:20px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);border:1px solid #e2e8f0;margin-bottom:20px;}
-    .field{margin-bottom:18px;}
-    label{display:block;font-size:14px;font-weight:600;margin-bottom:6px;color:#64748b;}
-    input, select{width:100%;padding:14px;border-radius:12px;border:2px solid #e2e8f0;font-size:16px;box-sizing:border-box;outline:none;transition:border-color 0.2s;}
-    input:focus{border-color:var(--accent);}
-    
-    .btn{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer;margin-top:10px;transition:transform 0.1s;}
-    .btn:active{transform:scale(0.98);}
-    
-    #result{margin-top:20px;padding:16px;border-radius:12px;display:none;text-align:center;}
-    .success{background:#dcfce7;color:#166534;border:1px solid #bbf7d0;display:block !important;}
-    .error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;display:block !important;}
-    
-    .paws-id{font-size:24px;font-weight:800;display:block;margin-top:8px;letter-spacing:1px;}
+    #app-ui { display: none; width: 100%; max-width: 600px; animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .recent-list{margin-top:30px;padding:0;list-style:none;}
-    .recent-item{background:#fff;padding:12px;border-radius:12px;margin-bottom:8px;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;}
-    .recent-item span{font-size:14px;font-weight:600;}
-    .recent-item small{color:#64748b;}
+    .form-group { margin-bottom: 20px; text-align: left; }
+    label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    input, select { width: 100%; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; color: #fff; font-family: inherit; font-size: 1rem; outline: none; }
+    input:focus { border-color: var(--accent); }
+
+    .recent-list { margin-top: 40px; text-align: left; }
+    .recent-item { padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; margin-bottom: 8px; font-size: 14px; display: flex; justify-content: space-between; }
+
+    /* Success Overlay */
+    .success-gate { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020617; z-index: 100; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+    .success-gate h2 { font-size: 3rem; color: var(--accent); margin-top: 20px; }
+    .receipt { margin-top: 30px; padding: 30px; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 20px; width: 300px; font-family: monospace; }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <div class="badge">Operation PAWS Admin</div>
-      <h1>Field Intake</h1>
-    </header>
 
-    <!-- PIN GATE -->
-    <div id="gate" class="card">
-      <div class="field">
-        <label>Enter Admin PIN</label>
-        <input type="password" id="pin" placeholder="••••" maxlength="4" inputmode="numeric">
-      </div>
-      <button class="btn" onclick="checkPin()">Unlock Form</button>
-    </div>
-
-    <!-- INTAKE FORM -->
-    <div id="form-wrap" class="card" style="display:none;">
-      <form id="intakeForm">
-        <div class="field">
-          <label>Dog Name</label>
-          <input type="text" id="dog_name" required placeholder="e.g. Rex">
-        </div>
-        
-        <div class="field">
-          <label>Dog Breed (Corrected Spelling)</label>
-          <select id="breed" required>
-            <option value="" disabled selected>Select a breed...</option>
-            <option value="Belgian Malinois">Belgian Malinois</option>
-            <option value="Border Collie">Border Collie</option>
-            <option value="German Shepherd">German Shepherd</option>
-            <option value="Golden Retriever">Golden Retriever</option>
-            <option value="Labrador Retriever">Labrador Retriever</option>
-            <option value="Rottweiler">Rottweiler</option>
-            <option value="Springer Spaniel">Springer Spaniel</option>
-            <option value="Other">Other / Mixed</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>Microchip ID (15 Digits)</label>
-          <input type="text" id="microchip" required pattern="\d{15}" title="Exactly 15 digits" placeholder="900000000000000">
-        </div>
-
-        <div class="field">
-          <label>Intake Tier</label>
-          <select id="source_tier">
-            <option value="2">Tier 2: Public Donation</option>
-            <option value="1">Tier 1: Breeder Sourced</option>
-            <option value="3">Tier 3: Academy Lead</option>
-          </select>
-        </div>
-
-        <button type="submit" class="btn">Register Dog</button>
-      </form>
-
-      <!-- RESULTS DISPLAY -->
-      <div id="result"></div>
-
-      <!-- RECENT LIST -->
-      <h3 style="margin-top:32px; font-size:16px;">Recently Added</h3>
-      <div id="recent" class="recent-list">
-        <p style="font-size:13px; color:#64748b;">Loading recent dogs...</p>
-      </div>
-    </div>
+  <!-- 1. PIN GATE -->
+  <div class="gate-wrap" id="pin-gate">
+    <div class="badge-glow" style="margin: 0 auto;">Authorized Personnel Only</div>
+    <h1 style="margin-top:20px;">Field Terminal</h1>
+    <input type="password" maxlength="4" class="pin-input" id="pin" placeholder="••••">
+    <p class="muted">Enter 4-Digit Security PIN</p>
+    <button class="btn-premium" style="width:100%; margin-top:20px;" onclick="checkPin()">Access System</button>
   </div>
 
-  <script src="app.js"></script>
+  <!-- 2. MAIN APP UI -->
+  <main id="app-ui">
+    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+      <h2>Dog Intake Form</h2>
+      <div class="badge-glow" style="color:var(--accent);">SECURE: NODE-042</div>
+    </header>
+
+    <form id="intake-form" onsubmit="submitForm(event)">
+      <div class="form-group">
+        <label>Microchip Number (15 Digits)</label>
+        <input type="text" pattern="\d{15}" required placeholder="900XXXXXXXXXXXX">
+      </div>
+      <div class="form-group">
+        <label>Dog Name / Reference</label>
+        <input type="text" required placeholder="e.g. Max">
+      </div>
+      <div class="form-group">
+        <label>Primary Breed</label>
+        <select required>
+          <option value="">Select Breed...</option>
+          <option>German Shepherd</option>
+          <option>Rottweiler</option>
+          <option>Labrador</option>
+          <option>Border Collie</option>
+          <option>Malinois</option>
+          <option>Golden Retriever</option>
+          <option>Belgium Shepherd</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Source Tier</label>
+        <select required>
+          <option value="3">Tier 3 (Public Donation)</option>
+          <option value="2">Tier 2 (Professional Breeder)</option>
+          <option value="1">Tier 1 (International Strategic)</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-premium" style="width:100%; padding:20px; font-size:1.2rem;">REGISTER CANDIDATE</button>
+    </form>
+
+    <section class="recent-list">
+      <label>Recently Registered</label>
+      <div class="recent-item"><span>Rex (PAWS-26-00402)</span> <span style="color:var(--accent);">PASS</span></div>
+      <div class="recent-item"><span>Bella (PAWS-26-00403)</span> <span style="color:var(--muted);">PENDING</span></div>
+    </section>
+  </main>
+
+  <!-- 3. SUCCESS GATE -->
+  <div class="success-gate" id="success-gate">
+    <div style="font-size: 80px;">✅</div>
+    <h2>Candidate Secured</h2>
+    <div class="receipt" id="receipt-data">
+      <div style="border-bottom: 1px dashed #444; padding-bottom: 10px; margin-bottom: 10px;">NATIONAL REGISTRY RECEIPT</div>
+      <div id="receipt-paws-id">PAWS-26-XXXXX</div>
+      <div style="font-size: 10px; color:#666; margin-top:10px;">TIMESTAMP: JUST NOW</div>
+    </div>
+    <button class="btn-premium" style="margin-top:40px;" onclick="window.location.reload()">NEXT INTAKE</button>
+  </div>
+
+  <script>
+    function checkPin() {
+      const pin = document.getElementById('pin').value;
+      if (pin === '2499' || pin === '10111') {
+        document.getElementById('pin-gate').style.display = 'none';
+        document.getElementById('app-ui').style.display = 'block';
+      } else {
+        alert('ACCESS DENIED');
+      }
+    }
+
+    function submitForm(e) {
+      e.preventDefault();
+      const id = "PAWS-26-" + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('receipt-paws-id').innerText = id;
+      document.getElementById('app-ui').style.display = 'none';
+      document.getElementById('success-gate').style.display = 'flex';
+    }
+  </script>
 </body>
 </html>
