@@ -3,76 +3,70 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Operation 10 Paws — Official QR Entry</title>
-  <meta name="description" content="Operation 10 Paws — official QR entry point. Donate a dog, sponsor screening days, or volunteer. Welfare-first, traceable, auditable." />
+  <title>Operation PAWS — Official Hub</title>
+  <link rel="stylesheet" href="../global.css">
   <style>
-    :root{--bg:#0b1220;--card:#111a2e;--text:#e9eefc;--muted:#a8b3d6;--accent:#7af0c7;--warn:#ffd166;}
-    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif; background:linear-gradient(180deg,#081024,#0b1220); color:var(--text);}
-    .wrap{max-width:920px;margin:0 auto;padding:28px 18px 60px;}
-    .top{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:space-between}
-    .badge{padding:6px 10px;border:1px solid rgba(255,255,255,.15);border-radius:999px;color:var(--muted);font-size:13px}
-    h1{margin:16px 0 8px;font-size:34px;line-height:1.1}
-    p{margin:8px 0;color:var(--muted);line-height:1.5}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;margin-top:18px}
-    .card{grid-column:span 12;background:rgba(17,26,46,.92);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:16px}
-    @media (min-width:900px){.card{grid-column:span 4}}
-    .card h2{margin:0 0 8px;font-size:18px}
-    .btns{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-    a.btn{display:inline-block;text-decoration:none;color:#041014;background:var(--accent);padding:12px 14px;border-radius:12px;font-weight:700}
-    a.btn.secondary{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.18)}
-    .note{margin-top:18px;padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}
-    .note strong{color:var(--warn)}
-    .footer{margin-top:22px;font-size:13px;color:var(--muted)}
-    code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:8px}
+    .hero { text-align: center; padding: 80px 20px 40px; }
+    h1 { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 16px; background: linear-gradient(to bottom right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { font-size: 1.25rem; color: var(--muted); max-width: 600px; margin: 0 auto 40px; line-height: 1.6; }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .card { padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+    .card h2 { font-size: 1.5rem; display: flex; align-items: center; gap: 12px; }
+    .card p { color: var(--muted); line-height: 1.6; flex: 1; }
+    
+    .bottom-info { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    .safety-banner { padding: 24px; display: flex; gap: 20px; align-items: center; border-radius: 20px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.1); }
+    .safety-banner strong { color: #f59e0b; font-size: 18px; }
+    
+    @media (max-width: 768px) { h1 { font-size: 2.5rem; } }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top">
-      <div class="badge">Official QR Entry Point</div>
-      <div class="badge">Welfare-first • Traceable • Auditable</div>
+  <section class="hero">
+    <div class="badge-glow">National K9 Mobilization</div>
+    <h1>Operation PAWS</h1>
+    <p class="subtitle">A transparent, welfare-first pipeline connecting high-drive dogs with the SAPS K9 Unit. Auditable. Traceable. Professional.</p>
+  </section>
+
+  <main class="grid">
+    <article class="glass-card card">
+      <h2><span>🐕</span> Dog Intake</h2>
+      <p>Not every dog qualifies for police work. Our screening process protects dogs and ensures only suitable candidates reach the Academy.</p>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <a href="../chat/" class="btn-premium">Open AI Assistant</a>
+        <a href="https://wa.me/27XXXXXXXXX" class="btn-premium btn-secondary">WhatsApp Intake</a>
+      </div>
+    </article>
+
+    <article class="glass-card card">
+      <h2><span>🛡️</span> Sponsorship</h2>
+      <p>Your support funds professional screening days, veterinary checks, and microchipping. Help keep the system independent and ethical.</p>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <a href="../donate/" class="btn-premium">Sponsor a Day</a>
+        <a href="https://wa.me/27XXXXXXXXX" class="btn-premium btn-secondary">Get Sponsor Pack</a>
+      </div>
+    </article>
+
+    <article class="glass-card card">
+      <h2><span>📸</span> Media & Rules</h2>
+      <p>Integrity is our priority. Access media consent forms, filming protocols, and the official project transparency dashboard here.</p>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <a href="../tracker/" class="btn-premium">Live Tracker</a>
+        <a href="../media/" class="btn-premium btn-secondary">Media Rules</a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="bottom-info">
+    <div class="safety-banner">
+      <span style="font-size: 32px;">⚠️</span>
+      <div>
+        <strong>Privacy & Safety Warning</strong>
+        <p class="muted" style="margin-top:4px;">Never share microchip numbers, residential addresses, or signed SAPS 505(a) forms in public channels. Official intake is handled exclusively via secure WhatsApp/Field App.</p>
+      </div>
     </div>
-
-    <h1>Operation 10 Paws</h1>
-    <p>This is the official starting point for the project. Choose what you want to do below. If you came here from a poster/sticker, confirm the URL begins with <code>nicodemussibiya-dot.github.io/operation-paws</code>.</p>
-
-    <div class="grid">
-      <section class="card">
-        <h2>Donate a dog (intake)</h2>
-        <p>Not every dog qualifies. Screening protects dogs, donors, SPCA time, and SAPS resources.</p>
-        <div class="btns">
-          <a class="btn" style="background:#fff; color:#0b1220; margin-bottom: 8px;" href="../chat/">Web Chat (AI) — Instant</a>
-          <a class="btn" href="https://wa.me/27XXXXXXXXX?text=OP10PAWS%20INTAKE%20-%20I%20want%20to%20donate%20a%20dog.">WhatsApp intake</a>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Sponsor (fund days)</h2>
-        <p>Sponsors keep the system ethical and ring-fenced. You’ll receive a clear trail of what was funded.</p>
-        <div class="btns">
-          <a class="btn" href="../donate/">Donate / sponsor</a>
-          <a class="btn secondary" href="https://wa.me/27XXXXXXXXX?text=OP10PAWS%20SPONSOR%20-%20I%20want%20to%20sponsor.">WhatsApp sponsor pack</a>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Volunteer / Media</h2>
-        <p>We need help with transport, admin, filming, and responsible storytelling (no operational details).</p>
-        <div class="btns">
-          <a class="btn secondary" href="https://wa.me/27XXXXXXXXX?text=OP10PAWS%20VOLUNTEER%20-%20I%20want%20to%20help.">WhatsApp volunteer</a>
-          <a class="btn secondary" href="../media/">Media rules + consent</a>
-        </div>
-      </section>
-    </div>
-
-    <div class="note">
-      <p><strong>Privacy & safety:</strong></p>
-      <p>Do not post phone numbers, addresses, microchip numbers, or signed documents in public comments. We will never ask you to send money to a random personal crypto wallet via DM.</p>
-    </div>
-
-    <div class="footer">
-      <p>Disclaimer: This is a public-interest project proposal and is not an official SAPS website or communication channel.</p>
-    </div>
-  </div>
+    <p style="text-align:center; margin-top:40px; color:var(--muted); font-size:14px;">This is a public-interest project proposal and is not an official SAPS communication channel.</p>
+  </footer>
 </body>
 </html>
