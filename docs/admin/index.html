@@ -12,7 +12,7 @@
     .badge{display:inline-block;padding:4px 12px;background:var(--accent);color:#fff;border-radius:99px;font-size:12px;font-weight:700;margin-bottom:8px;}
     h1{font-size:24px;margin:0;letter-spacing:-0.03em;}
     
-    .card{background:var(--card);padding:24px;border-radius:20px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);border:1px solid #e2e8f0;}
+    .card{background:var(--card);padding:24px;border-radius:20px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);border:1px solid #e2e8f0;margin-bottom:20px;}
     .field{margin-bottom:18px;}
     label{display:block;font-size:14px;font-weight:600;margin-bottom:6px;color:#64748b;}
     input, select{width:100%;padding:14px;border-radius:12px;border:2px solid #e2e8f0;font-size:16px;box-sizing:border-box;outline:none;transition:border-color 0.2s;}
@@ -26,6 +26,11 @@
     .error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;display:block !important;}
     
     .paws-id{font-size:24px;font-weight:800;display:block;margin-top:8px;letter-spacing:1px;}
+
+    .recent-list{margin-top:30px;padding:0;list-style:none;}
+    .recent-item{background:#fff;padding:12px;border-radius:12px;margin-bottom:8px;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;}
+    .recent-item span{font-size:14px;font-weight:600;}
+    .recent-item small{color:#64748b;}
   </style>
 </head>
 <body>
@@ -35,6 +40,7 @@
       <h1>Field Intake</h1>
     </header>
 
+    <!-- PIN GATE -->
     <div id="gate" class="card">
       <div class="field">
         <label>Enter Admin PIN</label>
@@ -43,20 +49,31 @@
       <button class="btn" onclick="checkPin()">Unlock Form</button>
     </div>
 
+    <!-- INTAKE FORM -->
     <div id="form-wrap" class="card" style="display:none;">
       <form id="intakeForm">
         <div class="field">
           <label>Dog Name</label>
           <input type="text" id="dog_name" required placeholder="e.g. Rex">
         </div>
+        
         <div class="field">
-          <label>Breed</label>
-          <input type="text" id="breed" required placeholder="e.g. German Shepherd">
+          <label>Dog Breed (SAPS Priority)</label>
+          <select id="breed" required>
+            <option value="" disabled selected>Select a breed...</option>
+            <option value="German Shepherd">German Shepherd</option>
+            <option value="Belgian Malinois">Belgian Malinois</option>
+            <option value="Labrador Retriever">Labrador Retriever</option>
+            <option value="Springer Spaniel">Springer Spaniel</option>
+            <option value="Other">Other / Mixed</option>
+          </select>
         </div>
+
         <div class="field">
           <label>Microchip ID (15 Digits)</label>
           <input type="text" id="microchip" required pattern="\d{15}" title="Exactly 15 digits" placeholder="900000000000000">
         </div>
+
         <div class="field">
           <label>Intake Tier</label>
           <select id="source_tier">
@@ -65,11 +82,19 @@
             <option value="3">Tier 3: Academy Lead</option>
           </select>
         </div>
+
         <button type="submit" class="btn">Register Dog</button>
       </form>
-    </div>
 
-    <div id="result"></div>
+      <!-- RESULTS DISPLAY -->
+      <div id="result"></div>
+
+      <!-- RECENT LIST -->
+      <h3 style="margin-top:32px; font-size:16px;">Recently Added</h3>
+      <div id="recent" class="recent-list">
+        <p style="font-size:13px; color:#64748b;">Loading recent dogs...</p>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
