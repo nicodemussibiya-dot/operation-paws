@@ -13,6 +13,7 @@ operation-paws/
 │  ├─ start/                # QR Landing Page
 │  ├─ admin/                # Field Intake App (Dumb-proof)
 │  ├─ chat/                 # AI Assistant UI
+│  ├─ commissioner/         # Strategic Approval Portal (Command Center)
 │  ├─ tracker/              # Transparency Dashboard
 │  ├─ verify/               # Reference Verification Tool
 │  ├─ donate/               # Sponsor Hub
@@ -21,31 +22,18 @@ operation-paws/
 ├─ handbook/                # The Operational Playbook
 │  ├─ 01_pipeline/          # The 3-Tier Model
 │  ├─ 02_academy/           # Curriculum & Scorecard
-│  ├─ 03_governance_and_ethics/
 │  ├─ 04_ops_and_logistics/ # Intake Day Runbooks
-│  ├─ 05_partner_management/ # Partner Roles
-│  ├─ 06_comms_and_media/   # Filming Rules
 │  ├─ 07_metrics_and_ids/   # ID Specs & Leaderboards
-│  ├─ 08_saps_alignment/    # SAPS 505(a) Reference
-│  ├─ 09_traceability/      # Anti-Smuggling Protocol
-│  └─ 10_partner_walkthroughs/ # Persona-based Guides
+│  └─ 08_saps_alignment/    # SAPS 505(a) Reference
 │
 ├─ templates/               # Legal & Admin Assets
 │  ├─ MOU_01...11           # Stakeholder Agreements
+│  ├─ MOU_12_Insurance_Partner.md # Strategic Risk Coverage
 │  ├─ FORM_01_Owner_Consent.md
-│  ├─ FORM_02_Return_of_Custody.md
-│  ├─ REF_01_SAPS_505a_Summary.md
 │  └─ 03_posters/           # Marketing Assets
 │
-├─ ops/                     # Ground Runbooks
-│  └─ 01_screening_day_checklist.md
-│
-├─ tech/                    # Technical Scaffolding
-│  ├─ ai/                   # Prompts & Schemas
-│  └─ supabase/             # DB Schema (Reference)
-│
-└─ supabase/                # Active Supabase Deployment
+├─ supabase/                # Active Supabase Deployment
    ├─ functions/            # Edge Functions (Deno)
    │  ├─ paws-chat/         # AI API Proxy
-   │  └─ telegram-webhook/  # Automated Routing
-   └─ migrations/           # SQL Migration Files
+   │  └─ paws-intake/       # Secure Field Intake
+   └─ migrations/           # SQL Migration Files (999_MASTER_SCHEMA)
