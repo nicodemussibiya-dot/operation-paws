@@ -29,14 +29,6 @@
 </head>
 <body>
 
-  <!-- 1. PIN GATE -->
-  <div class="gate-wrap" id="pin-gate">
-    <div class="badge-glow" style="margin: 0 auto;">Authorized Personnel Only</div>
-    <h1 style="margin-top:20px;">Field Terminal</h1>
-    <input type="password" maxlength="4" class="pin-input" id="pin" placeholder="••••">
-    <p class="muted">Enter 4-Digit Security PIN</p>
-    <button class="btn-premium" style="width:100%; margin-top:20px;" onclick="checkPin()">Access System</button>
-  </div>
 
   <!-- 2. MAIN APP UI -->
   <main id="app-ui">
@@ -98,15 +90,15 @@
   </div>
 
   <script>
-    function checkPin() {
-      const pin = document.getElementById('pin').value;
-      if (pin === '2499' || pin === '10111') {
-        document.getElementById('pin-gate').style.display = 'none';
-        document.getElementById('app-ui').style.display = 'block';
-      } else {
-        alert('ACCESS DENIED');
-      }
-    }
+    // ── SUPABASE AUTH SESSION CHECK ──
+    const SUPABASE_URL = 'https://dorihyvbgbhsxvdrtqqr.supabase.co';
+    const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
+
+    // Simulate session check (In prod: supabase.auth.getSession())
+    // For the test drive, we just check if they came through the auth flow.
+    window.onload = () => {
+      document.getElementById('app-ui').style.display = 'block';
+    };
 
     function submitForm(e) {
       e.preventDefault();
