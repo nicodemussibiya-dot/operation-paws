@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Operation PAWS — Public Data Boundary (Non‑Negotiable)
 
 **Last updated:** 23 April 2026

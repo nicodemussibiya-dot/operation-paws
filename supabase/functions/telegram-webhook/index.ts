@@ -52,7 +52,7 @@ async function routeToAI(userText: string): Promise<string> {
   try {
     const res = await fetch(SUPABASE_FUNCTION_PAWS_CHAT, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-internal-secret": Deno.env.get("INTERNAL_SECRET") || "" },
       body: JSON.stringify({ messages: [{ role: "user", content: userText }] })
     });
     const data = await res.json();

@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Media & Communications Guidelines
 
 Operation PAWS is a high-visibility project. Every post and press release must reflect the project's values and protect its security.

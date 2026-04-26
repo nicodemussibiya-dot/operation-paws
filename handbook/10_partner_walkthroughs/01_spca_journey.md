@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # SPCA Partner Journey: Welfare First
 
 This guide explains how Operation PAWS works from the perspective of an SPCA Inspector or Welfare Officer.

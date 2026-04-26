@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # MOU-19: Institutional Banking & Fund Management
 **BETWEEN:** Operation PAWS (National Strategic Suite)
 **AND:** [INSERT INVESTMENT BANK / e.g. Standard Bank - Institutional Banking]

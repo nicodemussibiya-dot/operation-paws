@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # SPEC: Digital Intake Fields (Tier 1)
 
 This document defines the data points collected during the initial digital intake (WhatsApp/Telegram/Web).

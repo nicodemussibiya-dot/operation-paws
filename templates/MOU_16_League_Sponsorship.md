@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # MOU-16: Academy League Title Sponsorship Agreement
 **BETWEEN:** Operation PAWS (Academy Management)
 **AND:** [INSERT CORPORATE PARTNER / e.g. Standard Bank, Hollard, etc.]

@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # The PAWS Pipeline Overview
 
 Operation PAWS uses a tiered approach to move dogs from public donors/breeders to official working service.

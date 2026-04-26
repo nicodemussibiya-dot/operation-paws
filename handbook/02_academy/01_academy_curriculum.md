@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # PAWS Academy Curriculum (Tier 3)
 
 The PAWS Academy provides a **foundation-only, non-tactical** training environment. We do NOT teach aggression or specific police tactics. We focus on building the "raw material" that SAPS evaluators look for.

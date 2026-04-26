@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Anti-Smuggling & Diversion Protocol
 
 **Objective:** To ensure 100% traceability of every dog in the Operation PAWS pipeline and prevent any possibility of "smuggling for profit" or unauthorized diversion of animals.

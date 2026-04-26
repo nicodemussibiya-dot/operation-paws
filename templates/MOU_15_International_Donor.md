@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # MOU-15: International Strategic K9 Donor Agreement
 **BETWEEN:** Operation PAWS (National Academy)
 **AND:** [INSERT INTERNATIONAL DONOR / KENNEL / POLICE UNIT]

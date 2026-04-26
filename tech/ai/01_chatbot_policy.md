@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # PAWS Chatbot Policy (Public-Safe)
 
 This chatbot runs on a public, indexed entry point.

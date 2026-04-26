@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # SAPS Policy Alignment & FAQ
 
 This document prepares the Operation PAWS team for meetings with SAPS provincial and national representatives by aligning project terminology with official SAPS instructions.

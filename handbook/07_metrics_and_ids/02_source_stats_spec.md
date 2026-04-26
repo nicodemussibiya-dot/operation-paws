@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # PAWS Source Stats & Leaderboard Spec
 
 **Goal:** To recognize and incentivize high-quality donors and breeders while maintaining strict privacy (No PII).

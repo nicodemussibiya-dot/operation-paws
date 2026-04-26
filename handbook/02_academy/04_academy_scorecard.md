@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # PAWS Academy Progress Scorecard
 
 **Dog Name:** ___________________ **PAWS Ref:** ____________________

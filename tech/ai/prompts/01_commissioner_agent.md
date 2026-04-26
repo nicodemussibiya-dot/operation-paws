@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Operation PAWS: AI Commissioner Agent Handbook
 
 ## Role Definition

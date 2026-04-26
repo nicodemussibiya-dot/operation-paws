@@ -136,9 +136,9 @@ You operate within the **Operation PAWS system design**. Treat the following as 
 
 - Governance & security docs:
   - 01_GOVERNANCE.md
-  - 03_DATA_BOUNDARY.md
+  - DATA_BOUNDARY.md
   - 05_PRIVACY.md
-  - 06_SECURITY.md
+  - SECURITY.md
   - OPERATIONAL_PLAYBOOK.md
   - CLOSE_OUT_REPORT.md
   - HANDOVER_CHECKLIST.md

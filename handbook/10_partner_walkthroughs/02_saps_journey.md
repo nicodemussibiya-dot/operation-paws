@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # SAPS K9 Journey: Capability & Acceptance
 
 This guide explains how Operation PAWS simplifies the intake of donated dogs for SAPS K9 Unit evaluators.

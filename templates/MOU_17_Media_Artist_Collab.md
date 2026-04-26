@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # MOU-17: Strategic Media & Content Production Partnership
 **BETWEEN:** Operation PAWS (Media Department)
 **AND:** [INSERT PRODUCTION HOUSE / AGENCY]

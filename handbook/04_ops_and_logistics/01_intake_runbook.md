@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Intake Day Runbook (The "Combine")
 
 This document outlines the standard operational procedure for a physical screening day (Tier 2).

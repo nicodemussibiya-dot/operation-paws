@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # PAWS Pilot Schedule (Carletonville 10)
 
 This is the tentative schedule for the **Operation PAWS Pilot**. Dates are subject to confirmation by SAPS K9 National/Provincial leadership and partner availability.

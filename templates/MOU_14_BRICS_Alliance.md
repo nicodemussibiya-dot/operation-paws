@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # MOU-14: BRICS Multilateral K9 Security Alliance
 **BETWEEN:** Operation PAWS (Lead Member: South Africa)
 **AND:** [INSERT REPRESENTATIVE - BRICS New Development Bank / NDB]

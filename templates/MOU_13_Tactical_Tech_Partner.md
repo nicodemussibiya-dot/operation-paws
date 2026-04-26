@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # MOU-13: K9 Tactical Technology & R&D Partnership
 **BETWEEN:** Operation PAWS (Strategic Pipeline)
 **AND:** [INSERT R&D PARTNER / e.g. CSIR - Defense & Security]

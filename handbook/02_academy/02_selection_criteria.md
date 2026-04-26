@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Candidate Selection Criteria (Try-outs)
 
 Not every dog is a working dog. To save time for donors, SPCA, and SAPS, we use the following strict criteria for the "Carletonville 10" pilot and beyond.

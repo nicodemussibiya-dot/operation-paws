@@ -1,6 +1,9 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Operation PAWS: National Breeder League — Code of Conduct & Promotion Rules
 
-## 1. The "Unfuckwithable" Integrity Charter
+## 1. The "highly secure" Integrity Charter
 The Breeder League is a meritocracy. Bragging rights and Tier 1 status cannot be bought or influenced. They are earned through the transparent aptitude performance of the K9 assets.
 
 ## 2. Breeder Tiers & Definitions

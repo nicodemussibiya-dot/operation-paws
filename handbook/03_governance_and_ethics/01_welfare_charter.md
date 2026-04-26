@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # PAWS Welfare & Ethics Charter
 
 Operation PAWS is built on a **Welfare-First** foundation. Every dog in the pipeline is a sentient being and a partner, not a tool.

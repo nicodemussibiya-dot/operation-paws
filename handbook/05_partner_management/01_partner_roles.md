@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Partner Roles & Communication
 
 Operation PAWS succeeds only through collaboration. This document defines the clear boundaries between partners to avoid "mission creep" or confusion.

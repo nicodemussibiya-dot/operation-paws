@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Sponsor & Partner Journey: Transparency
 
 This guide explains how corporate sponsors and partners like Gift of the Givers (GotG) interact with the project to ensure financial and animal integrity.

@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Checklist: Screening Day Operations (The "Combine")
 
 This checklist ensures that every Tier 2 screening event is safe, traceable, and professional.

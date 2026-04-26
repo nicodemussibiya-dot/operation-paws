@@ -2,11 +2,11 @@ operation-paws/
 ├─ README.md                # Launchpad & Quick Start
 ├─ 01_GOVERNANCE.md         # Core Principles
 ├─ 02_ROADMAP.md            # Execution Phases (A-E)
-├─ 03_DATA_BOUNDARY.md      # Non-Negotiable Privacy Rules
+├─ DATA_BOUNDARY.md      # Non-Negotiable Privacy Rules
 ├─ 04_DISCLAIMER.md         # Legal Boundaries
 ├─ 05_PRIVACY.md            # POPIA Framework
-├─ 06_SECURITY.md           # Secrets & AI Guardrails
-├─ 07_DONATIONS.md          # Funding Channels
+├─ SECURITY.md           # Secrets & AI Guardrails
+├─ DONATIONS.md          # Funding Channels
 │
 ├─ docs/                    # GitHub Pages (Public Hub)
 │  ├─ index.html            # Root Redirect / Launchpad

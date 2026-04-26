@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # FORM: Return of Custody (Discharge)
 
 **Candidate Dog:** ___________________ 

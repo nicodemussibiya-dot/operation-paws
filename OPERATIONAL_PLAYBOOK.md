@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Operation PAWS – Operational Playbook (Command/CFO)
 
 ## 1. The Approval Deck Demo Script

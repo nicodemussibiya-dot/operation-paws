@@ -18,6 +18,10 @@ function tierBadge(tier) {
   return map[tier] || 'color:var(--muted);';
 }
 
+const escapeHTML = str => String(str).replace(/[&<>'"]/g, tag => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+}[tag]));
+
 // ── 1. Load leaderboard from public view ─────────────────────
 async function loadLeaderboard() {
   const el = document.getElementById('leaderboard-body');
@@ -37,13 +41,13 @@ async function loadLeaderboard() {
       <div class="league-row">
         <div class="league-rank">${String(i + 1).padStart(2, '0')}</div>
         <div class="league-info">
-          <small>${row.tier_label}</small>
-          <h4>Source: ${row.source_code}</h4>
+          <small>${escapeHTML(row.tier_label)}</small>
+          <h4>Source: ${escapeHTML(row.source_code)}</h4>
         </div>
         <div class="league-score">
-          <strong style="${tierBadge(row.tier_label)}">${row.saps_accepted} Accepted (${row.service_rate_pct}%)</strong>
+          <strong style="${tierBadge(row.tier_label)}">${Number(row.saps_accepted)} Accepted (${Number(row.service_rate_pct)}%)</strong>
           <div class="score-bar">
-            <div class="score-fill" style="width: ${Math.min(row.service_rate_pct, 100)}%;"></div>
+            <div class="score-fill" style="width: ${Math.min(Number(row.service_rate_pct), 100)}%;"></div>
           </div>
         </div>
       </div>

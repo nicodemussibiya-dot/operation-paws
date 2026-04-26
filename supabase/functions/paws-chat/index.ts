@@ -35,7 +35,9 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const messages = Array.isArray(body?.messages) ? body.messages : [];
+    let rawMessages = Array.isArray(body?.messages) ? body.messages : [];
+    // Sanitize: strip client-supplied system messages
+    const messages = rawMessages.filter(m => m.role !== 'system');
     const lastMessage = (messages[messages.length - 1]?.content || "").toLowerCase();
     const role = body?.role || 'citizen';
 
@@ -43,12 +45,16 @@ serve(async (req) => {
     const origin = req.headers.get("origin") || "";
     const allowedOrigin = Deno.env.get("ALLOWED_ORIGIN");
     
+    const internalSecret = Deno.env.get("INTERNAL_SECRET");
+    const passedSecret = req.headers.get("x-internal-secret");
+    const isInternal = internalSecret && passedSecret === internalSecret;
+    
     // In production, strictly enforce origin
-    if (allowedOrigin && origin !== allowedOrigin && origin !== "http://localhost:3000") {
+    if (!isInternal && allowedOrigin && origin !== allowedOrigin && origin !== "http://localhost:3000") {
       return json({ error: "Forbidden origin" }, 403);
     }
 
-    const ip = req.headers.get('x-forwarded-for') || 'unknown';
+    const ip = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for') || 'unknown';
     const ipHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip))
       .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
 
@@ -57,17 +63,28 @@ serve(async (req) => {
     const { data: rateRow } = await supabase.from('paws_chat_rate_limit')
       .select('*').eq('ip_hash', ipHash).single();
 
-    if (rateRow?.blocked_until && new Date(rateRow.blocked_until) > new Date()) {
+    let attempts = rateRow?.attempts ?? 0;
+    const lastAttempt = rateRow?.last_attempt ? new Date(rateRow.last_attempt) : new Date(0);
+    const now = new Date();
+
+    // Reset rolling window (15 minutes)
+    if (now.getTime() - lastAttempt.getTime() > 15 * 60 * 1000) {
+      attempts = 0;
+    }
+
+    if (rateRow?.blocked_until && new Date(rateRow.blocked_until) > now) {
       return json({ error: 'Too Many Requests' }, 429);
     }
+
+    attempts += 1;
 
     // Update attempts
     await supabase.from('paws_chat_rate_limit').upsert({
       ip_hash: ipHash,
-      attempts: (rateRow?.attempts ?? 0) + 1,
-      last_attempt: new Date().toISOString(),
-      blocked_until: (rateRow?.attempts ?? 0) >= 20 
-        ? new Date(Date.now() + 60 * 60 * 1000).toISOString() : null
+      attempts: attempts,
+      last_attempt: now.toISOString(),
+      blocked_until: attempts >= 20 
+        ? new Date(now.getTime() + 60 * 60 * 1000).toISOString() : null
     });
 
     // ── 1. ROUTER-FIRST INTENT CHECK ──────────────────────────

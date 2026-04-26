@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # MEMORANDUM OF UNDERSTANDING (MOU)
 ## Operation PAWS – Veterinary Partner
 

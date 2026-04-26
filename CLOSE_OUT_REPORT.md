@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Operation PAWS – Commissioner/CFO Brief
 
 You are inheriting a system that treats the national K9 fleet as both:

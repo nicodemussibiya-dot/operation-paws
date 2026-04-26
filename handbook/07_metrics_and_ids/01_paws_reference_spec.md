@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # PAWS Reference Specification (ID Generation)
 
 To ensure national-level traceability and zero duplicates, every candidate dog is assigned a unique **PAWS Reference ID** at the moment of intake.

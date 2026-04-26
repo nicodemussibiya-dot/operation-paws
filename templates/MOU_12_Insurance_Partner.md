@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # MOU-12: Strategic Insurance Partnership
 **BETWEEN:** Operation PAWS (National K9 Mobilization Initiative)
 **AND:** [INSERT INSURANCE PROVIDER NAME]

@@ -41,18 +41,7 @@ GRANT SELECT ON public.paws_national_governance_dashboard TO authenticated;
 
 -- Ensure ONLY the oversight role and auditors/commissioners can see this view
 -- Others (officers) are restricted to their own provincial views (defined elsewhere).
-ALTER VIEW public.paws_national_governance_dashboard SET (security_invoker = on);
-
--- Underlyng RLS for Aggregate access
-CREATE POLICY "aggregate_oversight_read"
-  ON public.paws_dogs FOR SELECT TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM paws_user_roles
-      WHERE user_id = auth.uid() 
-      AND role IN ('presidency_oversight', 'commissioner', 'auditor')
-    )
-  );
+-- We do NOT grant SELECT on paws_dogs. The view executes with definer privileges.
 
 -- ── 4. EXAMPLE ROLE ASSIGNMENT ──────────────────────────────
 -- To be executed by a SuperAdmin/Commissioner only:
@@ -72,12 +61,4 @@ GROUP BY actor_role, action;
 
 GRANT SELECT ON public.paws_audit_governance_summary TO authenticated;
 
-CREATE POLICY "audit_summary_oversight_read"
-  ON public.paws_audit_log FOR SELECT TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM paws_user_roles
-      WHERE user_id = auth.uid() AND role = 'presidency_oversight'
-    )
-  );
--- Note: Combined with RLS, this ensures they only see what the policy allows.
+-- We do NOT grant SELECT on paws_audit_log. The view executes with definer privileges.

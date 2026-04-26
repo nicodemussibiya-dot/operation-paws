@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Strategic Command Manual: Operation PAWS
 **Confidential: For the National Commissioner & Authorized Personnel Only**
 

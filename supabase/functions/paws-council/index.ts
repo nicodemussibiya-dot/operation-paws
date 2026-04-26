@@ -11,13 +11,13 @@ const SERVICE_ROLE  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 // Here we keep a compact, provable fact set as the "source of truth."
 const KNOWLEDGE: Record<string, string> = {
   governance:   "Operation PAWS is governed by the Council of Paws (COP). All decisions require round-robin consensus from Agent Alpha (Auditor), Agent Beta (Welfare), and Agent Gamma (Strategist) before the Chair acts. See /01_GOVERNANCE.md.",
-  security:     "The system uses RLS, JWT, and 2FA. The paws_dogs table is never exposed to anonymous users. All actions are logged to an append-only audit trail. See /docs/06_SECURITY.md.",
+  security:     "The system uses RLS, JWT, and 2FA. The paws_dogs table is never exposed to anonymous users. All actions are logged to an append-only audit trail. See /docs/SECURITY.md.",
   league:       "Breeder promotion is merit-based. Premier Partner requires ≥10 SAPS-accepted dogs and ≥30% service rate. Gold requires ≥5 and ≥20%. Silver ≥2. All promotions are signed by the Chair after COP consensus. See /docs/league-rules.md.",
   escrow:       "Funding is held in a ring-fenced escrow account. Releases require Commissioner authorization and COP audit sign-off. The public tracker shows escrow status but not individual amounts.",
   dms:          "The Dead Man's Switch activates if the Commissioner is unreachable for 7 days. The AI Surrogate locks destructive actions and routes authority to the designated deputy.",
   biometric:    "Commissioner approvals require biometric identity verification (SHA-256 facial scan hash stored server-side). The frontend captures the signal; the hash is verified by the paws-secure-action Edge Function.",
   demo:         "The national tracker currently shows a SIMULATION dataset of 500 demo dogs (is_demo=true) to demonstrate project scale. Real dogs will replace demo data as intake occurs.",
-  mou:          "The Master MOU v2.0 formally recognizes the Council of Paws as the governing body. No human official can unilaterally override COP welfare or aptitude findings. See /docs/MASTER_MOU_v2.md.",
+  mou:          "The A drafted Master MOU framework proposes to recognize the Council of Paws as the governing body. No human official can unilaterally override COP welfare or aptitude findings. See /docs/MASTER_MOU_v2.md.",
 };
 
 function json(data: unknown, status = 200) {

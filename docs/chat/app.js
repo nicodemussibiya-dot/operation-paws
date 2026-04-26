@@ -15,7 +15,7 @@ const state = {
 const ROLES = {
   commissioner: {
     label: "National Commissioner",
-    greeting: (n) => `Welcome back${n ? ', ' + n : ''}. The tactical queue is synchronized. 500 candidates in the national registry. Ledger integrity is clean. What do you need?`,
+    greeting: (n) => `Welcome back${n ? ', ' + n : ''}. The intake queue is synchronized. 500 candidates in the demo dataset. Ledger integrity is clean. What do you need?`,
     link: { url: "../commissioner/", label: "Open Command Center" },
   },
   elder: {
@@ -30,7 +30,7 @@ const ROLES = {
   },
   officer: {
     label: "Field Officer",
-    greeting: (n) => `Terminal Node-042 is live${n ? ', ' + n : ''}. Ready for intake. All submissions require a 15-digit microchip and a welfare clearance. What do you need?`,
+    greeting: (n) => `Demo Hub is live${n ? ', ' + n : ''}. Ready for intake. All submissions require a 15-digit microchip and a welfare clearance. What do you need?`,
     link: { url: "../admin/", label: "Open Intake Terminal" },
   },
   breeder: {

@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Operation PAWS — AI Security & Data Boundary Policy
 
 This document defines the security guardrails for all AI agents and LLM integrations within the Operation PAWS ecosystem.

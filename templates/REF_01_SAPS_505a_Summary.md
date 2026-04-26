@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Reference: SAPS 505(a) (Unconditional Donation)
 
 **Official Title:** Deed of unconditional and irrevocable donation inter vivos.

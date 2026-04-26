@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Operation PAWS — Disclaimer (Public)
 
 **Last updated:** 23 April 2026
@@ -28,7 +31,7 @@ We do **not** publish:
 - signed documents,
 - sensitive operational details.
 
-See: `PUBLIC_DATA_BOUNDARY.md`.
+See: `DATA_BOUNDARY.md`.
 
 ## 5) Donations and anti-scam policy
 To protect the public:

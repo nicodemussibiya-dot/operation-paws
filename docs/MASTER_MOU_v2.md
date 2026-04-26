@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Operation PAWS: Master Memorandum of Understanding (MOU)
 ## Version 2.0 — Renegotiated Tactical Framework
 

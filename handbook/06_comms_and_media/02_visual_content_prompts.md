@@ -1,3 +1,6 @@
+
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
+
 # Media Department: Visual Content Prompts (The "Deterrence" Series)
 
 To "wow" partners and deter criminals, the Media Department should produce content following these high-impact prompts. Use these for AI Video Generation or as a script for a film crew.
