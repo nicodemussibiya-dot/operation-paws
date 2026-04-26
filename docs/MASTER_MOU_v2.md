@@ -26,5 +26,5 @@ Every dog's career, from T3 intake to T1 deployment, is recorded on an immutable
 Failure to adhere to the AI Council's welfare standards results in the immediate withdrawal of corporate funding and the cessation of tactical asset deployment.
 
 ---
-**Status: RENEGOTIATED & SIGNED**
-*Electronically Verified by PAWS-OS Chair*
+**Status: DRAFT / TEMPLATE (NOT EXECUTED)**
+*For review and discussion purposes only*

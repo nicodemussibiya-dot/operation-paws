@@ -3,6 +3,10 @@
 const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.PAWS_CONFIG;
 const COUNCIL_URL = `${SUPABASE_URL}/functions/v1/paws-council`;
 
+const escapeHTML = str => String(str).replace(/[&<>'"]/g, tag => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+}[tag]));
+
 // ── Conversation state ────────────────────────────────────────
 const state = {
   role: null,
@@ -210,29 +214,29 @@ async function sendMessage() {
       const llmReply = await callChatLLM(text);
       
       if (llmReply) {
-        responseHtml = llmReply;
+        responseHtml = escapeHTML(llmReply);
         state.history.push({ role: 'ai', text: llmReply });
       } else {
         // Ultimate Fallback: local intelligence
         const local = localResponse(text);
-        responseHtml = local;
+        responseHtml = escapeHTML(local);
         state.history.push({ role: 'ai', text: local });
       }
     } else {
       // Grounded hit
       const cites = councilData.citations?.length
-        ? `<br><span style="color:var(--muted); font-size:11px; margin-top:6px; display:block;">Sources: ${councilData.citations.join(', ')}</span>`
+        ? `<br><span style="color:var(--muted); font-size:11px; margin-top:6px; display:block;">Sources: ${escapeHTML(councilData.citations.join(', '))}</span>`
         : '';
-      responseHtml = councilData.answer + cites;
+      responseHtml = escapeHTML(councilData.answer) + cites;
       state.history.push({ role: 'ai', text: councilData.answer });
     }
   } else if (councilData && councilData.chair === 'BLOCKED') {
-    responseHtml = `That's outside what I can verify. ${councilData.reason || ''}<br><span style="color:var(--muted); font-size:11px;">I won't speculate.</span>`;
+    responseHtml = `That's outside what I can verify. ${escapeHTML(councilData.reason || '')}<br><span style="color:var(--muted); font-size:11px;">I won't speculate.</span>`;
     state.history.push({ role: 'ai', text: responseHtml });
   } else {
     // Ultimate Fallback: local intelligence
     const local = localResponse(text);
-    responseHtml = local;
+    responseHtml = escapeHTML(local);
     state.history.push({ role: 'ai', text: local });
   }
 

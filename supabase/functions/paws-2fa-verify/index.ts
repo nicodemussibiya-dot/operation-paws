@@ -4,7 +4,7 @@
  * Validates a TOTP code server-side and issues a short-lived action_token.
  * This runs on Supabase infrastructure, never in the browser.
  *
- * SECURITY: The TOTP secret is stored in Supabase Vault (encrypted at rest).
+ * SECURITY: The TOTP secret is stored securely at the application layer via a Security Definer RPC.
  * It is NEVER exposed to the client, NEVER logged, NEVER in env vars.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: "Invalid target_id" }), { status: 400, headers: corsHeaders });
   }
 
-  // Secret retrieved from Supabase Vault — never from env vars or code
+  // Secret retrieved securely via RPC — never from env vars or code
   const { data: secretData } = await supabase.rpc('get_commissioner_totp_secret', { uid: user.id });
 
   const isValid = await validateTOTP(code, secretData?.secret);
