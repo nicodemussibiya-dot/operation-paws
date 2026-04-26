@@ -3,9 +3,6 @@
 const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.PAWS_CONFIG;
 const COUNCIL_URL = `${SUPABASE_URL}/functions/v1/paws-council`;
 
-const escapeHTML = str => String(str).replace(/[&<>'"]/g, tag => ({
-  '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-}[tag]));
 
 // ── Conversation state ────────────────────────────────────────
 const state = {

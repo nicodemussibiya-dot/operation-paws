@@ -18,9 +18,6 @@ function tierBadge(tier) {
   return map[tier] || 'color:var(--muted);';
 }
 
-const escapeHTML = str => String(str).replace(/[&<>'"]/g, tag => ({
-  '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-}[tag]));
 
 // ── 1. Load leaderboard from public view ─────────────────────
 async function loadLeaderboard() {

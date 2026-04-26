@@ -1,5 +1,5 @@
 
-> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted. (Hardened Build: 2026-04-26)
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted. (Hardened Build: 2026-04-26 v3 — CORS fail-closed, zero-PII views, dead-code purge)
 
 # Operation PAWS
 
