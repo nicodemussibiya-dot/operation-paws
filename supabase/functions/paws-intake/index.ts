@@ -14,7 +14,7 @@ function json(data: unknown, status = 200) {
 
 // DB trigger `generate_paws_ref()` handles reference generation
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Use POST" }, 405);
 
@@ -65,13 +65,18 @@ serve(async (req) => {
 
     const assignedRef = data?.[0]?.paws_ref;
 
+    const microchipStr = String(microchip ?? "");
+    const microchipLast4 = microchipStr.slice(-4);
+    const microchipHash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(microchipStr))
+      .then(b => Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, "0")).join(""));
+
     // ── 2. AUDIT LOG ────────────────────────────────────────────
     await supabase.from('paws_audit_log').insert({
       actor_id: user.id,
       actor_role: roleRow.role,
       action: 'DOG_INTAKE_SUCCESS',
       target_id: assignedRef || 'UNKNOWN_REF',
-      metadata: { dog_name, breed, microchip }
+      metadata: { dog_name, breed, microchip_last4: microchipLast4, microchip_hash: microchipHash }
     });
 
     return json({ ok: true, paws_ref: assignedRef, inserted: data });
