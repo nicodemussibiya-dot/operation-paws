@@ -67,7 +67,7 @@ function buildAnswer(query: string): string {
 }
 
 // ── Main handler ─────────────────────────────────────────────
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "POST only" }, 405);
 
