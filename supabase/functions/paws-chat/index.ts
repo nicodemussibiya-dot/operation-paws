@@ -1,21 +1,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { corsHeaders } from "../_shared/cors.ts";
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
+const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "";
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") || "";
 const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY") || "";
 
-const SYSTEM_PROMPT = `
-You are the PAWS Assistant.
-Mission: Welfare-first, traceable K9 mobilization for SAPS.
-Safety: No PII. No tactical secrets.
-Routing: Use /start for WhatsApp, /donate for funding, /tracker for stats.
-`.trim();
+import * as Prompts from "../_shared/prompts.ts";
 
 const FALLBACK_ANSWERS: Record<string, string> = {
   default:
@@ -42,8 +37,61 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const messages = Array.isArray(body?.messages) ? body.messages : [];
     const lastMessage = (messages[messages.length - 1]?.content || "").toLowerCase();
+    const role = body?.role || 'citizen';
 
-    // 1) Gemini
+    // ── 0. ORIGIN & RATE LIMIT CHECK ──────────────────────────
+    const origin = req.headers.get("origin") || "";
+    const allowedOrigin = Deno.env.get("ALLOWED_ORIGIN");
+    
+    // In production, strictly enforce origin
+    if (allowedOrigin && origin !== allowedOrigin && origin !== "http://localhost:3000") {
+      return json({ error: "Forbidden origin" }, 403);
+    }
+
+    const ip = req.headers.get('x-forwarded-for') || 'unknown';
+    const ipHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip))
+      .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
+    
+    const { data: rateRow } = await supabase.from('paws_chat_rate_limit')
+      .select('*').eq('ip_hash', ipHash).single();
+
+    if (rateRow?.blocked_until && new Date(rateRow.blocked_until) > new Date()) {
+      return json({ error: 'Too Many Requests' }, 429);
+    }
+
+    // Update attempts
+    await supabase.from('paws_chat_rate_limit').upsert({
+      ip_hash: ipHash,
+      attempts: (rateRow?.attempts ?? 0) + 1,
+      last_attempt: new Date().toISOString(),
+      blocked_until: (rateRow?.attempts ?? 0) >= 20 
+        ? new Date(Date.now() + 60 * 60 * 1000).toISOString() : null
+    });
+
+    // ── 1. ROUTER-FIRST INTENT CHECK ──────────────────────────
+    if (lastMessage.includes("donate") || lastMessage.includes("intake")) {
+      return json({ reply: FALLBACK_ANSWERS.intake });
+    }
+    if (lastMessage.includes("welfare") || lastMessage.includes("spca")) {
+      return json({ reply: FALLBACK_ANSWERS.welfare });
+    }
+    if (lastMessage.includes("trace")) {
+      return json({ reply: FALLBACK_ANSWERS.traceability });
+    }
+
+    // ── SELECT SYSTEM PROMPT BASED ON ROLE ──
+    let activePrompt = Prompts.PAWS_CITIZEN_ASSISTANT_PROMPT;
+    switch (role) {
+      case 'clerk': activePrompt = Prompts.PAWS_GOVERNANCE_CLERK_PROMPT; break;
+      case 'officer': activePrompt = Prompts.PAWS_OFFICER_ASSISTANT_PROMPT; break;
+      case 'command': activePrompt = Prompts.PAWS_COMMAND_ASSISTANT_PROMPT; break;
+      case 'presidency': activePrompt = Prompts.PAWS_PRESIDENCY_ASSISTANT_PROMPT; break;
+      case 'citizen': activePrompt = Prompts.PAWS_CITIZEN_ASSISTANT_PROMPT; break;
+    }
+
+    // 2) Gemini
     if (GEMINI_API_KEY) {
       try {
         const res = await fetch(
@@ -55,7 +103,7 @@ serve(async (req) => {
               contents: [
                 {
                   parts: [
-                    { text: `${SYSTEM_PROMPT}\n\nUser: ${messages[messages.length - 1]?.content ?? ""}` },
+                    { text: `${activePrompt}\n\nUser: ${messages[messages.length - 1]?.content ?? ""}` },
                   ],
                 },
               ],
@@ -82,7 +130,7 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             model: "gpt-4o-mini",
-            messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+            messages: [{ role: "system", content: activePrompt }, ...messages],
           }),
         });
 
@@ -107,7 +155,7 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             model: "google/gemini-flash-1.5",
-            messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+            messages: [{ role: "system", content: activePrompt }, ...messages],
           }),
         });
 

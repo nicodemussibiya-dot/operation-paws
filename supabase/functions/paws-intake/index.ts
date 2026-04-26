@@ -1,13 +1,5 @@
-/// <reference lib="deno.ns" />
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-
-const ADMIN_PIN = Deno.env.get("ADMIN_PIN") || ""; // set in Supabase Secrets
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { corsHeaders } from "../_shared/cors.ts";
 
 // Supabase provides these to Edge Functions by default:
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -20,30 +12,36 @@ function json(data: unknown, status = 200) {
   });
 }
 
-function makeRef() {
-  const d = new Date();
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const rand = String(Math.floor(Math.random() * 1_000_000)).padStart(6, "0");
-  return `PAWS-${y}${m}-${rand}`;
-}
+// DB trigger `generate_paws_ref()` handles reference generation
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Use POST" }, 405);
 
   try {
-    const body = await req.json();
-    const { pin, dog_name, breed, microchip, source_tier } = body ?? {};
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) return json({ error: 'Missing auth' }, 401);
 
-    if (!ADMIN_PIN || String(pin || "") !== ADMIN_PIN) {
-      return json({ error: "Invalid PIN" }, 401);
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (authErr || !user) return json({ error: 'Invalid session' }, 401);
+
+    // ── 1. CHECK ROLE ──────────────────────────────────────────
+    const { data: roleRow } = await supabase
+      .from('paws_user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!roleRow || !['officer', 'intake_admin', 'commissioner'].includes(roleRow.role)) {
+      return json({ error: 'Unauthorized: insufficient role' }, 403);
     }
 
-    // Stock image (turnkey demo)
-    const photo = `https://placedog.net/900/600?id=${Math.floor(Math.random() * 200) + 1}`;
+    const body = await req.json();
+    const { dog_name, breed, microchip, source_tier } = body ?? {};
 
-    const paws_ref = makeRef();
+    // Use internal placeholder or require client upload
+    const photo = `internal://assets/k9_placeholder.png`;
 
     const res = await fetch(`${SUPABASE_URL}/rest/v1/paws_dogs`, {
       method: "POST",
@@ -54,12 +52,11 @@ serve(async (req) => {
         Prefer: "return=representation",
       },
       body: JSON.stringify([{
-        paws_ref,
         name: dog_name,
         breed,
         microchip_number: microchip,
         status: "pending_commissioner",
-        photo_urls: [photo],
+        photo_urls: [],
         source_tier: source_tier || "T3"
       }]),
     });
@@ -67,7 +64,18 @@ serve(async (req) => {
     const data = await res.json();
     if (!res.ok) return json({ error: data }, 400);
 
-    return json({ ok: true, paws_ref, inserted: data, stock_photo: photo });
+    const assignedRef = data?.[0]?.paws_ref;
+
+    // ── 2. AUDIT LOG ────────────────────────────────────────────
+    await supabase.from('paws_audit_log').insert({
+      actor_id: user.id,
+      actor_role: roleRow.role,
+      action: 'DOG_INTAKE_SUCCESS',
+      target_id: assignedRef || 'UNKNOWN_REF',
+      metadata: { dog_name, breed, microchip }
+    });
+
+    return json({ ok: true, paws_ref: assignedRef, inserted: data });
   } catch (e) {
     return json({ error: String(e) }, 500);
   }

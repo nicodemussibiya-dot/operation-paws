@@ -9,18 +9,14 @@
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const CORS = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? 'https://nicodemussibiya-dot.github.io',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+import { corsHeaders } from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   // ── 1. AUTHENTICATE THE CALLER ──────────────────────────────
   const authHeader = req.headers.get('Authorization');
-  if (!authHeader) return new Response('Unauthorized', { status: 401, headers: CORS });
+  if (!authHeader) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -30,11 +26,11 @@ Deno.serve(async (req) => {
   const { data: { user }, error: authErr } = await supabase.auth.getUser(
     authHeader.replace('Bearer ', '')
   );
-  if (authErr || !user) return new Response('Invalid session', { status: 401, headers: CORS });
+  if (authErr || !user) return new Response('Invalid session', { status: 401, headers: corsHeaders });
 
   // ── 2. CHECK ROLE (Commissioner only) ───────────────────────
   const { data: roleRow } = await supabase
-    .from('paws_roles')
+    .from('paws_user_roles')
     .select('role')
     .eq('user_id', user.id)
     .single();
@@ -44,7 +40,7 @@ Deno.serve(async (req) => {
       actor_id: user.id, actor_role: roleRow?.role ?? 'unknown',
       action: '2FA_ATTEMPT_UNAUTHORIZED', metadata: { ip: req.headers.get('x-forwarded-for') }
     });
-    return new Response('Forbidden', { status: 403, headers: CORS });
+    return new Response('Forbidden', { status: 403, headers: corsHeaders });
   }
 
   // ── 3. RATE LIMIT CHECK ─────────────────────────────────────
@@ -53,11 +49,22 @@ Deno.serve(async (req) => {
     .select('*').eq('ip_hash', ipHash).eq('action', '2fa_verify').single();
 
   if (rateRow?.blocked_until && new Date(rateRow.blocked_until) > new Date()) {
-    return new Response('Too Many Requests', { status: 429, headers: CORS });
+    return new Response('Too Many Requests', { status: 429, headers: corsHeaders });
   }
 
-  // ── 4. VALIDATE TOTP ────────────────────────────────────────
-  const { code, action, target_id } = await req.json();
+  // ── 4. VALIDATE INPUTS ──────────────────────────────────────
+  const body = await req.json().catch(() => ({}));
+  const { code, action, target_id } = body;
+
+  if (!/^\d{6}$/.test(String(code ?? ""))) {
+    return new Response(JSON.stringify({ error: "Invalid code format" }), { status: 400, headers: corsHeaders });
+  }
+  if (!["DELETE_DOG","APPROVE_DOG","REJECT_DOG","UPDATE_ROLE_FROM_PROPOSAL","APPROVE_DOG_BATCH"].includes(String(action ?? ""))) {
+    return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers: corsHeaders });
+  }
+  if (typeof target_id !== "string" && !Array.isArray(target_id)) {
+    return new Response(JSON.stringify({ error: "Invalid target_id" }), { status: 400, headers: corsHeaders });
+  }
 
   // Secret retrieved from Supabase Vault — never from env vars or code
   const { data: secretData } = await supabase.rpc('get_commissioner_totp_secret', { uid: user.id });
@@ -78,7 +85,7 @@ Deno.serve(async (req) => {
       action: '2FA_FAILED', target_id,
       metadata: { ip: req.headers.get('x-forwarded-for'), attempts: (rateRow?.attempts ?? 0) + 1 }
     });
-    return new Response(JSON.stringify({ error: 'Invalid code' }), { status: 401, headers: CORS });
+    return new Response(JSON.stringify({ error: 'Invalid code' }), { status: 401, headers: corsHeaders });
   }
 
   // ── 5. ISSUE SHORT-LIVED ACTION TOKEN ───────────────────────
@@ -87,12 +94,15 @@ Deno.serve(async (req) => {
     expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString()
   }).select('token').single();
 
+  const tokenStr = String(tokenRow?.token ?? "");
+  const tokenFingerprint = tokenStr ? tokenStr.slice(-6) : null;
+
   await supabase.from('paws_audit_log').insert({
     actor_id: user.id, actor_role: 'commissioner',
-    action: '2FA_SUCCESS', target_id, metadata: { action_token: tokenRow?.token }
+    action: '2FA_SUCCESS', target_id: Array.isArray(target_id) ? target_id[0] : target_id, metadata: { token_fingerprint: tokenFingerprint }
   });
 
-  return new Response(JSON.stringify({ action_token: tokenRow?.token }), { headers: CORS });
+  return new Response(JSON.stringify({ action_token: tokenRow?.token }), { headers: corsHeaders });
 });
 
 async function hashIp(ip: string): Promise<string> {

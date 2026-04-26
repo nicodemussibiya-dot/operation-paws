@@ -135,6 +135,36 @@ async function callCouncil(text) {
   }
 }
 
+const CHAT_URL = `${SUPABASE_URL}/functions/v1/paws-chat`;
+
+// ── LLM call (next-level conversational fallback) ───────────
+async function callChatLLM(text) {
+  try {
+    const formattedHistory = state.history.map(m => ({
+      role: m.role === 'ai' ? 'assistant' : 'user',
+      content: m.text
+    }));
+    
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000); // 10s timeout for LLM
+
+    const res = await fetch(CHAT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY },
+      body: JSON.stringify({ role: state.role || 'citizen', messages: [...formattedHistory.slice(-6), {role: 'user', content: text}] }),
+      signal: ctrl.signal,
+    });
+    clearTimeout(timer);
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return data.reply || null;
+  } catch (err) {
+    console.error("LLM Error:", err);
+    return null;
+  }
+}
+
 // ── Core message handler ──────────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById('user-input');
@@ -143,8 +173,7 @@ async function sendMessage() {
 
   appendUser(text);
   input.value = '';
-  state.history.push({ role: 'user', text });
-
+  
   // Show typing indicator
   const bubble = appendAI('<span class="typing-dots"><span></span><span></span><span></span></span>');
 
@@ -163,9 +192,12 @@ async function sendMessage() {
     const response = cfg.greeting(state.name) + 
       `<br><br>→ <a href="${cfg.link.url}" style="color:var(--accent); font-weight:700; text-decoration:none;">${cfg.link.label} ↗</a>`;
     await typeInto(bubble, response, true);
+    state.history.push({ role: 'user', text });
     state.history.push({ role: 'ai', text: cfg.greeting(state.name) });
     return;
   }
+  
+  state.history.push({ role: 'user', text });
 
   // 3. Try Council (async, with fallback)
   const councilData = await callCouncil(text);
@@ -173,18 +205,32 @@ async function sendMessage() {
   let responseHtml = '';
 
   if (councilData && councilData.chair === 'APPROVED' && councilData.answer) {
-    const cites = councilData.citations?.length
-      ? `<br><span style="color:var(--muted); font-size:11px; margin-top:6px; display:block;">Sources: ${councilData.citations.join(', ')}</span>`
-      : '';
-    responseHtml = councilData.answer + cites;
-    state.history.push({ role: 'ai', text: councilData.answer });
-
+    // If Council has no grounded facts, route to the LLM Brain
+    if (councilData.answer.includes("I cannot find a grounded answer")) {
+      const llmReply = await callChatLLM(text);
+      
+      if (llmReply) {
+        responseHtml = llmReply;
+        state.history.push({ role: 'ai', text: llmReply });
+      } else {
+        // Ultimate Fallback: local intelligence
+        const local = localResponse(text);
+        responseHtml = local;
+        state.history.push({ role: 'ai', text: local });
+      }
+    } else {
+      // Grounded hit
+      const cites = councilData.citations?.length
+        ? `<br><span style="color:var(--muted); font-size:11px; margin-top:6px; display:block;">Sources: ${councilData.citations.join(', ')}</span>`
+        : '';
+      responseHtml = councilData.answer + cites;
+      state.history.push({ role: 'ai', text: councilData.answer });
+    }
   } else if (councilData && councilData.chair === 'BLOCKED') {
     responseHtml = `That's outside what I can verify. ${councilData.reason || ''}<br><span style="color:var(--muted); font-size:11px;">I won't speculate.</span>`;
     state.history.push({ role: 'ai', text: responseHtml });
-
   } else {
-    // Fallback: local intelligence
+    // Ultimate Fallback: local intelligence
     const local = localResponse(text);
     responseHtml = local;
     state.history.push({ role: 'ai', text: local });

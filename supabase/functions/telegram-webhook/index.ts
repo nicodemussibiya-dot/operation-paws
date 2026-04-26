@@ -3,10 +3,22 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "";
 const SUPABASE_FUNCTION_PAWS_CHAT = Deno.env.get("SUPABASE_FUNCTION_PAWS_CHAT") ?? ""; 
-// e.g. https://YOUR_PROJECT_REF.supabase.co/functions/v1/paws-chat
+const TELEGRAM_SECRET_TOKEN = Deno.env.get("TELEGRAM_SECRET_TOKEN") ?? "";
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("ok");
+
+  // Fail closed if missing critical env vars
+  if (!TELEGRAM_BOT_TOKEN || !SUPABASE_FUNCTION_PAWS_CHAT) {
+    console.error("Missing critical messaging env vars");
+    return new Response("ok", { status: 500 });
+  }
+
+  // Verify Telegram secret token to prevent spoofing
+  const secretHeader = req.headers.get("X-Telegram-Bot-Api-Secret-Token");
+  if (TELEGRAM_SECRET_TOKEN && secretHeader !== TELEGRAM_SECRET_TOKEN) {
+    return new Response("Forbidden", { status: 403 });
+  }
 
   try {
     const update = await req.json();
