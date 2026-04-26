@@ -1,37 +1,41 @@
 # Operation PAWS
-**PAWS = Partnership for Animal Work & Service**
 
-Operation PAWS is a **National Strategic Command System** designed to be run by **Autonomous AI Agents**. It is an "unfuckwithable" pipeline for mobilising high-drive K9 assets, where the AI does the majority of the auditing, sorting, and management.
+## What Operation PAWS Is
 
-## 🤖 The AI Handbooks (How the System Runs Itself)
-The system is governed by specialized AI Agents, each with a specific "Handbook" that defines their logic, browser-access protocols, and authority to **offer pushback**:
-- **[AI Commissioner Agent](/tech/ai/prompts/01_commissioner_agent.md)** — High-level tactical auditing and secure 2FA approvals.
-- **[AI Breeder League Agent](/tech/ai/prompts/02_breeder_league_agent.md)** — Manages rivalry, tier promotions, and youth education.
-- **[AI Intake & Welfare Agent](/tech/ai/prompts/03_intake_agent.md)** — SPCA compliance gatekeeper and microchip registry.
+Operation PAWS is a national K9 command-and-oversight system for South Africa.
 
-## 🛡️ Continuity of Command (The Dead Man's Switch)
-Operation PAWS includes a **Continuity of Government (CoG)** protocol:
-- **Dead Man's Switch (DMS)**: If the National Commissioner fails to check in for 7 days, the system triggers a secure handover.
-- **AI Surrogate Activation**: Upon DMS trigger, the AI Tactical Assistant takes temporary control, locking destructive actions and maintaining project transparency until a designated successor is verified.
+- The **code and logic are open** so anyone can inspect how decisions are made.
+- The **data and infrastructure are closed** so no one outside the system can see live cases, locations, or personal information.
 
-## 🏆 The National Breeder Rivalry (The League)
-The "Academy" is a competitive league for **Breeders**, not just a training school.
-- **Tier 1 (T1)**: "Bragging Rights" for sponsored breeders supplying the SAPS with elite assets.
-- **Tier 2 (T2)**: Commercial-grade protection breeders.
-- **Tier 3 (T3)**: Grassroots and Youth Academy initiatives where kids learn to train and handle dogs.
-- **Rivalry**: Tiers are fluid—T3 breeders can rise to T1 based on aptitude scores, creating a national standard of excellence.
+PAWS does three things at once:
 
-## 🏛️ Strategic Command (The Portals)
-- **[Commissioner's Command Center](/docs/commissioner/)** — Secure Tactical Approval Portal (Auth Required).
-- **[National Transparency Tracker](/docs/tracker/)** — Real-time Breeder Leaderboard and Audit Feed.
-- **[Field Intake Terminal](/docs/admin/)** — High-speed on-the-ground registration for officers and breeders.
+1. **Protects dogs and handlers**
+   - Every dog has a full lifecycle: training, deployments, welfare, insurance, and losses.
+   - Risk, injuries, and near-misses are tracked, not hidden.
+   - Welfare and SPCA screening are built into the intake and audit trail.
 
-## 🚀 Key Strategic Features
-1.  **Immutable Audit Logs**: Every action is etched into a tamper-proof ledger.
-2.  **SPCA Welfare First**: Integrated animal welfare checkpoints at every stage of the pipeline.
-3.  **BRICS Interoperability**: Standardized commands and deployment protocols for member states.
-4.  **Youth Empowerment**: A dedicated stream for kids to learn vocational skills in dog training and tech.
+2. **Protects the public and fights crime**
+   - Each K9 operation is logged: arrests, seizures, missing persons found, firearms recovered.
+   - The system can show which tactics reduce violence and which don’t.
+   - Leadership can see risk and performance by province, not just headlines.
+
+3. **Protects the integrity of SAPS and the Presidency**
+   - No single Commissioner can quietly switch off oversight.
+   - A Presidency Oversight role sees national, anonymized dashboards but cannot edit or delete.
+   - AI can propose leadership changes based on official notices, but **only humans with 2FA and secure actions can approve them**.
+
+In short: PAWS is **“open recipe, locked kitchen”** for national K9 mobilization.
+The recipe (code, policies, RLS) is public. The kitchen (real dogs, people, and data) is locked behind strict authentication, 2FA, and database policies.
 
 ---
-**Status: AI-COMMAND READY**
-*System is designed to be autonomous. Humans approve; AI executes.*
+
+## Technical Overview
+- **Stack**: Supabase (PostgreSQL + RLS + Edge Functions).
+- **Security**: 2FA, JWT-based RBAC, Single-use Action Tokens, Hardened CORS.
+- **AI**: Phase-aware guardrails for Officers, Command, Oversight, and Public.
+- **Oversight**: Presidency Dashboard for national stability monitoring.
+
+---
+
+## 500-Dog Pilot Close-Out
+The system has completed its initial 500-dog pilot simulation. See [CLOSE_OUT_REPORT.md](./CLOSE_OUT_REPORT.md) for results.

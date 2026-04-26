@@ -1,0 +1,18 @@
+# IDE / System
+.vscode/
+.idea/
+.DS_Store
+node_modules/
+dist/
+
+# SEC-01: SECRETS & CONFIG (DO NOT REMOVE)
+.env
+.env.*
+!.env.example
+*.local
+config.js
+docs/config.js
+
+# Supabase
+supabase/.temp/
+supabase/functions/.env

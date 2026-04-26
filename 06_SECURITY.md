@@ -23,3 +23,11 @@ Operation PAWS handles sensitive operational data and partner secrets. This docu
 ## 5. Physical Security (On-Site)
 - **Offline Backups:** During screening days, an offline backup of the intake log is maintained to ensure data persistence if network connectivity fails.
 - **Chain of Custody:** Physical documents (e.g., SAPS 505a) are handled only by authorized personnel and filed securely at the Unit level.
+
+## 6. Oversight Security Gate (Presidency)
+Access for the Presidency Oversight role is strictly compartmentalized:
+- **RBAC Gating**: Managed through the `paws_user_roles` table with `presidency_oversight` role.
+- **Aggregate Isolation**: Users with this role are restricted via RLS to pre-anonymized views (`paws_national_governance_dashboard`). They have ZERO access to the underlying `paws_dogs` operational table.
+- **Enhanced Verification**: Mandatory 2FA and IP-restricted logins (where possible) are required for oversight accounts.
+- **Immutable Audit**: Every query and login by an oversight account is captured in `paws_audit_log`. 
+- **Private Access**: Dashboards are served on private, non-indexed URLs and are NEVER exposed to the public internet.

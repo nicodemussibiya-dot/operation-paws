@@ -20,6 +20,18 @@ Operation PAWS (PAWS — Partnership for Animal Work & Service) is a public-inte
 - Sponsors: fund ring-fenced programme costs; no influence over acceptance decisions.
 - Media/influencers: responsible storytelling under strict rules + consent.
 
+## 5. Presidency Oversight Role
+
+To ensure continuity of national visibility during periods of leadership churn, the system includes a dedicated **Presidency Oversight** layer.
+
+- **Purpose**: Provide the Presidency (as an institution) with a real-time "heartbeat" of national K9 mobilization, risk, and stability.
+- **Powers**: Read-only access to the `paws_national_governance_dashboard`.
+- **Constraints**: 
+    - **No Operational Control**: Cannot approve, reject, or delete records.
+    - **No PII Access**: Restricted to aggregate, anonymized data only.
+    - **Strict Audit**: Every access by an oversight account is logged and auditable by the Council of Paws.
+- **Resilience**: This role survives the transition of National Commissioners, providing a stable data signal for the Head of State.
+
 ## 4) Decision-making
 - Public repo changes follow documented rules and are reviewed if collaborators exist.
 - Operational decisions require written approvals and documented procedures.

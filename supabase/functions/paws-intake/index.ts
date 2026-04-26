@@ -40,8 +40,7 @@ serve(async (req) => {
     const body = await req.json();
     const { dog_name, breed, microchip, source_tier } = body ?? {};
 
-    // Use internal placeholder or require client upload
-    const photo = `internal://assets/k9_placeholder.png`;
+    // No external media allowed in closed-system
 
     const res = await fetch(`${SUPABASE_URL}/rest/v1/paws_dogs`, {
       method: "POST",
