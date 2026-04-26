@@ -146,7 +146,9 @@ CREATE TABLE IF NOT EXISTS public.paws_escrow (
   created_at   TIMESTAMPTZ DEFAULT now()
 );
 ALTER TABLE public.paws_escrow ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "escrow_read_authenticated" ON public.paws_escrow FOR SELECT TO authenticated USING (true);
+CREATE POLICY "escrow_read_authorized" ON public.paws_escrow FOR SELECT TO authenticated USING (
+  EXISTS (SELECT 1 FROM paws_user_roles WHERE user_id = auth.uid() AND role IN ('commissioner', 'auditor', 'partner'))
+);
 
 
 -- ── 11. DEAD MAN'S SWITCH ────────────────────────────────────

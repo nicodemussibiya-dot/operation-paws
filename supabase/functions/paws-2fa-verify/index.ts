@@ -14,6 +14,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin');
   const headers = corsHeaders(origin);
+  if (!headers) return new Response("Forbidden origin", { status: 403 });
   if (req.method === 'OPTIONS') return new Response(null, { headers });
 
   // ── 1. AUTHENTICATE THE CALLER ──────────────────────────────

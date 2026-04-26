@@ -19,27 +19,27 @@ const state = {
 const ROLES = {
   commissioner: {
     label: "National Commissioner",
-    greeting: (n) => `Welcome back${n ? ', ' + n : ''}. The intake queue is synchronized with the 500-dog demo dataset. All systems are green. What do you need?`,
+    greeting: (n) => `SIMULATED DEMO MODE: The national K9 registry is populated with 500 prototype records. Access to the command simulation is authorized. What would you like to explore?`,
     link: { url: "../commissioner/", label: "Open Command Center" },
   },
   elder: {
     label: "Community Leader",
-    greeting: (n) => `It is an honour${n ? ', ' + n : ''}. I have your community briefing ready. We operate with radical transparency — every animal is cared for, every rand is accounted for. How can I serve you?`,
+    greeting: (n) => `SIMULATED DEMO MODE: This community portal demonstrates our commitment to transparency. Every action in this simulation is logged to a public ledger. How can I help you explore the model?`,
     link: { url: "../community-briefing/", label: "Read Community Briefing" },
   },
   partner: {
     label: "Strategic Partner",
-    greeting: (n) => `Good to have you${n ? ', ' + n : ''}. Your contribution is ring-fenced in escrow and visible on the public ledger. Every release requires Council sign-off. What would you like to know?`,
+    greeting: (n) => `SIMULATED DEMO MODE: This dashboard shows how sponsorship funds would be tracked in escrow. Every simulated release requires multi-agent consensus. What would you like to know?`,
     link: { url: "../donate/", label: "View Sponsorship Hub" },
   },
   officer: {
     label: "Field Officer",
-    greeting: (n) => `Demo Hub is live${n ? ', ' + n : ''}. Ready for intake. All submissions require a 15-digit microchip and a welfare clearance. What do you need?`,
+    greeting: (n) => `SIMULATED DEMO MODE: Ready for intake simulation. All entries require a 15-digit microchip and welfare verification for the pilot. What do you need?`,
     link: { url: "../admin/", label: "Open Intake Terminal" },
   },
   breeder: {
     label: "League Participant",
-    greeting: (n) => `The rivalry is live${n ? ', ' + n : ''}. Premier Partner status requires ≥10 SAPS-accepted dogs at ≥30% service rate. The system tracks this — no lobbying. What's your question?`,
+    greeting: (n) => `SIMULATED DEMO MODE: The league standings are derived from simulated performance data. This prototype demonstrates merit-only tiering. What's your question?`,
     link: { url: "../tracker/", label: "View League Tracker" },
   },
 };
@@ -50,13 +50,13 @@ const LOCAL_BRAIN = [
     respond: () => `I'm here. Talk to me — ask about the registry, the league, security, or just tell me who you are.` },
 
   { pattern: /who are you|what are you|paws.?os/i,
-    respond: () => `I'm PAWS-OS — the tactical intelligence running Operation PAWS. I manage the national K9 registry, oversee the Breeder League, and ensure every decision is logged and auditable. I answer from facts, not guesses.` },
+    respond: () => `I'm PAWS-OS — a prototype tactical intelligence for the Operation PAWS reference architecture. I manage a simulated national K9 registry and demonstrate how merit-based tiering and auditable decision-making work.` },
 
   { pattern: /how are you|you good|you ok/i,
-    respond: () => `Functioning at capacity. The ledger is clean, the Council is armed, and the registry has 500 candidates on deck. We are ready to move. What do you need?` },
+    respond: () => `Functioning at capacity. The simulation environment is stable, and the registry contains 500 prototype records for scale testing. How can I serve you?` },
 
   { pattern: /dead man|dms|commissioner offline|unreachable/i,
-    respond: () => `The Dead Man's Switch is armed. If the Commissioner is unreachable for 7 days, the AI Surrogate takes temporary control, locks destructive actions, and routes authority to the designated deputy. No single point of failure.` },
+    respond: () => `The Dead Man's Switch is a proposed failsafe. If a Commissioner is unreachable for 7 days, authority is routed to a designated deputy via an AI surrogate. This prototype demonstrates how the system prevents a single point of failure.` },
 
   { pattern: /secure|hack|safe|github|public repo|corrupt/i,
     respond: () => `The repo is public by design — transparency is the strategy. What's protected is the data and the keys. paws_dogs has zero anonymous access. Every action goes through cryptographic verification and lands in an append-only audit log. You cannot quietly corrupt this system.` },
@@ -74,7 +74,7 @@ const LOCAL_BRAIN = [
     respond: () => `The Commissioner approval console requires biometric verification — a SHA-256 facial scan hash is stored server-side. The frontend captures the signal; the Edge Function validates it. No hash, no approval.` },
 
   { pattern: /council|cop|agent|alpha|beta|gamma/i,
-    respond: () => `The Council of Paws has three agents: Alpha (data auditor), Beta (welfare officer), Gamma (strategist). Every major decision goes through all three. The Chair only acts if all three return VERIFIED. If any agent flags a concern, the action is blocked and the reason is logged.` },
+    respond: () => `The Council of Paws simulation features three governance agents: Alpha (data auditor), Beta (welfare officer), and Gamma (strategist). This demonstration shows how multi-agent consensus prevents unauthorized overrides by requiring a 'VERIFIED' status from all three agents.` },
 
   { pattern: /welfare|spca|dog|animal|breed/i,
     respond: () => `Welfare is non-negotiable in this system. The AI Welfare Officer (Agent Beta) vetoes any action that bypasses SPCA compliance. A single critical welfare violation causes immediate relegation from the Breeder League and a 24-month ban on T1 supply.` },
@@ -321,5 +321,5 @@ window.onload = async () => {
 
   const el = appendAI('');
   await sleep(300);
-  await typeInto(el, `PAWS-OS online. I'm your tactical intelligence for Operation PAWS — I work from facts, not guesses.\n\nTell me who you are or just ask me anything.`);
+  await typeInto(el, `PAWS-OS online. I am a prototype tactical intelligence for the Operation PAWS reference architecture. I work from a grounded fact repository to demonstrate national K9 oversight.\n\nTell me who you are or just ask me anything.`);
 };

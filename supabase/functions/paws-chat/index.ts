@@ -49,8 +49,20 @@ function sanitizeMessages(input: unknown) {
 serve(async (req) => {
   const origin = req.headers.get("origin");
   const headers = corsHeaders(origin);
-  if (!headers) return new Response("Forbidden origin", { status: 403 });
-  if (req.method === "OPTIONS") return new Response("ok", { headers });
+  
+  // ── 0. BYPASS FOR INTERNAL CALLS (e.g. Telegram) ────────────
+  const internalSecret = Deno.env.get("INTERNAL_SECRET");
+  const passedSecret = req.headers.get("x-internal-secret");
+  const isInternal = internalSecret && passedSecret === internalSecret;
+
+  if (req.method === "OPTIONS") {
+    if (!headers) return new Response("Forbidden origin", { status: 403 });
+    return new Response("ok", { headers });
+  }
+
+  if (!isInternal && !headers) {
+    return new Response("Forbidden origin", { status: 403 });
+  }
 
   try {
     const body = await req.json().catch(() => ({}));
@@ -58,20 +70,6 @@ serve(async (req) => {
     const lastMessage = (messages[messages.length - 1]?.content || "").toLowerCase();
     const role = body?.role || 'citizen';
 
-    // ── 0. ORIGIN & RATE LIMIT CHECK ──────────────────────────
-    const origin = req.headers.get("origin") || "";
-    const allowedOrigin = Deno.env.get("ALLOWED_ORIGIN");
-    
-    // In production, strictly enforce origin
-    // Note: corsHeaders(origin) already handles this if configured,
-    // but we keep this as a secondary explicit check.
-    const internalSecret = Deno.env.get("INTERNAL_SECRET");
-    const passedSecret = req.headers.get("x-internal-secret");
-    const isInternal = internalSecret && passedSecret === internalSecret;
-    
-    if (!isInternal && !headers) {
-      return json({ error: "Forbidden origin" }, null, 403);
-    }
 
     const ip = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for') || 'unknown';
     const ipHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip))
