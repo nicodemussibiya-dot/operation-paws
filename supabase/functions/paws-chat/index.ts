@@ -102,17 +102,6 @@ serve(async (req) => {
         ? new Date(now + 60 * 60 * 1000).toISOString() : null
     });
 
-    // ── 1. ROUTER-FIRST INTENT CHECK ──────────────────────────
-    if (lastMessage.includes("donate") || lastMessage.includes("intake")) {
-      return json({ reply: FALLBACK_ANSWERS.intake }, origin);
-    }
-    if (lastMessage.includes("welfare") || lastMessage.includes("spca")) {
-      return json({ reply: FALLBACK_ANSWERS.welfare }, origin);
-    }
-    if (lastMessage.includes("trace")) {
-      return json({ reply: FALLBACK_ANSWERS.traceability }, origin);
-    }
-
     // ── SELECT SYSTEM PROMPT BASED ON ROLE ──
     let activePrompt = Prompts.PAWS_CITIZEN_ASSISTANT_PROMPT;
     switch (role) {
@@ -126,21 +115,23 @@ serve(async (req) => {
     // 2) Gemini
     if (GEMINI_API_KEY) {
       try {
+        // Format for Gemini API (user/model roles)
+        const contents = [
+          { role: "user", parts: [{ text: activePrompt }] },
+          { role: "model", parts: [{ text: "Understood. I am online and grounded in the Operation PAWS repository. How can I assist the Presidency/Command oversight today?" }] },
+          ...messages.map(m => ({
+            role: m.role === "assistant" ? "model" : "user",
+            parts: [{ text: m.content }]
+          }))
+        ];
+
         const res = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [
-                {
-                  parts: [
-                    { text: `${activePrompt}\n\nUser: ${messages[messages.length - 1]?.content ?? ""}` },
-                  ],
-                },
-              ],
-            }),
-          },
+            body: JSON.stringify({ contents }),
+          }
         );
 
         const data = await res.json();

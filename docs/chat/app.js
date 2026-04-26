@@ -41,101 +41,78 @@ const ROLES = {
   },
 };
 
-// ── Local intelligence (stakeholder-grade fallback) ───────────
-// Mirrors the Council knowledge base so offline mode is equally capable.
+// ── Local intelligence — conversational, grounded, conscious ──
 const LOCAL_BRAIN = [
-  // Greetings
+
   { pattern: /\b(hi|hello|hey|howzit|sawubona|dumela|good morning|good afternoon)\b/i,
-    respond: () => `Hello. I am PAWS-OS — the prototype intelligence for Operation PAWS. I answer from verified facts in the governance repository, not from guesswork.\n\nYou can ask me: "What is PAWS?", "How does the escrow work?", "Who controls the AI?", "Show me a tour" — or anything else about the system.` },
+    respond: () => `Hello. I'm PAWS-OS. I know this system from the inside — the code, the governance rules, the decisions behind how it's built. Ask me anything and I'll give you a straight answer. What would you like to understand?` },
 
-  // Identity
   { pattern: /who are you|what are you|paws.?os|about this system/i,
-    respond: () => `I am PAWS-OS — a prototype AI assistant for the Operation PAWS reference architecture. I answer questions about the system from the governance repository. I do not guess, and I do not invent facts.\n\nThis is a simulated demo. No real dogs or money are in this system yet.` },
+    respond: () => `I'm PAWS-OS — the intelligence layer built into the Operation PAWS prototype. I exist to explain this system honestly, including what it hasn't done yet and what it's still proposing. I don't guess. If I know it, I'll tell you. If I don't, I'll say so. What do you want to know?` },
 
-  // What is PAWS
   { pattern: /what is (paws|this|operation paws)|what does paws do|explain paws/i,
-    respond: () => `Operation PAWS (Police Animal Welfare & Stability) is a proposed open-source governance framework for South Africa's national K9 programme.\n\nIt is a prototype — not yet operational. It demonstrates how a welfare registry, merit-based breeder league, and transparent escrow system should be built so that no single person can corrupt it.\n\nKey principles: open code, closed data. Public accountability without exposing private records.` },
+    respond: () => `Operation PAWS stands for Police Animal Welfare and Stability. At its core it's a proposal for how South Africa's national K9 programme should actually be governed — and a working demonstration that it can be done. The problem it's solving is traceability. Right now a trained K9 can move from breeder to trainer to SAPS and somewhere in that chain the record breaks. Welfare checks get skipped. Money disappears. Certifications get faked. This system closes that chain. Every dog gets a unique reference number. Every step gets logged. Every decision requires verified human authority and AI council sign-off. And everything that can be made public, is — so the public can hold the programme accountable without needing to trust anyone's word for it. This is a prototype right now, not a live system. But the architecture is real, and the question it's asking is whether accountable governance can actually be built from the ground up.` },
 
-  // Is it real / operational
   { pattern: /is this (real|live|operational|working|active)|is this already|already running/i,
-    respond: () => `This is a working prototype, not a live operation. The architecture and code are real. The 500 dogs on the tracker are synthetic simulation records (is_demo=true in the database).\n\nNo real dogs, no real owners, no real money are in this system. This demonstration shows what the live system would look like when formally adopted.` },
+    respond: () => `The system is real. The data isn't — not yet. What you're seeing is a working prototype built to show exactly what the live system would look like. The five hundred dogs on the tracker are synthetic, flagged as simulation data at the database level so they can never be confused with real records. No real animals, no real owners, no real money. The architecture, the security controls, the governance rules, the audit trail — those are all real and functional. The next step is formal adoption by a government body or SAPS unit, which would replace the demo data with actual intake from a real K9 kennel. Right now this is an open invitation to scrutinise the design before committing to it.` },
 
-  // Security
   { pattern: /secur|hack|safe|breach|vulnerab|protected/i,
-    respond: () => `Security is layered:\n• Row-Level Security — anonymous users see zero private data\n• JWT authentication for all staff actions\n• Time-limited 2FA tokens for every destructive action (delete, approve, reject)\n• Append-only audit log — nothing can be erased, including failed attempts\n• CORS enforcement — only whitelisted origins can call the API\n\nThe code is public by design. Security does not depend on secrecy — it depends on cryptographic controls and role-based policies. Source: SECURITY.md and migration 005_security_hardening.sql.` },
+    respond: () => `The honest answer is that the security here doesn't rely on keeping the code secret. The whole codebase is public — anyone can read it, including people looking for weaknesses. What the system relies on instead is layers of controls that hold even when the code is fully known. Anonymous users can't reach private data at all, not through any query or API call. Staff actions require authentication tokens. Any approval or rejection requires a time-limited 2FA token that gets consumed in a single atomic database transaction — so even if someone intercepted it, it's already spent. And the audit log is physically append-only. Nothing gets quietly removed, including failed attempts. The philosophy is: if someone does break in, there's still a complete trail of exactly what they did.` },
 
-  // Who can see data
   { pattern: /who can see|who has access|data access|pii|private data|owner details/i,
-    respond: () => `Private dog records (microchip numbers, owner names, contacts) are restricted to Officers, Commissioners, Auditors, and Intake Admins via database-enforced role policies.\n\nAnonymous users — including the public and media — see only the transparency tracker: breed, status, and reference number. No PII is ever exposed publicly. These are separate database tables by design. No query can accidentally combine them.` },
+    respond: () => `The system draws a hard line between two kinds of information. Private records — microchip numbers, owner contacts, full case histories — live in a table that anonymous users and the public simply cannot touch. That's enforced at the database level by role policies, not by an application rule someone could accidentally bypass. What the public sees is a completely separate table: breed, status, a reference number, nothing more. The design intent is that someone could publish the public tracker in a newspaper and there would be nothing in it that exposes anyone's private information. Auditors and commissioners see the full picture. The Presidency oversight role sees aggregate statistics only — no individual records, by design.` },
 
-  // Audit trail
   { pattern: /audit|log|trail|evidence|accountability|cannot be deleted/i,
-    respond: () => `Every action is written to paws_audit_log — an append-only table with no DELETE or UPDATE policy. This includes: intake submissions, approvals, rejections, and failed 2FA attempts.\n\nAuditors and Commissioners can read the full log. The Presidency oversight role sees aggregate summaries only — not individual records. Nothing can be quietly removed.` },
+    respond: () => `Every action the system takes gets written to an audit log that has no delete policy — and that's not a promise, it's a database constraint. Intake submissions, approvals, rejections, even failed 2FA attempts all land there permanently. The critical thing is that nothing can be erased from it, not even by someone with full database administrator access. The logic behind this is simple: if people know a complete, unalterable record exists of everything they do, they make different decisions about what they're willing to attempt.` },
 
-  // Governance / Council of Paws
   { pattern: /govern|council of paws|cop|how decisions|who decides/i,
-    respond: () => `Governance has three layers:\n\n1. The Commissioner — human authority, verified by biometric + 2FA\n2. The Council of Paws — three AI agents that must all return VERIFIED:\n   • Agent Alpha (Data Auditor): checks integrity\n   • Agent Beta (Welfare Officer): enforces SPCA compliance — cannot be overridden by any human\n   • Agent Gamma (Strategist): checks tactical relevance\n3. Presidency Oversight — aggregate-only read dashboard, cannot modify anything\n\nNo single person holds all authority.` },
+    respond: () => `Governance here is structured so that no single person or system holds all the authority. The Commissioner is the human decision-maker — they carry real responsibility, but they have to pass biometric verification and a 2FA challenge every time they want to act. Sitting alongside them is the Council of Paws — three AI agents that evaluate every action before it can proceed. The first is the auditor, checking data integrity. The second is the welfare officer, and this one matters most: its veto cannot be overridden by any human, including the Commissioner. The third is the strategist, checking whether an action fits the programme's mandate. All three have to return VERIFIED. If even one flags a concern, the action is blocked and the reason is logged. And then beyond that there's the Presidency Oversight role — it can see aggregate statistics but cannot modify anything at all. The separation of visibility and authority is intentional.` },
 
-  // Who controls the AI
   { pattern: /who controls the ai|ai authority|can ai override|ai override|ai autonomous/i,
-    respond: () => `The AI recommends — humans authorise.\n\nThe Council of Paws provides a VERIFIED or BLOCKED verdict on every request. Only the Commissioner — with a valid biometric check and 2FA token — can execute the resulting action. The AI has no autonomous write access to the database.\n\nIf the Council is BLOCKED, no action occurs regardless of what the Commissioner wants.` },
+    respond: () => `The AI doesn't control anything — it advises. The Council of Paws looks at a request and returns a verdict, verified or blocked. But the only thing that can actually execute an action is a Commissioner who has passed biometric verification and holds a valid 2FA token. The AI has no write access to the database on its own. What this creates in practice is a system where the AI can block a corrupt human — the welfare agent can refuse to verify an action even if the Commissioner pushes for it — but the AI cannot act without a human either. Neither holds the power alone, and neither can be bypassed without breaking the other. That balance was a deliberate design choice.` },
 
-  // Dead man's switch
   { pattern: /dead man|dms|commissioner disappear|unreachable|offline|deputy/i,
-    respond: () => `If the Commissioner is unreachable for 7 consecutive days, the Dead Man's Switch triggers automatically:\n• Destructive actions are locked\n• Authority routes to the designated deputy\n• The AI Surrogate maintains read-only operations\n\nThis prevents a single point of human failure from paralysing the programme. Source: migration 007_governance_loop.sql.` },
+    respond: () => `The Dead Man's Switch exists because a governance system that depends on one person is fragile by design. If the Commissioner is unreachable for seven consecutive days — through illness, removal, corruption, anything — the system triggers automatically. Destructive actions get locked. Authority routes to the designated deputy. The AI Surrogate holds the read-only state of the programme. What this means is that no single person going offline can be used to freeze or paralyse the system. It's the kind of safeguard that's invisible until it matters, and then it matters completely.` },
 
-  // MOU
   { pattern: /mou|memorandum|agreement|signed|contract|who signed/i,
-    respond: () => `The Master MOU (Memorandum of Understanding) is a DRAFT TEMPLATE — not executed. No institution has signed it.\n\nIt proposes how SAPS, sponsors, and the Council of Paws would relate contractually. It is the starting point for negotiation, not a claim of endorsement. Clearly marked DRAFT / TEMPLATE (NOT EXECUTED) in the repository. Source: /docs/MASTER_MOU_v2.md.` },
+    respond: () => `The MOU is a draft. It hasn't been signed by anyone, and saying otherwise would be the kind of claim that destroys trust before a conversation even gets started. What it is, is a template — a proposed framework for how SAPS, sponsors, and the Council of Paws governance structure would relate to each other contractually. It's published openly in the repository so any institution considering this can read the proposed terms before committing to anything. It's an invitation to negotiate, not a claim of endorsement.` },
 
-  // Transparency / Open source
   { pattern: /transparent|open source|public repo|github|can i audit|can i see the code/i,
-    respond: () => `Yes. The entire codebase is public at github.com/nicodemussibiya-dot/operation-paws.\n\nEvery database policy, governance rule, security control, and AI prompt is readable by anyone. This is the "open recipe, locked kitchen" model — the recipe (code) is public; the ingredients (data) are protected.\n\nThis means any auditor, journalist, or institution can verify the security claims without trusting our word.` },
+    respond: () => `Yes — everything is at github.com/nicodemussibiya-dot/operation-paws. Every database policy, governance rule, security control, and AI prompt, including this one. The reasoning is that if the design is sound, it shouldn't matter that it's public. And if it's not sound, it's better for people to find the flaws before they cause harm. The open recipe, locked kitchen model: the recipe is readable by anyone. What's protected is the actual data — the dogs, the owners, the credentials. You can audit the code right now from any browser, without asking permission.` },
 
-  // Public tracker
   { pattern: /tracker|transparency ledger|public dashboard|public view/i,
-    respond: () => `The public transparency tracker at /tracker/ is open to anyone — no login required.\n\nIt reads from paws_public_dogs — a zero-PII table separate from the private records. It shows: PAWS reference, breed, status, and source code.\n\nThe leaderboard ranks breeders by merit (accepted dogs / service rate). No owner names, no microchips, no addresses are ever shown.` },
+    respond: () => `The public tracker is a live feed of the registry that anyone can open without logging in. It draws from a completely separate table that contains no personal information — just the PAWS reference number, breed, status, and which source submitted the dog. The leaderboard ranks breeders by the only things that should matter: how many dogs were accepted by SAPS and what percentage of them are actually in active service. No one lobbied their way onto that ranking. The system calculated it from verified data.` },
 
-  // Escrow / money / finance
   { pattern: /escrow|money|fund|rand|financial|sponsor|donation/i,
-    respond: () => `Sponsorship funds, in a live deployment, would sit in a ring-fenced escrow account.\n\nReleases require:\n• Commissioner authorisation (biometric + 2FA)\n• Council of Paws audit sign-off\n\nNeither can act alone. The public tracker shows escrow status (SECURED / RELEASED) — not individual amounts. The financial model tracks three pools per dog: SAPS allocation, SPCA contribution, and donor escrow. Source: migration 009_financial_brain.sql.` },
+    respond: () => `In a live deployment, sponsorship money would sit in a ring-fenced escrow account — held separately so it can't be quietly moved without a trail. Releasing it requires two independent authorisations: the Commissioner has to approve with biometric verification and a 2FA token, and the Council of Paws has to sign off on the audit. Neither can act alone. The public tracker shows escrow status — secured or released — but not the amounts. The financial model also tracks three separate funding pools per dog: the SAPS allocation, the SPCA contribution, and the donor escrow. Every rand has a trail from source to expenditure, and that trail is auditable by anyone with the right access role.` },
 
-  // Breeder League
   { pattern: /league|breeder|tier|rank|promote|premier partner|gold|silver/i,
-    respond: () => `The Breeder League ranks dog suppliers by merit only — no lobbying, no relationships.\n\n• Premier Partner: ≥10 SAPS-accepted dogs, ≥30% service rate\n• Gold: ≥5 dogs, ≥20% service rate\n• Silver: ≥2 dogs\n• Standard: all others\n\nThe Council of Paws calculates tiers automatically from verified data. One critical welfare violation = immediate relegation + 24-month Tier 1 ban.` },
+    respond: () => `The Breeder League is a merit ranking, and merit here means something very specific: how many dogs did SAPS actually accept from you, and what percentage of them are in active service? Premier Partner requires at least ten accepted dogs and a thirty percent service rate. Gold is five dogs and twenty percent. Silver is two. Everyone else is Standard until the numbers move. The calculation runs automatically from verified intake and deployment data — there's no application process, no relationship that gets you bumped up. One critical welfare violation causes immediate relegation and a twenty-four month ban from the top tier, treated as an automatic consequence rather than a committee decision.` },
 
-  // Welfare / SPCA
   { pattern: /welfare|spca|animal|cruelty|ethical|compliance/i,
-    respond: () => `Animal welfare is a hard system-level constraint, not a guideline.\n\nAgent Beta (AI Welfare Officer) automatically blocks any action that bypasses SPCA compliance. This block cannot be overridden by the Commissioner or any human. A welfare violation is recorded in the immutable audit log and triggers automatic league demotion.\n\nThe system is designed so that animal welfare is protected even against a corrupt official.` },
+    respond: () => `Welfare is the one thing in this system that no human authority can override. The AI Welfare Officer — Agent Beta on the Council of Paws — is hard-coded to block any action that bypasses SPCA compliance standards. Not as a guideline. Not as a recommendation. As a veto that the Commissioner cannot override, even with a valid 2FA token. A welfare violation gets logged in the immutable audit trail and triggers automatic demotion in the Breeder League. The reasoning is straightforward: if you build a system where welfare can be overridden under pressure, it will be overridden under pressure. The only way to make it hold is to make it structurally impossible to bypass.` },
 
-  // Demo data
   { pattern: /500|demo|simulation|mock|fake dogs|not real dogs/i,
-    respond: () => `The 500 dogs on the tracker are synthetic simulation records, clearly flagged is_demo=true in the database. They are there to demonstrate what the system looks like at national scale.\n\nWhen the system is formally adopted, real intake data replaces the demo records. The demo data cannot be confused with real data — the flag is enforced at the database level.` },
+    respond: () => `The five hundred dogs on the tracker are synthetic — marked is_demo=true in the database, which means no query or report can accidentally treat them as real records. They exist to show you what the system looks like at national scale, not to misrepresent what's actually operational. When the system is formally adopted and real intake begins, those records get replaced. The distinction is enforced at the database level, not just as a label on a page.` },
 
-  // Privacy
-  { pattern: /privacy|popia|gdpr|personal information|microchip exposed/i,
-    respond: () => `The system is designed for POPIA compliance.\n\nPII is isolated in role-restricted tables. Microchip numbers are stored as SHA-256 hashes in the audit log — the raw number is never logged. Owner contact data is never exposed to the public tracker, this AI chat, or the oversight dashboard.\n\nThe public sees: reference number, breed, status. Nothing else.` },
+  { pattern: /privacy|popia|personal information|microchip exposed/i,
+    respond: () => `The system was built with POPIA in mind. Personal information — owner names, contact details, raw microchip numbers — sits in role-restricted tables that the public tracker never touches. Even in the audit log, microchip numbers are stored as SHA-256 hashes rather than the raw identifiers. So the audit trail is complete and verifiable without ever exposing the underlying data. The public sees a reference number, a breed, and a status. That's intentional.` },
 
-  // SAPS endorsement
   { pattern: /saps|south african police|endorsed|government approval|officially/i,
-    respond: () => `SAPS has not formally endorsed this system. This prototype was built to demonstrate what a SAPS-compatible K9 governance framework should look like.\n\nThe architecture is designed to complement existing SAPS systems — not replace them. No government body has signed an MOU. Formal endorsement is what we are seeking, not what we are claiming.` },
+    respond: () => `SAPS hasn't endorsed this. That's important to say clearly because claiming endorsement that doesn't exist is the kind of thing that ends conversations before they start. What this is, is a system built to be compatible with how SAPS operates — designed to complement their existing processes, not replace them. The question this prototype is asking is whether SAPS, or any government body, sees enough value in the model to run a pilot. That's the conversation it's trying to open.` },
 
-  // How to adopt / pilot
   { pattern: /pilot|adopt|implement|deploy|how do we start|how would this work/i,
-    respond: () => `The proposed pilot is: one province, one K9 kennel unit, 30 days of real intake data.\n\nThe project team handles infrastructure. SAPS validates the workflow. The adopting institution owns their own database — zero vendor lock-in.\n\nFormal adoption requires: (1) letter of intent, (2) a pilot agreement on data ownership, (3) a signed MOU establishing the Council of Paws structure.` },
+    respond: () => `The proposed pilot is kept simple by design: one province, one kennel unit, thirty days of real intake data. The project team handles the infrastructure. The adopting institution validates whether the workflow fits how their people actually work. And the institution owns their own database — if they walk away, they take their data with them. There's no vendor lock-in because this is open-source. Formally, what's needed to start is a letter of intent, a data ownership agreement, and eventually a signed MOU establishing the Council of Paws governance structure for that specific deployment.` },
 
-  // Guided tour
   { pattern: /tour|show me|walk me through|where do i start|what should i look at/i,
-    respond: () => `Guided tour — explore in this order:\n\n1. Tracker: open /tracker/ — see the public leaderboard and 500 simulation records. No login needed.\n2. This chat: ask me "Who controls the AI?", "How does escrow work?", "Can it be hacked?" — I answer from the repository.\n3. GitHub: github.com/nicodemussibiya-dot/operation-paws — read the migration files to see every security rule in plain SQL.\n4. MOU template: /docs/MASTER_MOU_v2.md — the governance contract framework.\n5. SECURITY.md — the responsible disclosure policy.\n\nAsk me about any step.` },
+    respond: () => `Start with the tracker — open /tracker/ in your browser. No login, no account needed. Just look at what the public sees when they want to hold this programme accountable. Then come back here and ask me something hard — what happens if the Commissioner tries to approve a welfare violation, or whether the code can actually be audited, or how the escrow model prevents someone from quietly releasing funds. If you want to go deeper, the GitHub repository has every database rule written in plain SQL. And the MOU template at /docs/MASTER_MOU_v2.md shows what a formal governance agreement would look like. Where would you like to start?` },
 
-  // What questions can I ask
-  { pattern: /what can (i|you)|capabilities|help|questions/i,
-    respond: () => `Questions I can answer from the repository:\n\n• "What is PAWS?"\n• "Is this real or a simulation?"\n• "Who can see dog data?"\n• "How does escrow work?"\n• "Who controls the AI?"\n• "What is the Council of Paws?"\n• "How does the Breeder League work?"\n• "What is the Dead Man's Switch?"\n• "Is this secure?"\n• "Can I audit the code?"\n• "Has SAPS endorsed this?"\n• "How would we adopt this?"\n\nI answer from facts, not guesses. If I do not have a grounded answer, I will say so.` },
+  { pattern: /what can (i|you)|capabilities|help|what.*ask/i,
+    respond: () => `Ask me anything about this system. What it is, how it works, who built which safeguard into where and why, what would happen if someone tried to abuse it, what the honest limitations are, what hasn't been built yet. I know this system from the inside and I won't dress it up. If there's something I can't answer from the repository, I'll say that too, rather than filling the gap with something that sounds plausible.` },
 
-  // Catch-all
   { pattern: /.+/,
-    respond: (text) => `I do not have a grounded answer for "${text.length > 50 ? text.slice(0,50) + '…' : text}" in the Operation PAWS repository.\n\nI will not speculate. Try asking: "What is PAWS?", "How does escrow work?", "Who controls the AI?", or "Show me a tour."` },
-];
+    respond: (text) => `I don't have that grounded in the repository — and I won't invent an answer for "${text.length > 40 ? text.slice(0,40)+'…' : text}". Try asking me about how the governance works, what the security model is built on, how escrow functions, or just say "show me where to start" and I'll walk you through it.` },
+]
 
 function localResponse(text) {
   for (const rule of LOCAL_BRAIN) {
@@ -285,6 +262,17 @@ async function sendMessage() {
       // Grounded hit
       responseText = councilData.answer;
       state.history.push({ role: 'ai', text: councilData.answer });
+      
+      if (councilData.deliberation) {
+        const delib = document.createElement('div');
+        delib.style.fontStyle = "italic";
+        delib.style.fontSize = "12px";
+        delib.style.color = "var(--muted)";
+        delib.style.marginBottom = "8px";
+        delib.textContent = `Council Deliberation: ${councilData.deliberation}`;
+        bubble.appendChild(delib);
+      }
+
       await typeInto(bubble, responseText);
       
       if (councilData.citations?.length) {
