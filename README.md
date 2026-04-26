@@ -1,5 +1,5 @@
 
-> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted. (Hardened Build: 2026-04-26 v3 — CORS fail-closed, zero-PII views, dead-code purge)
+> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted. (Hardened Build: 2026-04-26 v4 — Conscious AI deliberation, RAG-grounded council, context-aware chat)
 
 # Operation PAWS
 
