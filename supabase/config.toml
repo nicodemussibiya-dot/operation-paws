@@ -1,11 +1,17 @@
 [functions.paws-council]
-verify_jwt = false
+verify_jwt = true
 
 [functions.paws-chat]
 verify_jwt = false
 
 [functions.paws-intake]
-verify_jwt = false
+verify_jwt = true
 
 [functions.telegram-webhook]
 verify_jwt = false
+
+[functions.paws-2fa-verify]
+verify_jwt = true
+
+[functions.paws-secure-action]
+verify_jwt = true

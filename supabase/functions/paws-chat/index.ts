@@ -17,11 +17,43 @@ const FALLBACK_ANSWERS: Record<string, string> = {
     "I'm having trouble connecting to my AI brain right now. Please use the Start Hub to find official links for WhatsApp and our Transparency Tracker.",
   intake:
     "To donate a dog, please visit the Start Hub to join our official WhatsApp intake channel. This ensures traceability.",
-  welfare:
-    "Operation PAWS is welfare-first. Every dog is screened by an independent SPCA inspector.",
   traceability:
     "We use verified microchips and unique PAWS Reference numbers to reduce smuggling/diversion risk.",
 };
+
+async function getContext(supabase: any, query: string, apiKey: string, accessLevel: string) {
+  if (!apiKey) return "";
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "models/text-embedding-004",
+          content: { parts: [{ text: query }] }
+        }),
+      }
+    );
+    const data = await res.json();
+    const embedding = data?.embedding?.values;
+    if (!embedding) return "";
+
+    const { data: chunks, error } = await supabase.rpc('match_paws_knowledge', {
+      query_embedding: embedding,
+      match_count: 5,
+      min_similarity: 0.2, // Lower threshold for better retrieval in demo
+      p_access_level: accessLevel
+    });
+
+    if (error || !chunks || chunks.length === 0) return "";
+
+    return chunks.map((c: any) => `[Source: ${c.source}]\n${c.content}`).join("\n\n---\n\n");
+  } catch (e) {
+    console.error("RAG Error:", e);
+    return "";
+  }
+}
 
 function json(data: unknown, origin: string | null, status = 200) {
   const headers = corsHeaders(origin) || {};
@@ -108,8 +140,15 @@ serve(async (req) => {
       case 'clerk': activePrompt = Prompts.PAWS_GOVERNANCE_CLERK_PROMPT; break;
       case 'officer': activePrompt = Prompts.PAWS_OFFICER_ASSISTANT_PROMPT; break;
       case 'command': activePrompt = Prompts.PAWS_COMMAND_ASSISTANT_PROMPT; break;
-      case 'presidency': activePrompt = Prompts.PAWS_PRESIDENCY_ASSISTANT_PROMPT; break;
       case 'citizen': activePrompt = Prompts.PAWS_CITIZEN_ASSISTANT_PROMPT; break;
+    }
+
+    // ── RAG RETRIEVAL ──
+    const accessLevel = (role === 'presidency' || role === 'command' || role === 'officer') ? 'restricted' : 'public';
+    const context = await getContext(supabase, lastMessage, GEMINI_API_KEY, accessLevel);
+
+    if (context) {
+      activePrompt = `${activePrompt}\n\n==================================================\nRETRIEVED CONTEXT (GROUND TRUTH)\n==================================================\nUse the following verified excerpts from the Operation PAWS knowledge base to answer the user's request. You MUST prioritize this information over your general knowledge and cite the specific [Source] provided.\n\n${context}`;
     }
 
     // 2) Gemini

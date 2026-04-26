@@ -12,7 +12,7 @@ The PAWS Command Center is a premium, glassmorphic terminal designed for nationa
 - **Financial Portfolio Management**: The Command assistant manages multi-million Rand funding pools with real-time ROI tracking.
 
 > [!NOTE]
-> View the live interaction recording here: [paws_command_center_demo.webp](file:///Users/apple/.gemini/antigravity/brain/7215e887-7d12-499e-ab2b-9dbc676b3b6d/paws_command_center_demo_1777147641761.webp)
+> View the live interaction recording here: [paws_command_center_demo.webp](demo_assets/paws_command_center_demo_1777147641761.webp)
 
 ---
 
@@ -21,7 +21,7 @@ We maintain a "Pinterest-level" aesthetic standard for all operational media to 
 
 | Tactical Patrol | Search & Rescue | Tracking & SAR |
 | :--- | :--- | :--- |
-| ![Malinois](/Users/apple/.gemini/antigravity/brain/7215e887-7d12-499e-ab2b-9dbc676b3b6d/tactical_malinois_sunset_1777145938400.png) | ![GSD](/Users/apple/.gemini/antigravity/brain/7215e887-7d12-499e-ab2b-9dbc676b3b6d/gsd_search_rescue_mountain_1777146346140.png) | ![Bloodhound](/Users/apple/.gemini/antigravity/brain/7215e887-7d12-499e-ab2b-9dbc676b3b6d/bloodhound_tracking_savanna_1777146378714.png) |
+| ![Malinois](demo_assets/tactical_malinois_sunset_1777145938400.png) | ![GSD](demo_assets/gsd_search_rescue_mountain_1777146346140.png) | ![Bloodhound](demo_assets/bloodhound_tracking_savanna_1777146378714.png) |
 
 ---
 

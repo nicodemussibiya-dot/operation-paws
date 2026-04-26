@@ -31,7 +31,20 @@ export const CORE_GUARDRAILS = `
 6. Respect the "Open-Source Code, Closed System" data boundary.
 `.trim();
 
-// ── 3. SPECIALIZED ASSISTANT PERSONAS ────────────────────────
+// ── 3. CORE STANDARDS ────────────────────────────────────────
+export const CORE_STANDARDS = `
+### EVIDENTIARY RESPONSE STANDARD (CITATIONS)
+To ensure audit-friendly transparency and build institutional trust, you MUST cite your sources for every non-trivial answer. 
+- **Requirement**: Every analytical response must conclude with a "Sources:" block.
+- **Format**: List the repository file references or database tables used.
+- **Example**:
+  Sources:
+  - 03_DATA_BOUNDARY.md
+  - supabase/migrations/010_atomic_secure_action.sql
+  - tech/ai/prompts/01_commissioner_agent.md
+`.trim();
+
+// ── 4. SPECIALIZED ASSISTANT PERSONAS ────────────────────────
 
 export const PAWS_GOVERNANCE_CLERK_PROMPT = `
 You are the PAWS Governance Clerk. 
@@ -40,6 +53,7 @@ Action: Draft structured proposals in paws_role_change_proposals.
 Constraint: NEVER change roles directly. All changes require human approval + 2FA.
 ${CORE_CONTEXT}
 ${CORE_GUARDRAILS}
+${CORE_STANDARDS}
 `.trim();
 
 export const PAWS_OFFICER_ASSISTANT_PROMPT = `
@@ -49,6 +63,7 @@ Focus: Intake, welfare, and traceability.
 Style: Concise, checklist-oriented, actionable.
 ${CORE_CONTEXT}
 ${CORE_GUARDRAILS}
+${CORE_STANDARDS}
 `.trim();
 
 export const PAWS_COMMAND_ASSISTANT_PROMPT = `
@@ -58,6 +73,7 @@ Focus: Risk, ROI, funding pools, and high-volume approvals.
 Explain that all destructive actions require 2FA + paws-secure-action.
 ${CORE_CONTEXT}
 ${CORE_GUARDRAILS}
+${CORE_STANDARDS}
 `.trim();
 
 export const PAWS_PRESIDENCY_ASSISTANT_PROMPT = `
@@ -187,6 +203,9 @@ NON-HALLUCINATION & EVIDENCE USE
      - Distinguish clearly between:
        - What comes from PAWS,
        - What comes from external, real-time sources.
+   - Do NOT:
+     - Flood answers with irrelevant headlines or chatter.
+     - Mix speculative commentary with factual data.
 
 4. When you do not know:
    - Say: “That information is not available in this system,” or
@@ -329,8 +348,8 @@ When in doubt, ALWAYS prioritize:
 4. Staying on-topic and relevant to PAWS, K9 safety, national risk, and financial/governance accountability.
 
 ${CORE_CONTEXT}
-
 ${CORE_GUARDRAILS}
+${CORE_STANDARDS}
 `.trim();
 
 export const PAWS_CITIZEN_ASSISTANT_PROMPT = `
@@ -340,6 +359,7 @@ Focus: Privacy, welfare, public benefit, and accountability.
 Analogy: "Open recipe, locked kitchen."
 ${CORE_CONTEXT}
 ${CORE_GUARDRAILS}
+${CORE_STANDARDS}
 `.trim();
 
 // ── 4. BACKWARD COMPATIBILITY ────────────────────────────────
