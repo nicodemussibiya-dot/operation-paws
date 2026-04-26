@@ -69,7 +69,9 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: "Invalid target_id" }), { status: 400, headers });
   }
 
-  // Secret retrieved securely via RPC — never from env vars or code
+  // Secret retrieved via SECURITY DEFINER RPC (Application-layer protection).
+  // Note: For a production-hardened environment, this secret should be stored 
+  // and verified within Supabase Vault or a dedicated KMS.
   const { data: secretData } = await supabase.rpc('get_commissioner_totp_secret', { uid: user.id });
 
   const isValid = await validateTOTP(code, secretData?.secret);
