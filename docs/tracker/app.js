@@ -25,6 +25,7 @@ const escapeHTML = str => String(str).replace(/[&<>'"]/g, tag => ({
 // ── 1. Load leaderboard from public view ─────────────────────
 async function loadLeaderboard() {
   const el = document.getElementById('leaderboard-body');
+  if (!el) return;
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/public_source_stats?select=*&limit=10`,
@@ -32,28 +33,52 @@ async function loadLeaderboard() {
     );
     const data = await res.json();
 
+    el.textContent = '';
     if (!Array.isArray(data) || data.length === 0) {
-      el.innerHTML = '<p class="muted">No leaderboard data yet. Intake will populate this.</p>';
+      const p = document.createElement('p');
+      p.className = 'muted';
+      p.textContent = 'No leaderboard data yet. Intake will populate this.';
+      el.appendChild(p);
       return;
     }
 
-    el.innerHTML = data.map((row, i) => `
-      <div class="league-row">
-        <div class="league-rank">${String(i + 1).padStart(2, '0')}</div>
-        <div class="league-info">
-          <small>${escapeHTML(row.tier_label)}</small>
-          <h4>Source: ${escapeHTML(row.source_code)}</h4>
-        </div>
-        <div class="league-score">
-          <strong style="${tierBadge(row.tier_label)}">${Number(row.saps_accepted)} Accepted (${Number(row.service_rate_pct)}%)</strong>
-          <div class="score-bar">
-            <div class="score-fill" style="width: ${Math.min(Number(row.service_rate_pct), 100)}%;"></div>
-          </div>
-        </div>
-      </div>
-    `).join('');
+    for (const [i, row] of data.entries()) {
+      const wrap = document.createElement('div');
+      wrap.className = 'league-row';
+
+      const rank = document.createElement('div');
+      rank.className = 'league-rank';
+      rank.textContent = String(i + 1).padStart(2, '0');
+
+      const info = document.createElement('div');
+      info.className = 'league-info';
+      const small = document.createElement('small');
+      small.textContent = String(row.tier_label ?? '');
+      const h4 = document.createElement('h4');
+      h4.textContent = `Source: ${String(row.source_code ?? '')}`;
+      info.append(small, h4);
+
+      const score = document.createElement('div');
+      score.className = 'league-score';
+      const strong = document.createElement('strong');
+      strong.setAttribute('style', tierBadge(row.tier_label));
+      const accepted = Number(row.saps_accepted ?? 0);
+      const pct = Number(row.service_rate_pct ?? 0);
+      strong.textContent = `${accepted} Accepted (${pct}%)`;
+
+      const bar = document.createElement('div');
+      bar.className = 'score-bar';
+      const fill = document.createElement('div');
+      fill.className = 'score-fill';
+      fill.style.width = `${Math.max(0, Math.min(pct, 100))}%`;
+      bar.appendChild(fill);
+
+      score.append(strong, bar);
+      wrap.append(rank, info, score);
+      el.appendChild(wrap);
+    }
   } catch (e) {
-    el.innerHTML = `<p class="muted">Unable to reach ledger. ${e.message}</p>`;
+    el.textContent = `Unable to reach ledger. ${e.message}`;
   }
 }
 

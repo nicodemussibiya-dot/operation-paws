@@ -11,7 +11,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER -- Run as DB owner to bypass RLS for token consumption
 AS $$
 DECLARE
-    v_token_id uuid;
+    -- v_token_id is removed as token is the PK
     v_expires_at timestamptz;
     v_used_at timestamptz;
     v_result jsonb;
@@ -20,7 +20,7 @@ DECLARE
     v_new_ref text;
 BEGIN
     -- 1. Find and lock the token row FOR UPDATE to prevent race conditions
-    SELECT id, expires_at, used_at INTO v_token_id, v_expires_at, v_used_at
+    SELECT expires_at, used_at INTO v_expires_at, v_used_at
     FROM paws_action_tokens
     WHERE token = p_action_token
       AND actor_id = p_actor_id
@@ -28,8 +28,9 @@ BEGIN
       AND target_id = p_target_id
     FOR UPDATE NOWAIT;
 
-    -- 2. Verify token state
-    IF v_token_id IS NULL THEN
+    -- 2. Verify token existence and state
+    -- In Postgres, we check if the row exists by checking a non-null column
+    IF NOT FOUND THEN
         PERFORM insert_audit_log(p_actor_id, 'commissioner', 'ACTION_TOKEN_INVALID', p_target_id, '{"error": "Token not found or mismatch"}');
         RAISE EXCEPTION 'Invalid action token';
     END IF;
@@ -45,7 +46,7 @@ BEGIN
     END IF;
 
     -- 3. Mark token as consumed IMMEDIATELY
-    UPDATE paws_action_tokens SET used_at = now() WHERE id = v_token_id;
+    UPDATE paws_action_tokens SET used_at = now() WHERE token = p_action_token;
 
     -- 4. Execute the requested action
     IF p_action = 'DELETE_DOG' THEN

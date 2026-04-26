@@ -19,12 +19,12 @@ const state = {
 const ROLES = {
   commissioner: {
     label: "National Commissioner",
-    greeting: (n) => `Welcome back${n ? ', ' + n : ''}. The intake queue is synchronized. 500 candidates in the demo dataset. Ledger integrity is clean. What do you need?`,
+    greeting: (n) => `Welcome back${n ? ', ' + n : ''}. The intake queue is synchronized with the 500-dog demo dataset. All systems are green. What do you need?`,
     link: { url: "../commissioner/", label: "Open Command Center" },
   },
   elder: {
     label: "Community Leader",
-    greeting: (n) => `It is an honour${n ? ', ' + n : ''}. I have your community briefing ready. We operate by Proverbs 12:10 — every animal is cared for, every rand is accounted for. How can I serve you?`,
+    greeting: (n) => `It is an honour${n ? ', ' + n : ''}. I have your community briefing ready. We operate with radical transparency — every animal is cared for, every rand is accounted for. How can I serve you?`,
     link: { url: "../community-briefing/", label: "Read Community Briefing" },
   },
   partner: {
@@ -193,9 +193,20 @@ async function sendMessage() {
   if (detectedRole && !state.role) {
     state.role = detectedRole;
     const cfg = ROLES[state.role];
-    const response = cfg.greeting(state.name) + 
-      `<br><br>→ <a href="${cfg.link.url}" style="color:var(--accent); font-weight:700; text-decoration:none;">${cfg.link.label} ↗</a>`;
-    await typeInto(bubble, response, true);
+    await typeInto(bubble, cfg.greeting(state.name));
+    
+    const link = document.createElement('a');
+    link.href = cfg.link.url;
+    link.textContent = `${cfg.link.label} ↗`;
+    link.style.color = "var(--accent)";
+    link.style.fontWeight = "700";
+    link.style.textDecoration = "none";
+    
+    bubble.appendChild(document.createElement('br'));
+    bubble.appendChild(document.createElement('br'));
+    bubble.appendChild(document.createTextNode('→ '));
+    bubble.appendChild(link);
+
     state.history.push({ role: 'user', text });
     state.history.push({ role: 'ai', text: cfg.greeting(state.name) });
     return;
@@ -214,33 +225,51 @@ async function sendMessage() {
       const llmReply = await callChatLLM(text);
       
       if (llmReply) {
-        responseHtml = escapeHTML(llmReply);
+        responseText = llmReply;
         state.history.push({ role: 'ai', text: llmReply });
       } else {
         // Ultimate Fallback: local intelligence
         const local = localResponse(text);
-        responseHtml = escapeHTML(local);
+        responseText = local;
         state.history.push({ role: 'ai', text: local });
       }
     } else {
       // Grounded hit
-      const cites = councilData.citations?.length
-        ? `<br><span style="color:var(--muted); font-size:11px; margin-top:6px; display:block;">Sources: ${escapeHTML(councilData.citations.join(', '))}</span>`
-        : '';
-      responseHtml = escapeHTML(councilData.answer) + cites;
+      responseText = councilData.answer;
       state.history.push({ role: 'ai', text: councilData.answer });
+      await typeInto(bubble, responseText);
+      
+      if (councilData.citations?.length) {
+        const citeSpan = document.createElement('span');
+        citeSpan.style.color = "var(--muted)";
+        citeSpan.style.fontSize = "11px";
+        citeSpan.style.marginTop = "6px";
+        citeSpan.style.display = "block";
+        citeSpan.textContent = `Sources: ${councilData.citations.join(', ')}`;
+        bubble.appendChild(citeSpan);
+      }
+      return;
     }
   } else if (councilData && councilData.chair === 'BLOCKED') {
-    responseHtml = `That's outside what I can verify. ${escapeHTML(councilData.reason || '')}<br><span style="color:var(--muted); font-size:11px;">I won't speculate.</span>`;
-    state.history.push({ role: 'ai', text: responseHtml });
+    responseText = `That's outside what I can verify. ${councilData.reason || ''}`;
+    state.history.push({ role: 'ai', text: responseText });
+    await typeInto(bubble, responseText);
+    
+    const specSpan = document.createElement('span');
+    specSpan.style.color = "var(--muted)";
+    specSpan.style.fontSize = "11px";
+    specSpan.style.display = "block";
+    specSpan.textContent = "I won't speculate.";
+    bubble.appendChild(specSpan);
+    return;
   } else {
     // Ultimate Fallback: local intelligence
     const local = localResponse(text);
-    responseHtml = escapeHTML(local);
+    responseText = local;
     state.history.push({ role: 'ai', text: local });
   }
 
-  await typeInto(bubble, responseHtml, true);
+  await typeInto(bubble, responseText);
 }
 
 // ── UI Helpers ────────────────────────────────────────────────
@@ -248,40 +277,34 @@ function appendUser(text) {
   const box = document.getElementById('chat-box');
   const el  = document.createElement('div');
   el.className = 'message user';
-  el.innerText  = text;
+  el.textContent = text;
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
 }
 
-function appendAI(html) {
+function appendAI(content) {
   const box = document.getElementById('chat-box');
   const el  = document.createElement('div');
   el.className  = 'message ai';
-  el.innerHTML  = html;
+  if (typeof content === 'string') {
+    el.textContent = content;
+  } else {
+    el.appendChild(content);
+  }
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
   return el;
 }
 
 // Smooth character-by-character typing effect
-async function typeInto(el, html, isHtml = false) {
-  el.innerHTML = '';
-  if (isHtml) {
-    // For HTML content, reveal word by word rather than char by char
-    const words = html.split(/(?<=\s)/);
-    let built = '';
-    for (const word of words) {
-      built += word;
-      el.innerHTML = built;
-      const box = document.getElementById('chat-box');
-      box.scrollTop = box.scrollHeight;
-      await sleep(18);
-    }
-  } else {
-    for (const ch of html) {
-      el.textContent += ch;
-      await sleep(14);
-    }
+async function typeInto(el, text) {
+  el.textContent = '';
+  const s = String(text ?? '');
+  for (const ch of s) {
+    el.textContent += ch;
+    const box = document.getElementById('chat-box');
+    if (box) box.scrollTop = box.scrollHeight;
+    await sleep(14);
   }
 }
 
@@ -298,5 +321,5 @@ window.onload = async () => {
 
   const el = appendAI('');
   await sleep(300);
-  await typeInto(el, `PAWS-OS online. I'm your tactical intelligence for Operation PAWS — I work from facts, not guesses.\n\nTell me who you are or just ask me anything.`, false);
+  await typeInto(el, `PAWS-OS online. I'm your tactical intelligence for Operation PAWS — I work from facts, not guesses.\n\nTell me who you are or just ask me anything.`);
 };

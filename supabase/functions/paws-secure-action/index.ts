@@ -16,7 +16,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get('origin');
+  const headers = corsHeaders(origin);
+  if (req.method === 'OPTIONS') return new Response(null, { headers });
 
   // ── 1. AUTHENTICATE ─────────────────────────────────────────
   const authHeader = req.headers.get('Authorization');
@@ -30,12 +32,12 @@ Deno.serve(async (req) => {
   const { data: { user }, error: authErr } = await supabase.auth.getUser(
     authHeader.replace('Bearer ', '')
   );
-  if (authErr || !user) return res(401, { error: 'Invalid session' });
+  if (authErr || !user) return res(401, { error: 'Invalid session' }, headers);
 
   // ── 2. PARSE REQUEST ────────────────────────────────────────
   const { action_token, action, target_id } = await req.json();
   if (!action_token || !action || !target_id) {
-    return res(400, { error: 'Missing required fields' });
+    return res(400, { error: 'Missing required fields' }, headers);
   }
 
   // ── 3. ATOMIC EXECUTION (Prevent Race Conditions) ───────────
@@ -44,7 +46,7 @@ Deno.serve(async (req) => {
   
   if (action === 'APPROVE_DOG_BATCH') {
     // Handling batch requires a different RPC or loop. For standard atomic:
-    return res(501, { error: 'Batch processing requires the updated batch RPC' });
+    return res(501, { error: 'Batch processing requires the updated batch RPC' }, headers);
   }
 
   const { data: result, error: rpcErr } = await supabase.rpc('consume_action_token_and_execute', {
@@ -56,15 +58,15 @@ Deno.serve(async (req) => {
 
   if (rpcErr) {
     // The RPC handles its own failure logging where possible.
-    return res(403, { error: rpcErr.message || 'Action failed or token invalid' });
+    return res(403, { error: rpcErr.message || 'Action failed or token invalid' }, headers);
   }
 
-  return res(200, { success: true, action, target_id, details: result });
+  return res(200, { success: true, action, target_id, details: result }, headers);
 });
 
 // ── HELPERS ───────────────────────────────────────────────────
-function res(status: number, body: Record<string, unknown>) {
-  return new Response(JSON.stringify(body), { status, headers: corsHeaders });
+function res(status: number, body: Record<string, unknown>, headers: any) {
+  return new Response(JSON.stringify(body), { status, headers });
 }
 
 async function auditLog(

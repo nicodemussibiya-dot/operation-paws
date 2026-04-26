@@ -23,21 +23,38 @@ const FALLBACK_ANSWERS: Record<string, string> = {
     "We use verified microchips and unique PAWS Reference numbers to reduce smuggling/diversion risk.",
 };
 
-function json(data: unknown, status = 200) {
+function json(data: unknown, origin: string | null, status = 200) {
+  const headers = corsHeaders(origin) || {};
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...headers, "Content-Type": "application/json" },
   });
 }
 
+function sanitizeMessages(input: unknown) {
+  const out: { role: "user" | "assistant"; content: string }[] = [];
+  if (!Array.isArray(input)) return out;
+
+  for (const m of input.slice(-12)) { // cap history
+    const role = (m as any)?.role;
+    const content = (m as any)?.content;
+    if ((role !== "user" && role !== "assistant") || typeof content !== "string") continue;
+
+    const trimmed = content.slice(0, 2000); // cap per message
+    out.push({ role, content: trimmed });
+  }
+  return out;
+}
+
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const headers = corsHeaders(origin);
+  if (!headers) return new Response("Forbidden origin", { status: 403 });
+  if (req.method === "OPTIONS") return new Response("ok", { headers });
 
   try {
     const body = await req.json().catch(() => ({}));
-    let rawMessages = Array.isArray(body?.messages) ? body.messages : [];
-    // Sanitize: strip client-supplied system messages
-    const messages = rawMessages.filter(m => m.role !== 'system');
+    const messages = sanitizeMessages(body?.messages);
     const lastMessage = (messages[messages.length - 1]?.content || "").toLowerCase();
     const role = body?.role || 'citizen';
 
@@ -45,13 +62,15 @@ serve(async (req) => {
     const origin = req.headers.get("origin") || "";
     const allowedOrigin = Deno.env.get("ALLOWED_ORIGIN");
     
+    // In production, strictly enforce origin
+    // Note: corsHeaders(origin) already handles this if configured,
+    // but we keep this as a secondary explicit check.
     const internalSecret = Deno.env.get("INTERNAL_SECRET");
     const passedSecret = req.headers.get("x-internal-secret");
     const isInternal = internalSecret && passedSecret === internalSecret;
     
-    // In production, strictly enforce origin
-    if (!isInternal && allowedOrigin && origin !== allowedOrigin && origin !== "http://localhost:3000") {
-      return json({ error: "Forbidden origin" }, 403);
+    if (!isInternal && !headers) {
+      return json({ error: "Forbidden origin" }, null, 403);
     }
 
     const ip = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for') || 'unknown';
@@ -64,38 +83,36 @@ serve(async (req) => {
       .select('*').eq('ip_hash', ipHash).single();
 
     let attempts = rateRow?.attempts ?? 0;
-    const lastAttempt = rateRow?.last_attempt ? new Date(rateRow.last_attempt) : new Date(0);
-    const now = new Date();
+    const lastAttemptStr = rateRow?.last_attempt;
+    const now = Date.now();
+    const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
-    // Reset rolling window (15 minutes)
-    if (now.getTime() - lastAttempt.getTime() > 15 * 60 * 1000) {
-      attempts = 0;
+    const lastTime = lastAttemptStr ? Date.parse(lastAttemptStr) : 0;
+    const withinWindow = lastTime && (now - lastTime) < WINDOW_MS;
+    const nextAttempts = withinWindow ? (rateRow?.attempts ?? 0) + 1 : 1;
+
+    if (rateRow?.blocked_until && new Date(rateRow.blocked_until).getTime() > now) {
+      return json({ error: 'Too Many Requests' }, origin, 429);
     }
-
-    if (rateRow?.blocked_until && new Date(rateRow.blocked_until) > now) {
-      return json({ error: 'Too Many Requests' }, 429);
-    }
-
-    attempts += 1;
 
     // Update attempts
     await supabase.from('paws_chat_rate_limit').upsert({
       ip_hash: ipHash,
-      attempts: attempts,
-      last_attempt: now.toISOString(),
-      blocked_until: attempts >= 20 
-        ? new Date(now.getTime() + 60 * 60 * 1000).toISOString() : null
+      attempts: nextAttempts,
+      last_attempt: new Date(now).toISOString(),
+      blocked_until: nextAttempts >= 30 
+        ? new Date(now + 60 * 60 * 1000).toISOString() : null
     });
 
     // ── 1. ROUTER-FIRST INTENT CHECK ──────────────────────────
     if (lastMessage.includes("donate") || lastMessage.includes("intake")) {
-      return json({ reply: FALLBACK_ANSWERS.intake });
+      return json({ reply: FALLBACK_ANSWERS.intake }, origin);
     }
     if (lastMessage.includes("welfare") || lastMessage.includes("spca")) {
-      return json({ reply: FALLBACK_ANSWERS.welfare });
+      return json({ reply: FALLBACK_ANSWERS.welfare }, origin);
     }
     if (lastMessage.includes("trace")) {
-      return json({ reply: FALLBACK_ANSWERS.traceability });
+      return json({ reply: FALLBACK_ANSWERS.traceability }, origin);
     }
 
     // ── SELECT SYSTEM PROMPT BASED ON ROLE ──
@@ -130,7 +147,7 @@ serve(async (req) => {
 
         const data = await res.json();
         const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (reply) return json({ reply });
+        if (reply) return json({ reply }, origin);
       } catch (_e) {
         // fall through
       }
@@ -153,7 +170,7 @@ serve(async (req) => {
 
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content;
-        if (reply) return json({ reply });
+        if (reply) return json({ reply }, origin);
       } catch (_e) {
         // fall through
       }
@@ -178,7 +195,7 @@ serve(async (req) => {
 
         const data = await res.json();
         const reply = data?.choices?.[0]?.message?.content;
-        if (reply) return json({ reply });
+        if (reply) return json({ reply }, origin);
       } catch (_e) {
         // fall through
       }
@@ -190,8 +207,8 @@ serve(async (req) => {
     if (lastMessage.includes("welfare")) finalReply = FALLBACK_ANSWERS.welfare;
     if (lastMessage.includes("trace")) finalReply = FALLBACK_ANSWERS.traceability;
 
-    return json({ reply: finalReply });
+    return json({ reply: finalReply }, origin);
   } catch (_err) {
-    return json({ reply: FALLBACK_ANSWERS.default }, 200);
+    return json({ reply: FALLBACK_ANSWERS.default }, origin, 200);
   }
 });

@@ -12,11 +12,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get('origin');
+  const headers = corsHeaders(origin);
+  if (req.method === 'OPTIONS') return new Response(null, { headers });
 
   // ── 1. AUTHENTICATE THE CALLER ──────────────────────────────
   const authHeader = req.headers.get('Authorization');
-  if (!authHeader) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+  if (!authHeader) return new Response('Unauthorized', { status: 401, headers });
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -26,7 +28,7 @@ Deno.serve(async (req) => {
   const { data: { user }, error: authErr } = await supabase.auth.getUser(
     authHeader.replace('Bearer ', '')
   );
-  if (authErr || !user) return new Response('Invalid session', { status: 401, headers: corsHeaders });
+  if (authErr || !user) return new Response('Invalid session', { status: 401, headers });
 
   // ── 2. CHECK ROLE (Commissioner only) ───────────────────────
   const { data: roleRow } = await supabase
@@ -40,7 +42,7 @@ Deno.serve(async (req) => {
       actor_id: user.id, actor_role: roleRow?.role ?? 'unknown',
       action: '2FA_ATTEMPT_UNAUTHORIZED', metadata: { ip: req.headers.get('x-forwarded-for') }
     });
-    return new Response('Forbidden', { status: 403, headers: corsHeaders });
+    return new Response('Forbidden', { status: 403, headers });
   }
 
   // ── 3. RATE LIMIT CHECK ─────────────────────────────────────
@@ -49,7 +51,7 @@ Deno.serve(async (req) => {
     .select('*').eq('ip_hash', ipHash).eq('action', '2fa_verify').single();
 
   if (rateRow?.blocked_until && new Date(rateRow.blocked_until) > new Date()) {
-    return new Response('Too Many Requests', { status: 429, headers: corsHeaders });
+    return new Response('Too Many Requests', { status: 429, headers });
   }
 
   // ── 4. VALIDATE INPUTS ──────────────────────────────────────
@@ -57,13 +59,13 @@ Deno.serve(async (req) => {
   const { code, action, target_id } = body;
 
   if (!/^\d{6}$/.test(String(code ?? ""))) {
-    return new Response(JSON.stringify({ error: "Invalid code format" }), { status: 400, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Invalid code format" }), { status: 400, headers });
   }
   if (!["DELETE_DOG","APPROVE_DOG","REJECT_DOG","UPDATE_ROLE_FROM_PROPOSAL","APPROVE_DOG_BATCH"].includes(String(action ?? ""))) {
-    return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers });
   }
   if (typeof target_id !== "string" && !Array.isArray(target_id)) {
-    return new Response(JSON.stringify({ error: "Invalid target_id" }), { status: 400, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Invalid target_id" }), { status: 400, headers });
   }
 
   // Secret retrieved securely via RPC — never from env vars or code
@@ -85,7 +87,7 @@ Deno.serve(async (req) => {
       action: '2FA_FAILED', target_id,
       metadata: { ip: req.headers.get('x-forwarded-for'), attempts: (rateRow?.attempts ?? 0) + 1 }
     });
-    return new Response(JSON.stringify({ error: 'Invalid code' }), { status: 401, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: 'Invalid code' }), { status: 401, headers });
   }
 
   // ── 5. ISSUE SHORT-LIVED ACTION TOKEN ───────────────────────
@@ -102,7 +104,7 @@ Deno.serve(async (req) => {
     action: '2FA_SUCCESS', target_id: Array.isArray(target_id) ? target_id[0] : target_id, metadata: { token_fingerprint: tokenFingerprint }
   });
 
-  return new Response(JSON.stringify({ action_token: tokenRow?.token }), { headers: corsHeaders });
+  return new Response(JSON.stringify({ action_token: tokenRow?.token }), { headers });
 });
 
 async function hashIp(ip: string): Promise<string> {
