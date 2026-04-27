@@ -65,10 +65,10 @@ Stakeholders can explore the prototype via the following entry points:
 
 ## 🚦 Start Here
 If you are a new contributor or stakeholder, please review the following in order:
-1. [STRUCTURE](Structure) - Repository map.
-2. [GOVERNANCE](01_GOVERNANCE.md) - The "Why" and "How" of oversight.
-3. [SECURITY](SECURITY.md) - Disclosure policy and contact.
-4. [CONTRIBUTING](CONTRIBUTING.md) - How to help (Security researchers & Developers).
+1. [STRUCTURE](Structure)
+2. [GOVERNANCE](01_GOVERNANCE.md)
+3. [SECURITY](SECURITY.md)
+4. [CONTRIBUTING](CONTRIBUTING.md)
 
 ---
 *Developed for the South African Presidency and SAPS K9 Modernization Initiative.*

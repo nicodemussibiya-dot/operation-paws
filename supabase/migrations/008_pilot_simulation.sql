@@ -72,3 +72,17 @@ CREATE POLICY "state_read_all" ON public.paws_system_state FOR SELECT TO authent
 CREATE POLICY "state_update_governance" ON public.paws_system_state FOR UPDATE TO authenticated USING (
     EXISTS (SELECT 1 FROM paws_user_roles WHERE user_id = auth.uid() AND role IN ('commissioner', 'presidency_oversight'))
 );
+
+-- ── 6. SEED 500 DEMO DOGS (marked is_demo = true) ───────────
+-- Move to this migration so it only runs during pilot/simulation setup.
+INSERT INTO public.paws_public_dogs (paws_ref, breed, status, intake_date, source_code, league, is_demo)
+SELECT
+  'PAWS-26-' || LPAD(gs::text, 5, '0'),
+  (ARRAY['Belgian Malinois','German Shepherd','Labrador','Dutch Shepherd'])[1 + (random()*3)::int],
+  (ARRAY['lead','pending_commissioner','approved','accepted','training','deployed'])[1 + (random()*5)::int],
+  (DATE '2026-01-01' + ((random()*110)::int)),
+  'BR' || LPAD((1 + (random()*49)::int)::text, 3, '0'),
+  (ARRAY['Narcotics','Explosives','Tracking','Search & Rescue'])[1 + (random()*3)::int],
+  true
+FROM generate_series(1, 500) gs
+ON CONFLICT (paws_ref) DO NOTHING;

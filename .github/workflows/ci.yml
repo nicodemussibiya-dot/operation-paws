@@ -1,0 +1,29 @@
+name: System Integrity & Security Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Environment
+        run: |
+          cp .env.example .env
+          # Use placeholder values for CI
+          sed -i 's/YOUR_ANON_KEY_HERE/ci-anon-key/g' .env
+          sed -i 's/https:\/\/your-project-id.supabase.co/https:\/\/test.supabase.co/g' .env
+
+      - name: Run Integrity Checks
+        run: chmod +x tests/system_integrity_check.sh && ./tests/system_integrity_check.sh
+
+      - name: Run Privacy Boundary Smoke Test
+        run: chmod +x tests/privacy_boundary_test.sh && ./tests/privacy_boundary_test.sh
+        continue-on-error: true # Fails gracefully if no live Supabase is reachable
