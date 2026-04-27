@@ -5,15 +5,16 @@
 
 -- ── 1. EXPAND ROLE ENUM ──────────────────────────────────────
 -- We update the check constraint to include 'presidency_oversight'
-ALTER TABLE public.paws_user_roles 
+-- AND keep 'partner' — required for escrow access policy
+ALTER TABLE public.paws_user_roles
   DROP CONSTRAINT IF EXISTS paws_user_roles_role_check;
 
-ALTER TABLE public.paws_user_roles 
-  ADD CONSTRAINT paws_user_roles_role_check 
-  CHECK (role IN ('officer','commissioner','auditor','breeder','intake_admin','presidency_oversight'));
+ALTER TABLE public.paws_user_roles
+  ADD CONSTRAINT paws_user_roles_role_check
+  CHECK (role IN ('officer','commissioner','auditor','breeder','intake_admin','presidency_oversight','partner'));
 
 -- ── 2. CREATE NATIONAL GOVERNANCE DASHBOARD (Aggregate-Only) ──
--- This function runs with SECURITY DEFINER (owner privileges) 
+-- This function runs with SECURITY DEFINER (owner privileges)
 -- to allow oversight roles to see summaries without needing SELECT on the base tables.
 CREATE OR REPLACE FUNCTION public.get_paws_national_governance_dashboard()
 RETURNS TABLE (
@@ -39,11 +40,11 @@ AS $$
     CASE WHEN MAX(d.updated_at) < (now() - interval '7 days') THEN 'STALE' ELSE 'ACTIVE' END as stability_signal
   FROM public.paws_dogs d
   WHERE d.is_demo = false
-    AND EXISTS (
-      SELECT 1 FROM public.paws_user_roles r
-      WHERE r.user_id = auth.uid()
-        AND r.role IN ('presidency_oversight','auditor','commissioner')
-    )
+  AND EXISTS (
+    SELECT 1 FROM public.paws_user_roles r
+    WHERE r.user_id = auth.uid()
+    AND r.role IN ('presidency_oversight','auditor','commissioner')
+  )
   GROUP BY d.status, d.risk_level, d.source_tier;
 $$;
 
@@ -68,7 +69,7 @@ AS $$
   WHERE EXISTS (
     SELECT 1 FROM public.paws_user_roles r
     WHERE r.user_id = auth.uid()
-      AND r.role IN ('presidency_oversight','auditor','commissioner')
+    AND r.role IN ('presidency_oversight','auditor','commissioner')
   )
   GROUP BY actor_role, action;
 $$;
