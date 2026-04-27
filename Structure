@@ -24,6 +24,6 @@
 2. 002_public_tracker_views.sql - PII-free views for public tracker
 3. 003_enable_rls.sql           - Global RLS activation
 ...
-12. 012_totp_secrets.sql        - Secure TOTP storage (encrypted)
+12. 012_totp_secrets.sql        - Secure TOTP storage
 ...
 16. 016_totp_encryption.sql     - Symmetrical encryption for secrets

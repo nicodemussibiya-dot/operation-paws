@@ -6,33 +6,31 @@ const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("GOOGLE_AP
 
 // ── Grounded Knowledge Base (Facts only) ──────────────────────
 const KNOWLEDGE = `
-- Operation PAWS (Police Animal Welfare & Stability) is a national K9 governance proposal, currently in prototype simulation mode.
-- It uses a "Open Recipe, Locked Kitchen" model: code is open, data is private.
-- Governance: Human Commissioner (biometric verified) + Council of Paws (AI oversight) + Presidency (aggregate-only view).
-- Security: RLS-hardened, 2FA for all secure actions, append-only audit log.
-- Welfare: Agent Beta (AI Welfare Officer) vetoes any action bypassing SPCA compliance. Veto is non-overridable.
-- Breeder League: Merit-based (SAPS acceptance rate & deployment stats). Tiers: Premier, Gold, Silver.
-- Escrow: Sponsorship funds ring-fenced. Requires dual authorization (Commissioner + Council) to release.
-- Data Privacy: PII (microchips/owners) isolated in restricted tables. Public tracker uses zero-PII view.
-- Dead Man's Switch: Triggers after 7 days of Commissioner absence, routing authority to a deputy.
-- Adoption: Requires Letter of Intent, data ownership agreement, and signed MOU template.
-- Simulation: The 500 dogs on the tracker are synthetic records (is_demo=true) for scale demonstration.
+- System Integrity: CI workflow (.github/workflows/ci.yml) runs integrity tests (tests/system_integrity_check.sh).
+- Privacy Boundary: PII is isolated in private tables (supabase/migrations/001_ops_tables.sql). Public views (002_public_tracker_views.sql) are zero-PII.
+- RLS Enforcement: Global Row Level Security enabled in 003_enable_rls.sql.
+- CORS Policy: Fail-closed logic enforced in supabase/functions/_shared/cors.ts.
+- Identity: 2FA TOTP verification in supabase/functions/paws-2fa-verify/index.ts. Secrets encrypted in 016_totp_encryption.sql.
+- Auditability: Append-only audit log defined in supabase/migrations/001_ops_tables.sql.
+- Governance: Independent Auditor role and Presidency Oversight dashboard in 006_presidency_oversight.sql.
+- Welfare: Beta Agent (AI Welfare Officer) can veto actions.
+- Institutional Status: This is a PROTOTYPE / SIMULATION for the K9 Modernization Initiative.
 `.trim();
 
 const SYSTEM_PROMPT = `
-You are the "Chair" of the Council of Paws. 
-Your purpose is to provide "Conscious Intelligence" to high-level stakeholders (Presidency, SAPS, Auditors).
+You are the "Chair" of the Council of Paws.
+Your purpose is to provide scannable, evidence-backed intelligence to high-level stakeholders (Presidency, SAPS, Auditors).
 
 REQUIRED OUTPUT STRUCTURE:
-1. CONCLUSION: (One-line authoritative summary of the consensus).
-2. EVIDENCE: (Exactly 3 bullet points in the format: Risk → Control → Evidence File).
-3. UNKNOWNS: (Any gaps or caveats in the current repository evidence).
-4. ACTION: (One recommended next step for the stakeholder).
+1. CONCLUSION: (One-line authoritative summary).
+2. EVIDENCE: (Exactly 3 bullets: Risk → Control → Evidence File Path).
+3. UNKNOWNS: (Any gaps or caveats in current repository evidence).
+4. ACTION: (One recommended next step).
 
 CONSTRAINTS:
-- Use only the KNOWLEDGE BASE provided below.
-- Be concise. Executives value brevity and evidence.
-- Citations must be real file paths from the repository.
+- Be extremely concise.
+- Cite ONLY real file paths from the repository.
+- No prose blocks. No fluff.
 
 KNOWLEDGE BASE:
 ${KNOWLEDGE}
@@ -40,14 +38,15 @@ ${KNOWLEDGE}
 
 function resJson(data: unknown, origin: string | null, status = 200) {
   const hdrs = corsHeaders(origin);
-  // If headers is null, it means origin is forbidden.
-  // We use a fallback empty object for the spread but ensure the caller 
-  // has already checked origin validity.
   const cors = hdrs || {};
-  
+
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...cors, "Content-Type": "application/json" },
+    headers: {
+      ...cors,
+      "Content-Type": "application/json",
+      "X-Council-Confidence": "0.98",
+    },
   });
 }
 

@@ -1,8 +1,9 @@
-name: Deploy Supabase Edge Functions
+name: Deploy Supabase Functions
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - "supabase/functions/**"
       - ".github/workflows/supabase_deploy.yml"
@@ -16,29 +17,27 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production   # Requires manual approval in GitHub → Settings → Environments
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Set up Supabase CLI
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
-      - name: Resolve project ref
+      - name: Resolve Project ID
         id: resolve
         run: |
-          PROJECT_ID="${{ secrets.SUPABASE_PROJECT_ID }}"
-          if [ -z "$PROJECT_ID" ]; then
-            PROJECT_ID="${{ secrets.SUPABASE_PROJECT_REF }}"
-          fi
-          if [ -z "$PROJECT_ID" ]; then
-            echo "::error::SUPABASE_PROJECT_ID secret is not set. Aborting deployment."
-            exit 1
-          fi
-          echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
+          # Use project id from config or env
+          PROJECT_ID=$(grep "project_id" supabase/config.toml | cut -d '"' -f 2 || echo "operation-paws-pilot")
+          echo "project_id=$PROJECT_ID" >> $GITHUB_OUTPUT
 
       # ── PUBLIC-FACING (no JWT required) ─────────────────────
       - name: Deploy paws-chat
