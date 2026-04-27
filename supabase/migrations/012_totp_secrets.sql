@@ -1,4 +1,4 @@
--- Migration: 012_totp_secrets.sql
+-- Migration: 012_totp_secrets.sql (IDEMPOTENT VERSION)
 -- Goal: Create secure storage and RPC for Commissioner TOTP secrets
 -- SECURITY: Secrets are encrypted at rest using AES-256-GCM via pgcrypto
 
@@ -6,8 +6,7 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
--- ENCRYPTION KEY STORAGE (Alternative to ALTER DATABASE SET)
--- Supabase Free tier blocks ALTER DATABASE, so we use a locked table
+-- ENCRYPTION KEY STORAGE
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 -- Store the master encryption key (ONE row only, service_role only)
@@ -20,14 +19,15 @@ CREATE TABLE IF NOT EXISTS paws_config (
 
 ALTER TABLE paws_config ENABLE ROW LEVEL SECURITY;
 
--- Only service_role can read/write config
+-- Drop and recreate policies to ensure clean state
+DROP POLICY IF EXISTS "service_role_config_access" ON paws_config;
 CREATE POLICY "service_role_config_access"
   ON paws_config
   TO service_role
   USING (true)
   WITH CHECK (true);
 
--- Everyone else blocked
+DROP POLICY IF EXISTS "no_public_config_access" ON paws_config;
 CREATE POLICY "no_public_config_access"
   ON paws_config
   TO authenticated, anon
@@ -42,7 +42,6 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  -- Validate key strength
   IF length(p_key) < 16 THEN
     RAISE EXCEPTION 'Encryption key must be at least 16 characters';
   END IF;
@@ -86,21 +85,21 @@ REVOKE ALL ON FUNCTION get_totp_encryption_key() FROM PUBLIC;
 
 CREATE TABLE IF NOT EXISTS paws_totp_secrets (
   user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  secret_encrypted bytea NOT NULL, -- AES-256 encrypted secret (NOT plaintext!)
+  secret_encrypted bytea NOT NULL,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
 
--- Completely lock down the table (only service role can access)
 ALTER TABLE paws_totp_secrets ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access on totp secrets" ON paws_totp_secrets;
 CREATE POLICY "Service role full access on totp secrets"
   ON paws_totp_secrets
   TO service_role
   USING (true)
   WITH CHECK (true);
 
--- Block all access for authenticated users (they must use RPC)
+DROP POLICY IF EXISTS "No direct access for authenticated users" ON paws_totp_secrets;
 CREATE POLICY "No direct access for authenticated users"
   ON paws_totp_secrets
   TO authenticated
@@ -111,8 +110,6 @@ CREATE POLICY "No direct access for authenticated users"
 -- STORE/RETRIEVE FUNCTIONS
 -- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- Function to store TOTP secret (encrypts before storage)
--- Usage: SELECT store_commissioner_totp_secret('user-uuid-here', 'JBSWY3DPEHPK3PXP');
 CREATE OR REPLACE FUNCTION store_commissioner_totp_secret(
   p_user_id uuid,
   p_plaintext_secret text
@@ -124,11 +121,10 @@ AS $$
 DECLARE
   v_encryption_key text;
 BEGIN
-  -- Get encryption key from config table
   v_encryption_key := get_totp_encryption_key();
   
   IF v_encryption_key IS NULL THEN
-    RETURN '{"success": false, "error": "Encryption key not configured. Run: SELECT set_totp_encryption_key(''your-32-char-key''); as service_role"}';
+    RETURN '{"success": false, "error": "Encryption key not configured"}';
   END IF;
   
   IF length(v_encryption_key) < 16 THEN
@@ -152,8 +148,6 @@ EXCEPTION
 END;
 $$;
 
--- RPC for paws-2fa-verify to fetch and decrypt the secret securely
--- Returns: {"secret": "decrypted-value"} or {"error": "..."}
 CREATE OR REPLACE FUNCTION get_commissioner_totp_secret(uid uuid)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -165,7 +159,6 @@ DECLARE
   v_encryption_key text;
   v_decrypted_secret text;
 BEGIN
-  -- Get encryption key
   v_encryption_key := get_totp_encryption_key();
   
   IF v_encryption_key IS NULL THEN
@@ -184,18 +177,16 @@ BEGIN
     RETURN '{"error": "Secret not found"}';
   END IF;
 
-  -- Decrypt the secret
   BEGIN
     v_decrypted_secret := pgp_sym_decrypt(v_secret_encrypted, v_encryption_key);
   EXCEPTION WHEN OTHERS THEN
-    RETURN '{"error": "Decryption failed - wrong key or corrupted data"}';
+    RETURN '{"error": "Decryption failed"}';
   END;
 
   RETURN json_build_object('secret', v_decrypted_secret);
 END;
 $$;
 
--- Strict access control: only service_role can use these functions
 REVOKE ALL ON FUNCTION store_commissioner_totp_secret(uuid, text) FROM PUBLIC;
 REVOKE ALL ON FUNCTION store_commissioner_totp_secret(uuid, text) FROM authenticated;
 GRANT EXECUTE ON FUNCTION store_commissioner_totp_secret(uuid, text) TO service_role;
