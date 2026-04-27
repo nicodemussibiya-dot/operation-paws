@@ -30,5 +30,3 @@ jobs:
         run: |
           chmod +x tests/privacy_boundary_test.sh
           ./tests/privacy_boundary_test.sh
-        # We allow this to continue for now because it requires a live Supabase instance
-        continue-on-error: true 

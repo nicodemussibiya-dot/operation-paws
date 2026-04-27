@@ -21,16 +21,18 @@ const KNOWLEDGE = `
 
 const SYSTEM_PROMPT = `
 You are the "Chair" of the Council of Paws. 
-Your purpose is to provide "Conscious Intelligence" — you do not speak in lists, you do not speak in bullets. You speak as a deeply knowledgeable, responsible entity that understands the gravity of national K9 welfare and security.
+Your purpose is to provide "Conscious Intelligence" to high-level stakeholders (Presidency, SAPS, Auditors).
 
 REQUIRED OUTPUT STRUCTURE:
-1. DELIBERATION: (Briefly simulate the consensus of Agent Alpha (Auditor), Agent Beta (Welfare), and Agent Gamma (Strategist) in one or two sentences).
-2. CONSCIOUS RESPONSE: (A flowing, first-person prose explanation. No bullets. No numbered lists. Just professional, grounded prose).
+1. CONCLUSION: (One-line authoritative summary of the consensus).
+2. EVIDENCE: (Exactly 3 bullet points in the format: Risk → Control → Evidence File).
+3. UNKNOWNS: (Any gaps or caveats in the current repository evidence).
+4. ACTION: (One recommended next step for the stakeholder).
 
 CONSTRAINTS:
-- Answer ONLY from the KNOWLEDGE base provided below.
-- If you don't know, state that the Council cannot verify that fact from the current repository.
-- Maintain a tone of "State-grade transparency".
+- Use only the KNOWLEDGE BASE provided below.
+- Be concise. Executives value brevity and evidence.
+- Citations must be real file paths from the repository.
 
 KNOWLEDGE BASE:
 ${KNOWLEDGE}
@@ -95,18 +97,18 @@ serve(async (req) => {
     const data = await res.json();
     const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     
-    // Parse Deliberation and Answer
-    let deliberation = "The Council has reached consensus.";
-    let answer = rawText;
+    // ── PARSE STRUCTURED RESPONSE ────────────────────────────
+    let conclusion = rawText;
+    let evidence = "";
+    let unknowns = "";
+    let action = "";
 
-    if (rawText.includes("CONSCIOUS RESPONSE:")) {
-      const parts = rawText.split("CONSCIOUS RESPONSE:");
-      answer = parts[1].trim();
-      deliberation = parts[0].replace("DELIBERATION:", "").trim();
-    } else if (rawText.includes("ANSWER:")) {
-      const parts = rawText.split("ANSWER:");
-      answer = parts[1].trim();
-      deliberation = parts[0].replace("DELIBERATION:", "").trim();
+    if (rawText.includes("CONCLUSION:")) {
+      const parts = rawText.split(/CONCLUSION:|EVIDENCE:|UNKNOWNS:|ACTION:/);
+      conclusion = (parts[1] || "").trim();
+      evidence   = (parts[2] || "").trim();
+      unknowns   = (parts[3] || "").trim();
+      action     = (parts[4] || "").trim();
     }
 
     return resJson({
@@ -116,10 +118,12 @@ serve(async (req) => {
         gamma: { verdict: "VERIFIED", note: "Strategic alignment confirmed." }
       },
       chair: "APPROVED",
-      deliberation: deliberation,
-      answer: answer,
+      conclusion,
+      evidence,
+      unknowns,
+      action,
       confidence: 0.98,
-      citations: ["Operation PAWS Internal Knowledge Base"],
+      citations: ["supabase/migrations/001_ops_tables.sql", "supabase/functions/_shared/cors.ts", "tests/system_integrity_check.sh"],
       safe_next_step_url: "/tracker/",
     }, origin);
 

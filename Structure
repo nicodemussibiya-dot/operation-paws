@@ -11,7 +11,7 @@
 │   │   ├── _shared/            # Shared security and CORS modules
 │   │   ├── paws-intake/        # Secured dog intake logic
 │   │   └── paws-chat/          # AI Gateway with RAG and Persona routing
-│   └── migrations/             # PostgreSQL Schema & RLS Policies (001-015)
+│   └── migrations/             # PostgreSQL Schema & RLS Policies (001-016)
 ├── tech/                       # Technical specifications
 │   ├── ai/                     # LLM prompts, schemas, and security policies
 │   └── supabase/               # Database architecture notes
@@ -20,8 +20,10 @@
 └── demo_gateway.ts             # Local development AI gateway (Deno)
 
 ## Migration Order
-1. 001_ops_tables.sql           - Core schema and RBAC roles
-2. 002_public_tracker_views.sql - PII-free views for public
+1. 001_ops_tables.sql           - Core schema, RBAC roles, and pgcrypto
+2. 002_public_tracker_views.sql - PII-free views for public tracker
 3. 003_enable_rls.sql           - Global RLS activation
 ...
-15. 015_knowledge_rag.sql       - Vector search and knowledge base
+12. 012_totp_secrets.sql        - Secure TOTP storage (encrypted)
+...
+16. 016_totp_encryption.sql     - Symmetrical encryption for secrets

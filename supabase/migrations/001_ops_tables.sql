@@ -1,6 +1,6 @@
--- 001_ops_tables.sql
 -- Core tables for Operation PAWS operations.
 -- These tables should be private/protected via RLS.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- ── 1. USER ROLES ───────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.paws_user_roles (

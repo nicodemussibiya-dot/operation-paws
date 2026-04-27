@@ -71,4 +71,4 @@ If you are a new contributor or stakeholder, please review the following in orde
 4. [CONTRIBUTING](CONTRIBUTING.md)
 
 ---
-*Developed for the South African Presidency and SAPS K9 Modernization Initiative.*
+*Developed as a public-interest prototype for the K9 Modernization Initiative.*
