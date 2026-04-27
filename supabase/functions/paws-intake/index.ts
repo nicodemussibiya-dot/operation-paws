@@ -5,26 +5,35 @@ import { corsHeaders } from "../_shared/cors.ts";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-function json(data: unknown, status = 200) {
+function json(data: unknown, origin: string | null, status = 200) {
+  const headers = corsHeaders(origin) || {};
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...headers, "Content-Type": "application/json" },
   });
 }
 
 // DB trigger `generate_paws_ref()` handles reference generation
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST") return json({ error: "Use POST" }, 405);
+  const origin = req.headers.get("origin");
+  const headers = corsHeaders(origin);
+
+  if (req.method === "OPTIONS") {
+    if (!headers) return new Response("Forbidden", { status: 403 });
+    return new Response("ok", { headers });
+  }
+
+  if (!headers) return new Response("Forbidden origin", { status: 403 });
+  if (req.method !== "POST") return json({ error: "Use POST" }, origin, 405);
 
   try {
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) return json({ error: 'Missing auth' }, 401);
+    if (!authHeader) return json({ error: 'Missing auth' }, origin, 401);
 
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
     const { data: { user }, error: authErr } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
-    if (authErr || !user) return json({ error: 'Invalid session' }, 401);
+    if (authErr || !user) return json({ error: 'Invalid session' }, origin, 401);
 
     // ── 1. CHECK ROLE ──────────────────────────────────────────
     const { data: roleRow } = await supabase
@@ -34,7 +43,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (!roleRow || !['officer', 'intake_admin', 'commissioner'].includes(roleRow.role)) {
-      return json({ error: 'Unauthorized: insufficient role' }, 403);
+      return json({ error: 'Unauthorized: insufficient role' }, origin, 403);
     }
 
     const body = await req.json();
@@ -61,7 +70,7 @@ Deno.serve(async (req) => {
     });
 
     const data = await res.json();
-    if (!res.ok) return json({ error: data }, 400);
+    if (!res.ok) return json({ error: data }, origin, 400);
 
     const assignedRef = data?.[0]?.paws_ref;
 
@@ -79,8 +88,8 @@ Deno.serve(async (req) => {
       metadata: { dog_name, breed, microchip_last4: microchipLast4, microchip_hash: microchipHash }
     });
 
-    return json({ ok: true, paws_ref: assignedRef, inserted: data });
+    return json({ ok: true, paws_ref: assignedRef, inserted: data }, origin);
   } catch (e) {
-    return json({ error: String(e) }, 500);
+    return json({ error: String(e) }, origin, 500);
   }
 });

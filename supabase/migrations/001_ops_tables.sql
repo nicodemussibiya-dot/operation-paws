@@ -2,8 +2,17 @@
 -- Core tables for Operation PAWS operations.
 -- These tables should be private/protected via RLS.
 
+-- ── 1. USER ROLES ───────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.paws_user_roles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) NOT NULL,
+    role TEXT NOT NULL CHECK (role IN ('officer','commissioner','auditor','breeder','intake_admin','presidency_oversight')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, role)
+);
+
 -- Dogs table (Sensitive info)
-CREATE TABLE IF NOT EXISTS paws_dogs (
+CREATE TABLE IF NOT EXISTS public.paws_dogs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     paws_ref TEXT UNIQUE NOT NULL,
     microchip_number TEXT,
@@ -12,7 +21,20 @@ CREATE TABLE IF NOT EXISTS paws_dogs (
     dob DATE,
     owner_name TEXT,
     owner_contact TEXT,
-    status TEXT DEFAULT 'lead', -- lead, screened, assessed, accepted, deployed
+    status TEXT DEFAULT 'lead', -- lead, screened, assessed, accepted, deployed, rejected
+    
+    -- Added for coherence with later migrations:
+    risk_level TEXT DEFAULT 'MEDIUM',
+    source_tier TEXT DEFAULT 'T3',
+    is_demo BOOLEAN DEFAULT false,
+    
+    -- Decision fields
+    approved_by UUID REFERENCES auth.users(id),
+    approved_at TIMESTAMPTZ,
+    commissioner_decision TEXT, -- approved, rejected
+    commissioner_decision_at TIMESTAMPTZ,
+    commissioner_decision_by UUID REFERENCES auth.users(id),
+    
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

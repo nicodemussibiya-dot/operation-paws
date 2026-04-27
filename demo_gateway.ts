@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// NOTE: This is a LOCAL-ONLY demo gateway tool for development/presentation.
+// It uses permissive CORS (*) to allow rapid prototyping without proxying.
 import "https://deno.land/std@0.168.0/dotenv/load.ts";
 import * as Prompts from "./supabase/functions/_shared/prompts.ts";
 

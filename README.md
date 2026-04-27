@@ -1,44 +1,74 @@
+# Operation PAWS 🐾
+### National K9 Command, Oversight, and Welfare System for South Africa
 
-> **NOTICE:** This repository is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted. (Hardened Build: 2026-04-26 v4 — Conscious AI deliberation, RAG-grounded council, context-aware chat)
+[![Security: Hardened](https://img.shields.io/badge/Security-Hardened-success)](SECURITY.md)
+[![License: Proprietary/Pilot](https://img.shields.io/badge/License-Proprietary-blue)](LICENSE)
+[![Built with Supabase](https://img.shields.io/badge/Stack-Supabase-green)](https://supabase.com)
 
-# Operation PAWS
-
-## What Operation PAWS Is
-
-Operation PAWS is a national K9 command-and-oversight system for South Africa.
-
-- The **code and logic are open** so anyone can inspect how decisions are made.
-- The **data and infrastructure are closed** so no one outside the system can see live cases, locations, or personal information.
-
-PAWS does three things at once:
-
-1. **Protects dogs and handlers**
-   - Every dog has a full lifecycle: training, deployments, welfare, insurance, and losses.
-   - Risk, injuries, and near-misses are tracked, not hidden.
-   - Welfare and SPCA screening are built into the intake and audit trail.
-
-2. **Protects the public and fights crime**
-   - Each K9 operation is logged: arrests, seizures, missing persons found, firearms recovered.
-   - The system can show which tactics reduce violence and which don’t.
-   - Leadership can see risk and performance by province, not just headlines.
-
-3. **Protects the integrity of SAPS and the Presidency**
-   - No single Commissioner can quietly switch off oversight.
-   - A Presidency Oversight role sees national, anonymized dashboards but cannot edit or delete.
-   - AI can propose leadership changes based on official notices, but **only humans with 2FA and secure actions can approve them**.
-
-In short: PAWS is **“open recipe, locked kitchen”** for national K9 mobilization.
-The recipe (code, policies, RLS) is public. The kitchen (real dogs, people, and data) is locked behind strict authentication, 2FA, and database policies.
+> **NOTICE:** This repository is a **proposal / pilot prototype reference architecture**. It is NOT operational until formally adopted by the relevant authorities. 
 
 ---
 
-## Technical Overview
-- **Stack**: Supabase (PostgreSQL + RLS + Edge Functions).
-- **Security**: 2FA, JWT-based RBAC, Single-use Action Tokens, Hardened CORS.
-- **AI**: Phase-aware guardrails for Officers, Command, Oversight, and Public.
-- **Oversight**: Presidency Dashboard for national stability monitoring.
+## 🚀 Elevator Pitch
+Operation PAWS is an "open recipe, locked kitchen" command system designed to modernize South Africa's K9 units. It provides a transparent, auditable framework for the entire K9 lifecycle—from intake and training to high-risk deployment and retirement—ensuring that dog welfare and institutional integrity are never compromised.
+
+## 🇿🇦 The South African Context
+Current K9 operations face significant challenges:
+- **Welfare Risks:** Lack of standardized, auditable health and retirement tracking.
+- **Corruption & Diversion:** Risk of K9 assets being misused or diverted without a centralized trail.
+- **Data Silos:** Provincial units operating without a unified national oversight layer.
+- **Public Trust:** Need for verifiable proof that K9 units are used effectively and humanely.
+
+PAWS solves this by making the **governance logic public** while keeping **operational data private**.
+
+## ⚙️ How It Works
+
+```mermaid
+graph TD
+    A[Intake: Breeder/Donation] --> B{PAWS Academy}
+    B -->|Fail| C[Community Rehoming]
+    B -->|Pass| D[Deployment: SAPS/Search & Rescue]
+    D --> E{Annual Audit}
+    E -->|Welfare Check| D
+    E -->|Retirement| F[PAWS Retirement Village]
+    
+    subgraph Oversight
+    G[Presidency Dashboard] -.->|Read-Only| D
+    H[Independent Auditor] -.->|Full Traceability| E
+    end
+```
+
+## 🗺️ Roadmap: From Pilot to National Scale
+
+| Phase | Milestone | Scope | Status |
+| :--- | :--- | :--- | :--- |
+| **PAWS-10** | Technical Proof of Concept | 10 Dogs, 1 Unit | ✅ Complete |
+| **PAWS-100** | Multi-Unit Stress Test | 100 Dogs, 5 Units | 🚧 Planning |
+| **PAWS-500** | Simulated National Pilot | 500 Dogs, Provincial | 🔄 Simulated |
+| **NATIONAL** | Full SAPS Integration | 2000+ Dogs | 📅 2027+ |
+
+## 🛠️ Tech Stack & Security
+- **Infrastructure:** Supabase (PostgreSQL, RLS, Edge Functions).
+- **Identity:** 2FA via Totp, JWT-based Role Based Access Control (RBAC).
+- **Auditability:** Immutable, append-only audit logs for every sensitive action.
+- **AI Guardrails:** Phase-aware assistants for Officers, Command, and Oversight.
+
+## 🔍 Explore the Demo
+Stakeholders can explore the prototype via the following entry points:
+1. **Command Center:** Open [paws_command_center.html](./paws_command_center.html) to see the Commissioner's strategic view.
+2. **Public Tracker:** Visit the [Transparency Dashboard](docs/tracker/index.html) to see anonymized national stats.
+3. **Documentation:**
+   - [Governance Principles](01_GOVERNANCE.md)
+   - [Data Boundary Rules](DATA_BOUNDARY.md)
+   - [Operational Playbook](OPERATIONAL_PLAYBOOK.md)
+   - [Pilot Close-Out Report](CLOSE_OUT_REPORT.md)
+
+## 🚦 Start Here
+If you are a new contributor or stakeholder, please review the following in order:
+1. [STRUCTURE](Structure) - Repository map.
+2. [GOVERNANCE](01_GOVERNANCE.md) - The "Why" and "How" of oversight.
+3. [SECURITY](SECURITY.md) - Disclosure policy and contact.
+4. [CONTRIBUTING](CONTRIBUTING.md) - How to help (Security researchers & Developers).
 
 ---
-
-## 500-Dog Pilot Close-Out
-The system has completed its initial 500-dog pilot simulation. See [CLOSE_OUT_REPORT.md](./CLOSE_OUT_REPORT.md) for results.
+*Developed for the South African Presidency and SAPS K9 Modernization Initiative.*
