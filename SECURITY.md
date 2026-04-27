@@ -10,6 +10,7 @@ If you discover a security vulnerability within this project, please **do not op
 We aim to acknowledge all security issues within 48 hours and provide a resolution plan within 72 hours.
 
 ## Scope
+
 - Edge Functions and Database Policies
 - Authentication and Role Management
 - API integrations

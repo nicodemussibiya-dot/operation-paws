@@ -37,10 +37,15 @@ ${KNOWLEDGE}
 `.trim();
 
 function resJson(data: unknown, origin: string | null, status = 200) {
-  const hdrs = corsHeaders(origin) ?? {};
+  const hdrs = corsHeaders(origin);
+  // If headers is null, it means origin is forbidden.
+  // We use a fallback empty object for the spread but ensure the caller 
+  // has already checked origin validity.
+  const cors = hdrs || {};
+  
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...hdrs, "Content-Type": "application/json" },
+    headers: { ...cors, "Content-Type": "application/json" },
   });
 }
 
@@ -48,11 +53,17 @@ serve(async (req) => {
   const origin = req.headers.get("origin");
   const headers = corsHeaders(origin);
 
+  // 1. Handle Preflight
   if (req.method === "OPTIONS") {
-    if (!headers) return new Response("Forbidden origin", { status: 403 });
+    if (!headers) return new Response("Forbidden: Invalid Origin", { status: 403 });
     return new Response("ok", { headers });
   }
-  if (req.method !== "POST") return resJson({ error: "POST only" }, origin, 405);
+
+  // 2. Enforce Origin (Fail-Closed)
+  if (!headers) return new Response("Forbidden: Invalid Origin", { status: 403 });
+
+  // 3. Enforce POST
+  if (req.method !== "POST") return resJson({ error: "Method Not Allowed. Use POST." }, origin, 405);
 
   try {
     const { query } = await req.json();

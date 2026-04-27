@@ -6,7 +6,7 @@
 CREATE TABLE IF NOT EXISTS public.paws_user_roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES auth.users(id) NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('officer','commissioner','auditor','breeder','intake_admin','presidency_oversight')),
+    role TEXT NOT NULL CHECK (role IN ('officer','commissioner','auditor','breeder','intake_admin','presidency_oversight','partner')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(user_id, role)
 );

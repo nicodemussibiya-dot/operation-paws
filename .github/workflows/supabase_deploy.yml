@@ -8,7 +8,7 @@ on:
       - ".github/workflows/supabase_deploy.yml"
   workflow_dispatch:
 
-# Least-privilege: only allow writing to deployments
+# Least-privilege: only allow reading to deployments
 permissions:
   contents: read
   deployments: write
@@ -42,27 +42,38 @@ jobs:
 
       # ── PUBLIC-FACING (no JWT required) ─────────────────────
       - name: Deploy paws-chat
-        run: supabase functions deploy paws-chat --project-ref "${{ steps.resolve.outputs.project_id }}" --no-verify-jwt
+        run: |
+          supabase functions deploy paws-chat \
+            --project-ref "${{ steps.resolve.outputs.project_id }}" \
+            --no-verify-jwt
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
+      # ── PRIVILEGED (JWT required - Default) ──────────────────
       - name: Deploy paws-intake
-        run: supabase functions deploy paws-intake --project-ref "${{ steps.resolve.outputs.project_id }}"
+        run: |
+          supabase functions deploy paws-intake \
+            --project-ref "${{ steps.resolve.outputs.project_id }}"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      # ── PRIVILEGED (JWT required) ────────────────────────────
       - name: Deploy paws-2fa-verify
-        run: supabase functions deploy paws-2fa-verify --project-ref "${{ steps.resolve.outputs.project_id }}"
+        run: |
+          supabase functions deploy paws-2fa-verify \
+            --project-ref "${{ steps.resolve.outputs.project_id }}"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Deploy paws-secure-action
-        run: supabase functions deploy paws-secure-action --project-ref "${{ steps.resolve.outputs.project_id }}"
+        run: |
+          supabase functions deploy paws-secure-action \
+            --project-ref "${{ steps.resolve.outputs.project_id }}"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Deploy paws-council
-        run: supabase functions deploy paws-council --project-ref "${{ steps.resolve.outputs.project_id }}"
+        run: |
+          supabase functions deploy paws-council \
+            --project-ref "${{ steps.resolve.outputs.project_id }}"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

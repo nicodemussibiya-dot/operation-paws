@@ -1,44 +1,27 @@
-operation-paws/
-├─ README.md                # Launchpad & Quick Start
-├─ 01_GOVERNANCE.md         # Core Principles
-├─ 02_ROADMAP.md            # Execution Phases (A-E)
-├─ DATA_BOUNDARY.md         # Non-Negotiable Privacy Rules
-├─ 04_DISCLAIMER.md         # Legal Boundaries
-├─ 05_PRIVACY.md            # POPIA Framework
-├─ SECURITY.md              # Secrets & AI Guardrails
-├─ DONATIONS.md             # Funding Channels
-│
-├─ docs/                    # GitHub Pages (Public Hub)
-│  ├─ index.html            # Root Redirect / Launchpad
-│  ├─ start/                # QR Landing Page
-│  ├─ admin/                # Field Intake App (Dumb-proof)
-│  ├─ chat/                 # AI Assistant UI
-│  ├─ commissioner/         # Strategic Approval Portal (Command Center)
-│  ├─ tracker/              # Transparency Dashboard
-│  ├─ verify/               # Reference Verification Tool
-│  ├─ donate/               # Sponsor Hub
-│  └─ media/                # Media Consent Hub
-│
-├─ handbook/                # The Operational Playbook
-│  ├─ 01_pipeline/          # The 3-Tier Model
-│  ├─ 02_academy/           # Curriculum & Scorecard
-│  ├─ 04_ops_and_logistics/ # Intake Day Runbooks
-│  ├─ 07_metrics_and_ids/   # ID Specs & Leaderboards
-│  ├─ 08_saps_alignment/    # SAPS 505(a) Reference
-│  └─ 11_commissioner_briefing/ # Chief Commissioner's Manual
-│
-├─ templates/               # Legal & Admin Assets
-│  ├─ MOU_01...11           # Stakeholder Agreements
-│  ├─ MOU_12_Insurance_Partner.md # Strategic Risk Coverage
-│  ├─ MOU_13_Tactical_Tech_Partner.md # Drones & Ballistics
-│  ├─ MOU_14_BRICS_Alliance.md # International Alliance
-│  ├─ MOU_15_International_Donor.md # Global Intake
-│  ├─ MOU_16_League_Sponsorship.md # Corporate Funding
-│  ├─ FORM_01_Owner_Consent.md
-│  └─ 03_posters/           # Marketing Assets
-│
-├─ supabase/                # Active Supabase Deployment
-   ├─ functions/            # Edge Functions (Deno)
-   │  ├─ paws-chat/         # AI API Proxy
-   │  └─ paws-intake/       # Secure Field Intake
-   └─ migrations/           # SQL Migration Files (999_MASTER_SCHEMA)
+# Repository Structure
+
+/
+├── .github/workflows/          # CI/CD pipelines (Security & Integrity)
+├── docs/                       # Strategic documentation and policies
+│   ├── PRIVACY_POSTURE.md      # Data boundary and PII isolation rules
+│   └── tracker/                # Public Transparency Dashboard (Static)
+├── ops/                        # Operational playbooks and checklists
+├── supabase/                   # Backend Infrastructure
+│   ├── functions/              # Deno Edge Functions (Intake, Chat, 2FA)
+│   │   ├── _shared/            # Shared security and CORS modules
+│   │   ├── paws-intake/        # Secured dog intake logic
+│   │   └── paws-chat/          # AI Gateway with RAG and Persona routing
+│   └── migrations/             # PostgreSQL Schema & RLS Policies (001-015)
+├── tech/                       # Technical specifications
+│   ├── ai/                     # LLM prompts, schemas, and security policies
+│   └── supabase/               # Database architecture notes
+├── tests/                      # Integrity and Privacy Boundary tests
+├── paws_command_center.html    # Commissioner's Command Interface (Prototype)
+└── demo_gateway.ts             # Local development AI gateway (Deno)
+
+## Migration Order
+1. 001_ops_tables.sql           - Core schema and RBAC roles
+2. 002_public_tracker_views.sql - PII-free views for public
+3. 003_enable_rls.sql           - Global RLS activation
+...
+15. 015_knowledge_rag.sql       - Vector search and knowledge base

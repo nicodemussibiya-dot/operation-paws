@@ -22,8 +22,13 @@ jobs:
           sed -i 's/https:\/\/your-project-id.supabase.co/https:\/\/test.supabase.co/g' .env
 
       - name: Run Integrity Checks
-        run: chmod +x tests/system_integrity_check.sh && ./tests/system_integrity_check.sh
+        run: |
+          chmod +x tests/system_integrity_check.sh
+          ./tests/system_integrity_check.sh
 
       - name: Run Privacy Boundary Smoke Test
-        run: chmod +x tests/privacy_boundary_test.sh && ./tests/privacy_boundary_test.sh
-        continue-on-error: true # Fails gracefully if no live Supabase is reachable
+        run: |
+          chmod +x tests/privacy_boundary_test.sh
+          ./tests/privacy_boundary_test.sh
+        # We allow this to continue for now because it requires a live Supabase instance
+        continue-on-error: true 
