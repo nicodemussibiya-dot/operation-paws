@@ -1,242 +1,165 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
 import { corsHeaders } from "../_shared/cors.ts";
+import { EXECUTIVE_SYSTEM_PROMPT } from "../_shared/prompts-executive.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "";
 
-const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("GOOGLE_API_KEY") || "";
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") || "";
-const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY") || "";
+// Rate limiting
+const RATE_LIMIT = new Map<string, { count: number; reset: number }>();
 
-import * as Prompts from "../_shared/prompts.ts";
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const windowStart = now - 600000;
+  const record = RATE_LIMIT.get(ip);
+  if (!record || record.reset < windowStart) {
+    RATE_LIMIT.set(ip, { count: 1, reset: now });
+    return true;
+  }
+  if (record.count >= 30) return false;
+  record.count++;
+  return true;
+}
 
-const FALLBACK_ANSWERS: Record<string, string> = {
-  default:
-    "I'm having trouble connecting to my AI brain right now. Please use the Start Hub to find official links for WhatsApp and our Transparency Tracker.",
-  intake:
-    "To donate a dog, please visit the Start Hub to join our official WhatsApp intake channel. This ensures traceability.",
-  traceability:
-    "We use verified microchips and unique PAWS Reference numbers to reduce smuggling/diversion risk.",
-};
+async function getAIResponse(messages: any[], role: string): Promise<string> {
+  const rolePrefixes: Record<string, string> = {
+    commissioner: "Role: National Commissioner. Focus on governance and strategy.",
+    command: "Role: Command Authority. Focus on operations and deployment.",
+    officer: "Role: Field Officer. Focus on execution and safety.",
+    breeder: "Role: Breeder League. Focus on standards and advancement.",
+    legal: "Role: Legal Partner. Focus on compliance and audit.",
+    logistics: "Role: Logistics Partner. Focus on traceability.",
+    church: "Role: Church Elder. Focus on ethical stewardship.",
+    media: "Role: Media. Focus on transparency and public trust.",
+    citizen: "Role: Citizen. Focus on accessibility and clarity."
+  };
 
-async function getContext(supabase: any, query: string, apiKey: string, accessLevel: string) {
-  if (!apiKey) return "";
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "models/text-embedding-004",
-          content: { parts: [{ text: query }] }
-        }),
+  const roleContext = rolePrefixes[role] || rolePrefixes.citizen;
+  const systemPrompt = `${EXECUTIVE_SYSTEM_PROMPT}\n\n${roleContext}`;
+
+  // DEBUG: Log if key exists
+  console.log("GEMINI_API_KEY exists:", !!GEMINI_API_KEY);
+
+  if (GEMINI_API_KEY) {
+    try {
+      const contents = [
+        { role: "user", parts: [{ text: systemPrompt }] },
+        { role: "model", parts: [{ text: "Understood. I am PAWS-OS Executive Intelligence." }] },
+        ...messages.map((m: any) => ({
+          role: m.role === "assistant" ? "model" : "user",
+          parts: [{ text: m.content }]
+        }))
+      ];
+
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents }),
+        }
+      );
+
+      // DEBUG: Log response status
+      console.log("Gemini API status:", res.status);
+      
+      const data = await res.json();
+      console.log("Gemini response:", JSON.stringify(data).slice(0, 200));
+
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (reply) {
+        return reply;
+      } else {
+        console.log("No reply in response, using fallback");
+        return getFallbackResponse("AI returned empty response");
       }
-    );
-    const data = await res.json();
-    const embedding = data?.embedding?.values;
-    if (!embedding) return "";
-
-    const { data: chunks, error } = await supabase.rpc('match_paws_knowledge', {
-      query_embedding: embedding,
-      match_count: 5,
-      min_similarity: 0.2, // Lower threshold for better retrieval in demo
-      p_access_level: accessLevel
-    });
-
-    if (error || !chunks || chunks.length === 0) return "";
-
-    return chunks.map((c: any) => `[Source: ${c.source}]\n${c.content}`).join("\n\n---\n\n");
-  } catch (e) {
-    console.error("RAG Error:", e);
-    return "";
+    } catch (e) {
+      console.error("Gemini error:", e);
+      return getFallbackResponse(e.message);
+    }
   }
+
+  return getFallbackResponse("No API key configured");
 }
 
-function json(data: unknown, origin: string | null, status = 200) {
-  const headers = corsHeaders(origin) || {};
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { ...headers, "Content-Type": "application/json" },
-  });
-}
+function getFallbackResponse(reason: string): string {
+  return `🎯 CONCLUSION
+AI service issue: ${reason}
 
-function sanitizeMessages(input: unknown) {
-  const out: { role: "user" | "assistant"; content: string }[] = [];
-  if (!Array.isArray(input)) return out;
+📊 EVIDENCE BASE
+• Service: paws-chat/paws-council Edge Function
+• Status: Running but encountered error
+• Error: ${reason}
 
-  for (const m of input.slice(-12)) { // cap history
-    const role = (m as any)?.role;
-    const content = (m as any)?.content;
-    if ((role !== "user" && role !== "assistant") || typeof content !== "string") continue;
+🔍 METHODOLOGY
+1. Received user query
+2. Attempted to route to Gemini API
+3. Encountered: ${reason}
+4. Returned diagnostic fallback
 
-    const trimmed = content.slice(0, 2000); // cap per message
-    out.push({ role, content: trimmed });
-  }
-  return out;
+⚖️ CONFIDENCE: N/A (service issue)
+
+🔗 AUDIT TRAIL
+• Function: paws-chat
+• Timestamp: ${new Date().toISOString()}
+• Error: ${reason}
+
+To fix:
+1. Verify GEMINI_API_KEY is set: supabase secrets list
+2. Check key is valid at https://makersuite.google.com/app/apikey
+3. Redeploy: supabase functions deploy paws-chat`;
 }
 
 serve(async (req) => {
   const origin = req.headers.get("origin");
   const headers = corsHeaders(origin);
-  
-  // ── 0. BYPASS FOR INTERNAL CALLS (e.g. Telegram) ────────────
-  const internalSecret = Deno.env.get("INTERNAL_SECRET");
-  const passedSecret = req.headers.get("x-internal-secret");
-  const isInternal = internalSecret && passedSecret === internalSecret;
 
   if (req.method === "OPTIONS") {
-    if (!headers) return new Response("Forbidden origin", { status: 403 });
     return new Response("ok", { headers });
   }
 
-  if (!isInternal && !headers) {
-    return new Response("Forbidden origin", { status: 403 });
+  const ip = req.headers.get("x-forwarded-for") || "unknown";
+  if (!checkRateLimit(ip)) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded" }),
+      { status: 429, headers: { ...headers, "Content-Type": "application/json" } }
+    );
   }
 
   try {
-    const body = await req.json().catch(() => ({}));
-    const messages = sanitizeMessages(body?.messages);
-    const lastMessage = (messages[messages.length - 1]?.content || "").toLowerCase();
-    const role = body?.role || 'citizen';
+    const body = await req.json();
+    const messages = body?.messages || [];
+    const role = body?.role || "citizen";
+    const lastMessage = messages[messages.length - 1]?.content || "";
 
-
-    const ip = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for') || 'unknown';
-    const ipHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip))
-      .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
-
+    // Log to audit
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
-    
-    const { data: rateRow } = await supabase.from('paws_chat_rate_limit')
-      .select('*').eq('ip_hash', ipHash).single();
-
-    let attempts = rateRow?.attempts ?? 0;
-    const lastAttemptStr = rateRow?.last_attempt;
-    const now = Date.now();
-    const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-
-    const lastTime = lastAttemptStr ? Date.parse(lastAttemptStr) : 0;
-    const withinWindow = lastTime && (now - lastTime) < WINDOW_MS;
-    const nextAttempts = withinWindow ? (rateRow?.attempts ?? 0) + 1 : 1;
-
-    if (rateRow?.blocked_until && new Date(rateRow.blocked_until).getTime() > now) {
-      return json({ error: 'Too Many Requests' }, origin, 429);
-    }
-
-    // Update attempts
-    await supabase.from('paws_chat_rate_limit').upsert({
-      ip_hash: ipHash,
-      attempts: nextAttempts,
-      last_attempt: new Date(now).toISOString(),
-      blocked_until: nextAttempts >= 30 
-        ? new Date(now + 60 * 60 * 1000).toISOString() : null
+    await supabase.from("paws_audit_log").insert({
+      actor_role: role,
+      action: "AI_QUERY",
+      target_id: "chat",
+      metadata: {
+        query: lastMessage.slice(0, 500),
+        ip_hash: ip,
+        timestamp: new Date().toISOString()
+      }
     });
 
-    // ── SELECT SYSTEM PROMPT BASED ON ROLE ──
-    let activePrompt = Prompts.PAWS_CITIZEN_ASSISTANT_PROMPT;
-    switch (role) {
-      case 'clerk': activePrompt = Prompts.PAWS_GOVERNANCE_CLERK_PROMPT; break;
-      case 'officer': activePrompt = Prompts.PAWS_OFFICER_ASSISTANT_PROMPT; break;
-      case 'command': activePrompt = Prompts.PAWS_COMMAND_ASSISTANT_PROMPT; break;
-      case 'citizen': activePrompt = Prompts.PAWS_CITIZEN_ASSISTANT_PROMPT; break;
-    }
+    // Get AI response (ALWAYS returns string now)
+    const reply = await getAIResponse(messages, role);
 
-    // ── RAG RETRIEVAL ──
-    const accessLevel = (role === 'presidency' || role === 'command' || role === 'officer') ? 'restricted' : 'public';
-    const context = await getContext(supabase, lastMessage, GEMINI_API_KEY, accessLevel);
+    return new Response(
+      JSON.stringify({ reply }),
+      { headers: { ...headers, "Content-Type": "application/json" } }
+    );
 
-    if (context) {
-      activePrompt = `${activePrompt}\n\n==================================================\nRETRIEVED CONTEXT (GROUND TRUTH)\n==================================================\nUse the following verified excerpts from the Operation PAWS knowledge base to answer the user's request. You MUST prioritize this information over your general knowledge and cite the specific [Source] provided.\n\n${context}`;
-    }
-
-    // 2) Gemini
-    if (GEMINI_API_KEY) {
-      try {
-        // Format for Gemini API (user/model roles)
-        const contents = [
-          { role: "user", parts: [{ text: activePrompt }] },
-          { role: "model", parts: [{ text: "Understood. I am online and grounded in the Operation PAWS repository. How can I assist the Presidency/Command oversight today?" }] },
-          ...messages.map(m => ({
-            role: m.role === "assistant" ? "model" : "user",
-            parts: [{ text: m.content }]
-          }))
-        ];
-
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ contents }),
-          }
-        );
-
-        const data = await res.json();
-        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (reply) return json({ reply }, origin);
-      } catch (_e) {
-        // fall through
-      }
-    }
-
-    // 2) OpenAI
-    if (OPENAI_API_KEY) {
-      try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${OPENAI_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [{ role: "system", content: activePrompt }, ...messages],
-          }),
-        });
-
-        const data = await res.json();
-        const reply = data?.choices?.[0]?.message?.content;
-        if (reply) return json({ reply }, origin);
-      } catch (_e) {
-        // fall through
-      }
-    }
-
-    // 3) OpenRouter
-    if (OPENROUTER_API_KEY) {
-      try {
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/nicodemussibiya-dot/operation-paws",
-            "X-Title": "Operation PAWS",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-flash-1.5",
-            messages: [{ role: "system", content: activePrompt }, ...messages],
-          }),
-        });
-
-        const data = await res.json();
-        const reply = data?.choices?.[0]?.message?.content;
-        if (reply) return json({ reply }, origin);
-      } catch (_e) {
-        // fall through
-      }
-    }
-
-    // 4) Static fallback
-    let finalReply = FALLBACK_ANSWERS.default;
-    if (lastMessage.includes("donate")) finalReply = FALLBACK_ANSWERS.intake;
-    if (lastMessage.includes("welfare")) finalReply = FALLBACK_ANSWERS.welfare;
-    if (lastMessage.includes("trace")) finalReply = FALLBACK_ANSWERS.traceability;
-
-    return json({ reply: finalReply }, origin);
-  } catch (_err) {
-    return json({ reply: FALLBACK_ANSWERS.default }, origin, 200);
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...headers, "Content-Type": "application/json" } }
+    );
   }
 });
