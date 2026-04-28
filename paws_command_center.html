@@ -1,571 +1,559 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PAWS Command Center</title>
-    <style>
-        :root {
-            --bg-color: #05070a;
-            --accent-color: #00d2ff;
-            --accent-glow: rgba(0, 210, 255, 0.35);
-            --glass-bg: rgba(15, 20, 30, 0.72);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #e0e6ed;
-            --text-dim: #94a3b8;
-            --warning-bg: #ffcc00;
-            --warning-text: #111827;
-            --danger-bg: rgba(255, 90, 90, 0.18);
-            --danger-border: rgba(255, 90, 90, 0.28);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PAWS Command Center</title>
+  <style>
+    :root {
+      --bg-color:       #05070a;
+      --accent-color:   #00d2ff;
+      --accent-glow:    rgba(0,210,255,0.35);
+      --glass-bg:       rgba(15,20,30,0.82);
+      --glass-border:   rgba(255,255,255,0.10);
+      --text-main:      #e0e6ed;
+      --text-dim:       #94a3b8;
+      --warning-bg:     #ffcc00;
+      --warning-text:   #111827;
+      --danger-bg:      rgba(255,90,90,0.15);
+      --danger-border:  rgba(255,90,90,0.30);
+      --retry-bg:       rgba(0,210,255,0.12);
+      --retry-border:   rgba(0,210,255,0.35);
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
+    * { margin:0; padding:0; box-sizing:border-box;
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
 
-        html,
-        body {
-            min-height: 100%;
-        }
+    html, body { min-height:100%; }
 
-        body {
-            background:
-                radial-gradient(circle at top, rgba(0, 210, 255, 0.08), transparent 35%),
-                linear-gradient(rgba(5, 7, 10, 0.55), rgba(5, 7, 10, 0.72)),
-                var(--bg-color);
-            background-image:
-                radial-gradient(circle at top, rgba(0, 210, 255, 0.08), transparent 35%),
-                linear-gradient(rgba(5, 7, 10, 0.55), rgba(5, 7, 10, 0.72)),
-                url('command_center_bg_1777147023307.png');
-            background-size: cover;
-            background-position: center;
-            color: var(--text-main);
-            overflow: hidden;
-        }
+    body {
+      background:
+        radial-gradient(circle at top, rgba(0,210,255,0.08), transparent 35%),
+        linear-gradient(rgba(5,7,10,0.55), rgba(5,7,10,0.72)),
+        var(--bg-color);
+      color: var(--text-main);
+      overflow: hidden;
+    }
 
-        .page-shell {
-            min-height: 100vh;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 16px;
-        }
+    .page-shell {
+      min-height: 100vh; width: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px; padding: 16px;
+    }
 
-        .notice-banner {
-            width: min(1100px, 90vw);
-            background: var(--warning-bg);
-            color: var(--warning-text);
-            padding: 12px 16px;
-            border-radius: 14px;
-            text-align: center;
-            font-weight: 800;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-        }
+    /* ── Notice banner ── */
+    .notice-banner {
+      width: min(1100px, 90vw);
+      background: var(--warning-bg); color: var(--warning-text);
+      padding: 10px 16px; border-radius: 14px;
+      text-align: center; font-weight: 800; font-size: 13px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
 
-        .container {
-            width: min(1100px, 90vw);
-            height: min(85vh, 900px);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.8s ease-out;
-            overflow: hidden;
-        }
+    /* ── Main container ── */
+    .container {
+      width: min(1100px, 90vw); height: min(85vh, 900px);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border); border-radius: 24px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+      animation: fadeIn 0.8s ease-out; overflow: hidden;
+    }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(18px); }
+      to   { opacity:1; transform:translateY(0);    }
+    }
 
-        header {
-            padding: 24px 28px;
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
+    /* ── Header ── */
+    header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; flex-wrap: wrap;
+    }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand .logo {
+      width:30px; height:30px;
+      background: var(--accent-color); border-radius:8px;
+      box-shadow: 0 0 20px var(--accent-glow); flex: 0 0 auto;
+    }
+    .brand h1 {
+      font-size:17px; font-weight:800;
+      letter-spacing:1px; text-transform:uppercase; color:#fff;
+    }
 
-        .brand .logo {
-            width: 32px;
-            height: 32px;
-            background: var(--accent-color);
-            border-radius: 8px;
-            box-shadow: 0 0 20px var(--accent-glow);
-            flex: 0 0 auto;
-        }
+    /* ── Role selector ── */
+    .role-selector {
+      display:flex; flex-wrap:wrap; gap:5px;
+      background: rgba(0,0,0,0.28); padding:5px;
+      border-radius:14px; border:1px solid var(--glass-border);
+    }
+    .role-btn {
+      padding:7px 12px; border-radius:9px; cursor:pointer;
+      font-size:11px; font-weight:700; color:var(--text-dim);
+      transition:all 0.2s ease; border:none; background:transparent;
+    }
+    .role-btn:hover { color:#fff; background:rgba(255,255,255,0.07); }
+    .role-btn.active {
+      background: var(--accent-color); color:#000;
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
 
-        .brand h1 {
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: #fff;
-        }
+    /* ── Chat body ── */
+    .chat-body {
+      flex:1; overflow-y:auto; padding:20px 24px;
+      display:flex; flex-direction:column; gap:14px;
+      scroll-behavior:smooth;
+    }
+    .chat-body::-webkit-scrollbar { width:6px; }
+    .chat-body::-webkit-scrollbar-track { background:transparent; }
+    .chat-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12); border-radius:3px; }
 
-        .role-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            background: rgba(0, 0, 0, 0.28);
-            padding: 6px;
-            border-radius: 14px;
-            border: 1px solid var(--glass-border);
-        }
+    /* ── Message bubbles ── */
+    .msg { display:flex; gap:12px; max-width:82%; animation:msgIn 0.25s ease-out; }
+    @keyframes msgIn {
+      from { opacity:0; transform:translateY(8px); }
+      to   { opacity:1; transform:translateY(0);   }
+    }
 
-        .role-btn {
-            padding: 8px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-dim);
-            transition: all 0.2s ease;
-            border: none;
-            background: transparent;
-        }
+    .msg.user-msg   { align-self:flex-end; flex-direction:row-reverse; }
+    .msg.system-msg { align-self:flex-start; }
 
-        .role-btn:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.05);
-        }
+    .avatar {
+      width:34px; height:34px; border-radius:10px; flex:0 0 auto;
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; font-weight:800;
+    }
+    .user-msg  .avatar { background: rgba(0,210,255,0.18); color:var(--accent-color); border:1px solid var(--accent-color); }
+    .system-msg .avatar{ background: rgba(255,255,255,0.08); color:#fff; border:1px solid var(--glass-border); }
 
-        .role-btn.active {
-            background: var(--accent-color);
-            color: #000;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.35);
-        }
+    .bubble {
+      padding:12px 16px; border-radius:16px; font-size:14px;
+      line-height:1.65; max-width:100%;
+    }
+    .user-msg  .bubble {
+      background: rgba(0,210,255,0.13); border:1px solid rgba(0,210,255,0.22);
+      border-top-right-radius:4px;
+    }
+    .system-msg .bubble {
+      background: rgba(255,255,255,0.05); border:1px solid var(--glass-border);
+      border-top-left-radius:4px;
+    }
 
-        .chat-container {
-            flex: 1;
-            min-height: 0;
-            padding: 28px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--glass-border) transparent;
-        }
+    .msg-badge {
+      font-size:10px; font-weight:700; letter-spacing:0.6px;
+      text-transform:uppercase; color:var(--text-dim);
+      margin-bottom:5px;
+    }
 
-        .message {
-            max-width: min(82%, 760px);
-            padding: 16px 18px;
-            border-radius: 18px;
-            font-size: 15px;
-            line-height: 1.65;
-            animation: msgSlide 0.25s ease-out;
-            word-break: break-word;
-        }
+    /* ── Error bubble ── */
+    .bubble.error-bubble {
+      background: var(--danger-bg); border-color: var(--danger-border);
+    }
+    .bubble.error-bubble .error-label {
+      color:#ff7a7a; font-weight:700; margin-bottom:6px; font-size:12px;
+    }
 
-        @keyframes msgSlide {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    /* ── Retry button inside error bubble ── */
+    .retry-btn {
+      margin-top:10px; padding:7px 14px;
+      background: var(--retry-bg); border:1px solid var(--retry-border);
+      color: var(--accent-color); border-radius:8px;
+      font-size:12px; font-weight:700; cursor:pointer;
+      transition:all 0.2s ease;
+    }
+    .retry-btn:hover { background:rgba(0,210,255,0.22); }
 
-        .message.system {
-            align-self: flex-start;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-        }
+    /* ── Loading indicator ── */
+    .loading-bubble {
+      display:flex; gap:5px; padding:14px 16px;
+      background: rgba(255,255,255,0.05); border:1px solid var(--glass-border);
+      border-radius:16px; border-top-left-radius:4px;
+      align-items:center;
+    }
+    .dot {
+      width:7px; height:7px; border-radius:50%;
+      background:var(--accent-color);
+      animation:bounce 1.2s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay:.2s; }
+    .dot:nth-child(3) { animation-delay:.4s; }
+    @keyframes bounce {
+      0%,80%,100% { transform:scale(0.7); opacity:0.4; }
+      40%          { transform:scale(1.1); opacity:1;   }
+    }
 
-        .message.user {
-            align-self: flex-end;
-            background: var(--accent-color);
-            color: #000;
-            font-weight: 600;
-        }
+    /* ── Input bar ── */
+    .input-bar {
+      padding:16px 20px;
+      border-top:1px solid var(--glass-border);
+      display:flex; gap:10px; align-items:flex-end;
+    }
+    .input-bar textarea {
+      flex:1; background:rgba(255,255,255,0.07);
+      border:1px solid var(--glass-border); border-radius:14px;
+      color:var(--text-main); font-size:14px;
+      padding:12px 16px; resize:none; outline:none;
+      line-height:1.5; max-height:120px;
+      transition:border-color 0.2s;
+    }
+    .input-bar textarea:focus { border-color:var(--accent-color); }
+    .input-bar textarea::placeholder { color:var(--text-dim); }
 
-        .message.error {
-            border: 1px solid var(--danger-border);
-            background: var(--danger-bg);
-        }
+    #sendBtn {
+      padding:12px 20px; border-radius:14px;
+      background:var(--accent-color); color:#000;
+      font-weight:800; font-size:13px; border:none; cursor:pointer;
+      box-shadow:0 0 20px var(--accent-glow);
+      transition:all 0.2s ease; white-space:nowrap;
+    }
+    #sendBtn:hover:not(:disabled) { filter:brightness(1.1); }
+    #sendBtn:disabled { opacity:0.5; cursor:not-allowed; }
 
-        .status-badge {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            display: block;
-            opacity: 0.7;
-            font-weight: 800;
-        }
-
-        footer {
-            padding: 20px 28px 24px;
-            background: rgba(0, 0, 0, 0.18);
-            border-top: 1px solid var(--glass-border);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 8px 8px 8px 18px;
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
-        }
-
-        input {
-            flex: 1;
-            min-width: 0;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-        }
-
-        input::placeholder {
-            color: var(--text-dim);
-        }
-
-        .send-btn {
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .send-btn:hover:not(:disabled) {
-            transform: scale(1.02);
-        }
-
-        .send-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .loading {
-            display: flex;
-            gap: 4px;
-            padding: 10px;
-            align-items: center;
-        }
-
-        .dot {
-            width: 6px;
-            height: 6px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            animation: blink 1.4s infinite both;
-        }
-
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes blink {
-            0%, 80%, 100% { opacity: 0; }
-            40% { opacity: 1; }
-        }
-
-        @media (max-width: 900px) {
-            body {
-                overflow: auto;
-            }
-
-            .page-shell {
-                justify-content: flex-start;
-            }
-
-            .container {
-                height: min(84vh, 960px);
-            }
-
-            header,
-            .chat-container,
-            footer {
-                padding-left: 18px;
-                padding-right: 18px;
-            }
-
-            .message {
-                max-width: 92%;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .notice-banner,
-            .container {
-                width: 100%;
-            }
-
-            .page-shell {
-                padding: 10px;
-            }
-
-            .brand h1 {
-                font-size: 16px;
-            }
-
-            .input-group {
-                padding-left: 14px;
-            }
-
-            .send-btn {
-                padding: 10px 16px;
-            }
-        }
-    </style>
+    /* ── Status bar ── */
+    .status-bar {
+      font-size:11px; color:var(--text-dim); text-align:center;
+      padding:4px 0 8px; letter-spacing:0.4px;
+    }
+    .status-bar .dot-live {
+      display:inline-block; width:7px; height:7px; border-radius:50%;
+      background:#22c55e; margin-right:5px;
+      box-shadow:0 0 8px #22c55e;
+      animation:pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; } 50% { opacity:0.4; }
+    }
+    .status-bar .dot-offline {
+      display:inline-block; width:7px; height:7px; border-radius:50%;
+      background:#ef4444; margin-right:5px;
+    }
+  </style>
 </head>
 <body>
-    <div class="page-shell">
-        <div class="notice-banner">
-            NOTICE: This is a proposal / pilot / demo prototype reference architecture. It is NOT operational until formally adopted.
-        </div>
+<div class="page-shell">
 
-        <div class="container">
-            <header>
-                <div class="brand">
-                    <div class="logo"></div>
-                    <h1>PAWS Command Center</h1>
-                </div>
+  <div class="notice-banner">
+    ⚠️ NOTICE: This is a proposal / pilot / demo prototype reference architecture.
+    It is NOT operational until formally adopted.
+  </div>
 
-                <div class="role-selector" id="roleSelector">
-                    <button class="role-btn" data-role="clerk">Clerk</button>
-                    <button class="role-btn" data-role="officer">Officer</button>
-                    <button class="role-btn" data-role="command">Command</button>
-                    <button class="role-btn active" data-role="presidency">Presidency</button>
-                    <button class="role-btn" data-role="citizen">Citizen</button>
-                </div>
-            </header>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo"></div>
+        <h1>🐾 PAWS Command Center</h1>
+      </div>
+      <div class="role-selector" id="roleSelector"></div>
+    </header>
 
-            <div class="chat-container" id="chat"></div>
+    <div class="chat-body" id="chatBody"></div>
 
-            <footer>
-                <div class="input-group">
-                    <input
-                        type="text"
-                        id="userInput"
-                        placeholder="Query the system..."
-                        autocomplete="off"
-                    />
-                    <button class="send-btn" id="sendBtn">Send</button>
-                </div>
-            </footer>
-        </div>
+    <div class="status-bar" id="statusBar">
+      <span class="dot-live"></span> Gateway: <span id="gatewayStatus">Connecting to localhost:9999…</span>
     </div>
 
-    <script>
-        const GATEWAY_URL = 'http://localhost:9999';
+    <div class="input-bar">
+      <textarea id="chatInput" rows="1" placeholder="Ask PAWS-OS anything…"
+                maxlength="2000"></textarea>
+      <button id="sendBtn">Send ↑</button>
+    </div>
+  </div>
 
-        const chat = document.getElementById('chat');
-        const input = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const roleSelector = document.getElementById('roleSelector');
+</div>
 
-        let currentRole = 'presidency';
-        let chatHistory = [];
-        let isSending = false;
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+//  PAWS Command Center — Client v2.1
+//  Fix: graceful 503 handling, client-side retry, "Try Again" UX
+// ═══════════════════════════════════════════════════════════════════════════════
 
-        const roles = {
-            clerk: {
-                name: "Governance Clerk",
-                badge: "Governance Active",
-                intro: "Welcome to the National K9 Command Center. You are currently logged in with **Governance Clerk** credentials. I can help you with policy flow, records alignment, and guardrail checks."
-            },
-            officer: {
-                name: "Field Officer",
-                badge: "Field Ops Active",
-                intro: "Welcome to the National K9 Command Center. You are currently logged in with **Field Officer** credentials. I can help you with operational procedures, readiness, and field guidance."
-            },
-            command: {
-                name: "Command Authority",
-                badge: "Portfolio Active",
-                intro: "Welcome to the National K9 Command Center. You are currently logged in with **Command Authority** credentials. I can help you with deployment readiness, command priorities, and strategic decisions."
-            },
-            presidency: {
-                name: "Presidency Oversight",
-                badge: "Strategic Oversight",
-                intro: "Welcome to the National K9 Command Center. You are currently logged in with **Presidency Oversight** credentials. How can I assist you with national risk and stability metrics?"
-            },
-            citizen: {
-                name: "Citizen Explainer",
-                badge: "Public Transparency",
-                intro: "Welcome to the National K9 Command Center. You are currently logged in with **Citizen Explainer** credentials. I can help translate the system into clear public-facing language."
-            }
-        };
+const GATEWAY_URL      = "http://localhost:9999";
+const CLIENT_MAX_TRIES = 2;   // additional client-side retries before showing error
+const CLIENT_DELAY_MS  = 900; // ms between client retries
 
-        function escapeHtml(text) {
-            return String(text ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
+const roles = {
+  citizen:      { label:"Citizen",      badge:"Public Transparency", avatar:"👤" },
+  officer:      { label:"Officer",      badge:"Field Operations",    avatar:"🐕" },
+  command:      { label:"Command",      badge:"Command Authority",   avatar:"🎖️" },
+  commissioner: { label:"Commissioner", badge:"National Commissioner", avatar:"⚖️" },
+  breeder:      { label:"Breeder",      badge:"Breeder League",      avatar:"🐾" },
+  legal:        { label:"Legal",        badge:"Legal Partner",       avatar:"📋" },
+  logistics:    { label:"Logistics",    badge:"Logistics Partner",   avatar:"🚛" },
+  church:       { label:"Community",    badge:"Community Leader",    avatar:"🤝" },
+  media:        { label:"Media",        badge:"Media",               avatar:"📡" },
+};
 
-        function formatMessageText(text) {
-            return escapeHtml(text)
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n/g, '<br>');
-        }
+const intros = {
+  citizen:      "Welcome to the National K9 Command Center. You are currently logged in with <strong>Citizen Explainer</strong> credentials. I can help translate the system into clear public-facing language.",
+  officer:      "Officer portal active. Ready to assist with handler assignments, deployment checks, and welfare protocols.",
+  command:      "Command dashboard online. Operational status, resource allocation, and deployment readiness are available.",
+  commissioner: "Commissioner view active. Strategic oversight, key metrics, and governance status are at your disposal.",
+  breeder:      "Breeder League portal. I can walk you through welfare standards, assessment criteria, and advancement pathways.",
+  legal:        "Legal Partner interface. I'll be thorough and precise — flag anything requiring official verification.",
+  logistics:    "Logistics interface active. Focus on traceability, movement records, and verification steps.",
+  church:       "Community Leader portal. Let's explore how PAWS serves the community with integrity and ethical stewardship.",
+  media:        "Media portal active. I'll keep things clear and jargon-free — feel free to ask me to go deeper on anything.",
+};
 
-        function clearChat() {
-            chat.innerHTML = '';
-        }
+// ─── State ────────────────────────────────────────────────────────────────────
+let currentRole  = "citizen";
+let chatHistory  = [];
+let isSending    = false;
+let lastUserText = null;   // kept for "Try Again"
 
-        function addMessage(type, text, badge = "", extraClass = "") {
-            const div = document.createElement('div');
-            div.className = `message ${type} ${extraClass}`.trim();
-            div.innerHTML =
-                (badge ? `<span class="status-badge">${escapeHtml(badge)}</span>` : "") +
-                formatMessageText(text);
+// ─── DOM refs ─────────────────────────────────────────────────────────────────
+const chatBody       = document.getElementById("chatBody");
+const input          = document.getElementById("chatInput");
+const sendBtn        = document.getElementById("sendBtn");
+const roleSelector   = document.getElementById("roleSelector");
+const gatewayStatus  = document.getElementById("gatewayStatus");
+const statusBar      = document.getElementById("statusBar");
 
-            chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
-            return div;
-        }
+// ─── Build role buttons ────────────────────────────────────────────────────────
+Object.entries(roles).forEach(([key, r]) => {
+  const btn = document.createElement("button");
+  btn.className = "role-btn" + (key === currentRole ? " active" : "");
+  btn.textContent = r.label;
+  btn.dataset.role = key;
+  btn.addEventListener("click", () => switchRole(key));
+  roleSelector.appendChild(btn);
+});
 
-        function addLoading() {
-            const id = 'loading-' + Date.now();
-            const div = document.createElement('div');
-            div.id = id;
-            div.className = 'message system loading';
-            div.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-            chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
-            return id;
-        }
+function switchRole(role) {
+  currentRole = role;
+  chatHistory = [];
+  document.querySelectorAll(".role-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.role === role));
+  chatBody.innerHTML = "";
+  renderIntro(role);
+}
 
-        function removeLoading(id) {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        }
+// ─── Render intro message ──────────────────────────────────────────────────────
+function renderIntro(role) {
+  addMessage("system", intros[role] ?? intros.citizen, roles[role].badge);
+}
 
-        function setBusyState(busy) {
-            isSending = busy;
-            sendBtn.disabled = busy;
-            input.disabled = busy;
-        }
+// ─── Add a chat message ────────────────────────────────────────────────────────
+let msgCounter = 0;
 
-        function renderIntro(roleKey) {
-            clearChat();
-            addMessage('system', roles[roleKey].intro, 'System Initialization');
-            input.focus();
-        }
+function addMessage(type, text, badge = "", variant = "") {
+  const id  = `msg-${++msgCounter}`;
+  const r   = roles[currentRole];
+  const div = document.createElement("div");
+  div.id        = id;
+  div.className = `msg ${type === "user" ? "user-msg" : "system-msg"}`;
 
-        roleSelector.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('role-btn')) return;
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.textContent = type === "user" ? "U" : r.avatar;
 
-            document.querySelectorAll('.role-btn').forEach((btn) => btn.classList.remove('active'));
-            e.target.classList.add('active');
+  const right = document.createElement("div");
 
-            currentRole = e.target.dataset.role;
-            chatHistory = [];
+  if (badge) {
+    const badgeEl = document.createElement("div");
+    badgeEl.className   = "msg-badge";
+    badgeEl.textContent = badge;
+    right.appendChild(badgeEl);
+  }
 
-            renderIntro(currentRole);
-            addMessage(
-                'system',
-                `Role switched to **${roles[currentRole].name}**. Context and guardrails updated.`,
-                roles[currentRole].badge
-            );
-        });
+  const bubble = document.createElement("div");
+  bubble.className = "bubble" + (variant === "error" ? " error-bubble" : "");
 
-        async function handleSend() {
-            const text = input.value.trim();
-            if (!text || isSending) return;
+  if (variant === "error") {
+    const label = document.createElement("div");
+    label.className   = "error-label";
+    label.textContent = "⚠ System Notice";
+    bubble.appendChild(label);
+  }
 
-            addMessage('user', text);
-            chatHistory.push({ role: 'user', content: text });
-            input.value = '';
+  const content = document.createElement("div");
+  content.innerHTML = parseMarkdown(text);
+  bubble.appendChild(content);
 
-            setBusyState(true);
-            const loadingId = addLoading();
+  // Add "Try Again" button for error messages when there's a pending user msg
+  if (variant === "error" && lastUserText) {
+    const retryBtn = document.createElement("button");
+    retryBtn.className   = "retry-btn";
+    retryBtn.textContent = "⟳ Try Again";
+    retryBtn.addEventListener("click", () => {
+      const txt = lastUserText;
+      // Remove the error bubble
+      div.remove();
+      // Re-send
+      dispatchMessage(txt);
+    });
+    bubble.appendChild(retryBtn);
+  }
 
-            try {
-                const res = await fetch(GATEWAY_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        role: currentRole,
-                        messages: chatHistory
-                    })
-                });
+  right.appendChild(bubble);
+  div.appendChild(avatar);
+  div.appendChild(right);
+  chatBody.appendChild(div);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  return id;
+}
 
-                let data;
-                try {
-                    data = await res.json();
-                } catch {
-                    data = { error: `Gateway returned a non-JSON response (HTTP ${res.status}).` };
-                }
+// ─── Loading indicator ─────────────────────────────────────────────────────────
+function addLoading() {
+  const id  = `loading-${++msgCounter}`;
+  const div = document.createElement("div");
+  div.id = id; div.className = "msg system-msg";
 
-                removeLoading(loadingId);
+  const avatar = document.createElement("div");
+  avatar.className   = "avatar";
+  avatar.textContent = roles[currentRole].avatar;
 
-                if (data.reply) {
-                    addMessage('system', data.reply, roles[currentRole].badge);
-                    chatHistory.push({ role: 'assistant', content: data.reply });
-                } else if (data.error) {
-                    addMessage(
-                        'system',
-                        `**Gateway Error:** ${data.error}`,
-                        'System Error',
-                        'error'
-                    );
-                } else {
-                    addMessage(
-                        'system',
-                        '**Gateway Error:** The gateway returned an empty response.',
-                        'System Error',
-                        'error'
-                    );
-                }
-            } catch (err) {
-                removeLoading(loadingId);
-                addMessage(
-                    'system',
-                    `The PAWS AI Gateway is not reachable at **${GATEWAY_URL}**. Ensure you have run **deno run -A demo_gateway.ts** in your terminal.`,
-                    'Connection Offline',
-                    'error'
-                );
-            } finally {
-                setBusyState(false);
-                input.focus();
-            }
-        }
+  const bubble = document.createElement("div");
+  bubble.className = "loading-bubble";
+  [1,2,3].forEach(() => {
+    const d = document.createElement("div"); d.className = "dot";
+    bubble.appendChild(d);
+  });
 
-        sendBtn.addEventListener('click', handleSend);
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSend();
-        });
+  div.appendChild(avatar); div.appendChild(bubble);
+  chatBody.appendChild(div);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  return id;
+}
 
-        renderIntro(currentRole);
-    </script>
+function removeLoading(id) {
+  document.getElementById(id)?.remove();
+}
+
+// ─── Busy state ────────────────────────────────────────────────────────────────
+function setBusyState(busy) {
+  isSending      = busy;
+  sendBtn.disabled = busy;
+  input.disabled   = busy;
+  sendBtn.textContent = busy ? "…" : "Send ↑";
+}
+
+// ─── Simple markdown parser (bold, italic, inline code) ───────────────────────
+function parseMarkdown(text) {
+  return text
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g,"<em>$1</em>")
+    .replace(/`(.+?)`/g,"<code>$1</code>")
+    .replace(/\n/g,"<br>");
+}
+
+// ─── Core send + retry logic ───────────────────────────────────────────────────
+async function callGateway(role, messages, attempt = 1) {
+  const res = await fetch(GATEWAY_URL, {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ role, messages }),
+  });
+
+  let data;
+  try   { data = await res.json(); }
+  catch { data = { error: `Gateway returned a non-JSON response (HTTP ${res.status}).` }; }
+
+  // If the gateway itself reports a transient Gemini 503/429, retry from client too
+  if (
+    data?.error &&
+    (data.error.includes("503") || data.error.includes("429") ||
+     data.error.toLowerCase().includes("high demand")) &&
+    attempt <= CLIENT_MAX_TRIES
+  ) {
+    await new Promise(r => setTimeout(r, CLIENT_DELAY_MS * attempt));
+    return callGateway(role, messages, attempt + 1);
+  }
+
+  return data;
+}
+
+async function dispatchMessage(text) {
+  lastUserText = text;
+  addMessage("user", text);
+  chatHistory.push({ role: "user", content: text });
+
+  setBusyState(true);
+  const loadingId = addLoading();
+
+  try {
+    const data = await callGateway(currentRole, chatHistory);
+    removeLoading(loadingId);
+
+    if (data.reply) {
+      addMessage("system", data.reply, roles[currentRole].badge);
+      chatHistory.push({ role:"assistant", content: data.reply });
+      setGatewayOnline();
+      lastUserText = null;  // clear — success
+    } else if (data.error) {
+      addMessage("system", data.error, "System Notice", "error");
+    } else {
+      addMessage("system", "The gateway returned an empty response.", "System Notice", "error");
+    }
+  } catch {
+    removeLoading(loadingId);
+    setGatewayOffline();
+    addMessage(
+      "system",
+      `The PAWS AI Gateway is not reachable at **${GATEWAY_URL}**.\n\nMake sure you have run **deno run -A demo_gateway.ts** in your terminal, then click Try Again.`,
+      "Connection Offline",
+      "error"
+    );
+  } finally {
+    setBusyState(false);
+    input.focus();
+  }
+}
+
+// ─── Handle send ───────────────────────────────────────────────────────────────
+async function handleSend() {
+  const text = input.value.trim();
+  if (!text || isSending) return;
+  input.value = "";
+  autoResize();
+  await dispatchMessage(text);
+}
+
+sendBtn.addEventListener("click", handleSend);
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+});
+
+// ─── Auto-resize textarea ──────────────────────────────────────────────────────
+function autoResize() {
+  input.style.height = "auto";
+  input.style.height = Math.min(input.scrollHeight, 120) + "px";
+}
+input.addEventListener("input", autoResize);
+
+// ─── Gateway health indicator ──────────────────────────────────────────────────
+function setGatewayOnline() {
+  gatewayStatus.textContent = "localhost:9999 — online";
+  statusBar.querySelector("span:first-child").className = "dot-live";
+}
+function setGatewayOffline() {
+  gatewayStatus.textContent = "localhost:9999 — not reachable";
+  statusBar.querySelector("span:first-child").className = "dot-offline";
+}
+
+// Ping gateway on load
+(async () => {
+  try {
+    await fetch(GATEWAY_URL, { method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ role:"citizen", messages:[] }),
+      signal: AbortSignal.timeout(3000),
+    });
+    setGatewayOnline();
+  } catch {
+    setGatewayOffline();
+    gatewayStatus.textContent = "localhost:9999 — start gateway with: deno run -A demo_gateway.ts";
+  }
+})();
+
+// ─── Boot ──────────────────────────────────────────────────────────────────────
+renderIntro(currentRole);
+</script>
 </body>
 </html>
