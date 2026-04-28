@@ -186,6 +186,7 @@
     const roleSelector = document.getElementById('roleSelector');
     
     let currentRole = 'presidency';
+    let chatHistory = [];
 
     // Role Configuration
     const roles = {
@@ -202,6 +203,7 @@
             document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
             currentRole = e.target.dataset.role;
+            chatHistory = []; // Reset history on role change
             
             addMessage('system', `Role switched to **${roles[currentRole].name}**. Context and guardrails updated.`, roles[currentRole].badge);
         }
@@ -213,6 +215,7 @@
         if (!text) return;
 
         addMessage('user', text);
+        chatHistory.push({ role: 'user', content: text });
         input.value = '';
         
         // Show Loading
@@ -224,7 +227,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     role: currentRole,
-                    messages: [{ content: text }]
+                    messages: chatHistory
                 })
             });
             
@@ -233,6 +236,7 @@
             
             if (data.reply) {
                 addMessage('system', data.reply, roles[currentRole].badge);
+                chatHistory.push({ role: 'assistant', content: data.reply });
             } else if (data.error) {
                 addMessage('system', `**Gateway Error:** ${data.error}`, "System Error");
             }

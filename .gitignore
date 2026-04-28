@@ -16,3 +16,4 @@ docs/config.js
 # Supabase
 supabase/.temp/
 supabase/functions/.env
+.env
