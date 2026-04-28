@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
-import { EXECUTIVE_SYSTEM_PROMPT } from "../_shared/prompts-executive.ts";
+import { EXECUTIVE_SYSTEM_PROMPT, getRoleContext } from "../_shared/prompts-executive.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
@@ -24,19 +24,7 @@ function checkRateLimit(ip: string): boolean {
 }
 
 async function getAIResponse(messages: any[], role: string): Promise<string> {
-  const rolePrefixes: Record<string, string> = {
-    commissioner: "Role: National Commissioner. Focus on governance and strategy.",
-    command: "Role: Command Authority. Focus on operations and deployment.",
-    officer: "Role: Field Officer. Focus on execution and safety.",
-    breeder: "Role: Breeder League. Focus on standards and advancement.",
-    legal: "Role: Legal Partner. Focus on compliance and audit.",
-    logistics: "Role: Logistics Partner. Focus on traceability.",
-    church: "Role: Church Elder. Focus on ethical stewardship.",
-    media: "Role: Media. Focus on transparency and public trust.",
-    citizen: "Role: Citizen. Focus on accessibility and clarity."
-  };
-
-  const roleContext = rolePrefixes[role] || rolePrefixes.citizen;
+  const roleContext = getRoleContext(role);
   const systemPrompt = `${EXECUTIVE_SYSTEM_PROMPT}\n\n${roleContext}`;
 
   // DEBUG: Log if key exists
@@ -46,7 +34,7 @@ async function getAIResponse(messages: any[], role: string): Promise<string> {
     try {
       const contents = [
         { role: "user", parts: [{ text: systemPrompt }] },
-        { role: "model", parts: [{ text: "Understood. I am PAWS-OS Executive Intelligence." }] },
+        { role: "model", parts: [{ text: "Hi there! I'm PAWS-OS. What can I help you with today?" }] },
         ...messages.map((m: any) => ({
           role: m.role === "assistant" ? "model" : "user",
           parts: [{ text: m.content }]
@@ -85,33 +73,16 @@ async function getAIResponse(messages: any[], role: string): Promise<string> {
   return getFallbackResponse("No API key configured");
 }
 
+
 function getFallbackResponse(reason: string): string {
-  return `🎯 CONCLUSION
-AI service issue: ${reason}
-
-📊 EVIDENCE BASE
-• Service: paws-chat/paws-council Edge Function
-• Status: Running but encountered error
-• Error: ${reason}
-
-🔍 METHODOLOGY
-1. Received user query
-2. Attempted to route to Gemini API
-3. Encountered: ${reason}
-4. Returned diagnostic fallback
-
-⚖️ CONFIDENCE: N/A (service issue)
-
-🔗 AUDIT TRAIL
-• Function: paws-chat
-• Timestamp: ${new Date().toISOString()}
-• Error: ${reason}
-
-To fix:
-1. Verify GEMINI_API_KEY is set: supabase secrets list
-2. Check key is valid at https://makersuite.google.com/app/apikey
-3. Redeploy: supabase functions deploy paws-chat`;
+  return "Hi there! I'm PAWS-OS, and I'm here to help — but it looks like I'm having a bit of trouble connecting to my AI services right now (" + reason + ").\n\n" +
+    "While that gets sorted out, here's what you can check on the technical side:\n" +
+    "1. Make sure the GEMINI_API_KEY secret is set — run `supabase secrets list` to confirm.\n" +
+    "2. Verify the key is still valid at https://makersuite.google.com/app/apikey.\n" +
+    "3. Redeploy the function: `supabase functions deploy paws-chat`.\n\n" +
+    "Apologies for the interruption — once the connection is restored, I'll be right back to helping you with anything you need about Operation PAWS.";
 }
+
 
 serve(async (req) => {
   const origin = req.headers.get("origin");
