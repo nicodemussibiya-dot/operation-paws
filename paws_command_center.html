@@ -254,7 +254,7 @@
     <div class="chat-body" id="chatBody"></div>
 
     <div class="status-bar" id="statusBar">
-      <span class="dot-live"></span> Gateway: <span id="gatewayStatus">Connecting to PAWS-Cloud…</span>
+      <span class="dot-live"></span> Gateway: <span id="gatewayStatus">Connecting to localhost:9999…</span>
     </div>
 
     <div class="input-bar">
@@ -272,7 +272,7 @@
 //  Fix: graceful 503 handling, client-side retry, "Try Again" UX
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const GATEWAY_URL      = "https://dorihyvbgbhsxvdrtqqr.supabase.co/functions/v1/paws-chat";
+const GATEWAY_URL      = "http://localhost:9999";
 const CLIENT_MAX_TRIES = 2;   // additional client-side retries before showing error
 const CLIENT_DELAY_MS  = 900; // ms between client retries
 
@@ -529,11 +529,11 @@ input.addEventListener("input", autoResize);
 
 // ─── Gateway health indicator ──────────────────────────────────────────────────
 function setGatewayOnline() {
-  gatewayStatus.textContent = "PAWS-Cloud — online";
+  gatewayStatus.textContent = "localhost:9999 — online";
   statusBar.querySelector("span:first-child").className = "dot-live";
 }
 function setGatewayOffline() {
-  gatewayStatus.textContent = "PAWS-Cloud — offline";
+  gatewayStatus.textContent = "localhost:9999 — not reachable";
   statusBar.querySelector("span:first-child").className = "dot-offline";
 }
 
@@ -547,7 +547,8 @@ function setGatewayOffline() {
     });
     setGatewayOnline();
   } catch {
-    gatewayStatus.textContent = "PAWS-Cloud — syncing…";
+    setGatewayOffline();
+    gatewayStatus.textContent = "localhost:9999 — start gateway with: deno run -A demo_gateway.ts";
   }
 })();
 

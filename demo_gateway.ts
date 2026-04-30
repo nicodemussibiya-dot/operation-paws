@@ -9,15 +9,40 @@ import {
 
 await load({ export: true, allowEmptyValues: true });
 
-const GEMINI_API_KEY =
-  Deno.env.get("GEMINI_API_KEY") ?? Deno.env.get("GOOGLE_API_KEY");
+// ─── Multi-key pool: load all available Gemini keys ──────────────────────────
+// Add keys to .env as GEMINI_API_KEY_1, GEMINI_API_KEY_2, … GEMINI_API_KEY_5
+// (Also checks legacy GEMINI_API_KEY / GOOGLE_API_KEY for backwards compat)
+function loadGeminiKeys(): string[] {
+  const keys: string[] = [];
+  // legacy single-key
+  const legacy = Deno.env.get("GEMINI_API_KEY") ?? Deno.env.get("GOOGLE_API_KEY");
+  if (legacy) keys.push(legacy);
+  // numbered keys
+  for (let i = 1; i <= 10; i++) {
+    const k = Deno.env.get(`GEMINI_API_KEY_${i}`);
+    if (k && !keys.includes(k)) keys.push(k);
+  }
+  return keys;
+}
+
+const GEMINI_KEYS = loadGeminiKeys();
+const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+
+console.log(`[PAWS-GW] Loaded ${GEMINI_KEYS.length} Gemini key(s)${OPENROUTER_API_KEY ? " + OpenRouter" : ""}`);
+
+// Track which keys are temporarily exhausted (reset every hour)
+const exhaustedKeys = new Set<string>();
+setInterval(() => exhaustedKeys.clear(), 60 * 60 * 1000);
+
+function getAvailableKey(): string | null {
+  return GEMINI_KEYS.find((k) => !exhaustedKeys.has(k)) ?? null;
+}
 
 // Primary model, with an automatic fallback if it is overloaded or not found.
-// gemini-2.0-flash is the stable, widely-available fallback (not deprecated).
 const PRIMARY_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
-const FALLBACK_MODEL = "gemini-2.0-flash"; // ✅ current stable fallback
-const MAX_RETRIES = 3;
-const BASE_DELAY_MS = 1000; // first back-off delay (slightly longer to respect rate limits)
+const FALLBACK_MODEL = "gemini-2.0-flash";
+const MAX_RETRIES = 2;
+const BASE_DELAY_MS = 800;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -58,18 +83,67 @@ function releaseSlot(): void {
   }
 }
 
-// ─── Core Gemini call with retry + model fallback ─────────────────────────────
+// ─── OpenRouter fallback ───────────────────────────────────────────────────────
+async function callOpenRouter(
+  systemPrompt: string,
+  contents: unknown[],
+): Promise<{ reply?: string; error?: string }> {
+  if (!OPENROUTER_API_KEY) return { reply: STATIC_FALLBACK };
+
+  // Free models available on OpenRouter (no billing required)
+  const model = "google/gemini-2.0-flash-exp:free";
+  console.log(`[PAWS-GW] Trying OpenRouter → ${model}`);
+
+  const messages = [
+    { role: "system", content: systemPrompt },
+    ...(contents as Array<{ role: string; parts: Array<{ text: string }> }>).map(
+      (c) => ({ role: c.role === "model" ? "assistant" : c.role, content: c.parts?.[0]?.text ?? "" }),
+    ),
+  ];
+
+  if (messages.length === 1) messages.push({ role: "user", content: "Hello" });
+
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "HTTP-Referer": "https://operation-paws.demo",
+        "X-Title": "PAWS Command Center",
+      },
+      body: JSON.stringify({ model, messages }),
+    });
+
+    if (!res.ok) {
+      console.error(`[PAWS-GW] OpenRouter error: ${res.status}`);
+      return { reply: STATIC_FALLBACK };
+    }
+
+    const data = await res.json();
+    const reply = data?.choices?.[0]?.message?.content?.trim();
+    return reply ? { reply } : { reply: STATIC_FALLBACK };
+  } catch (e) {
+    console.error("[PAWS-GW] OpenRouter network error:", e);
+    return { reply: STATIC_FALLBACK };
+  }
+}
+
+// ─── Core Gemini call with key rotation + model fallback ──────────────────────
 async function callGemini(
   model: string,
   systemPrompt: string,
   contents: unknown[],
   attempt = 1,
+  usedKeys: Set<string> = new Set(),
 ): Promise<{ reply?: string; error?: string }> {
-  if (!GEMINI_API_KEY) {
-    return {
-      error:
-        "Missing API key. Add GEMINI_API_KEY or GOOGLE_API_KEY to your .env file.",
-    };
+  // Pick the next available key not already tried in this request chain
+  const apiKey = GEMINI_KEYS.find((k) => !exhaustedKeys.has(k) && !usedKeys.has(k)) ?? null;
+
+  if (!apiKey) {
+    // All Gemini keys exhausted — try OpenRouter
+    console.warn("[PAWS-GW] All Gemini keys exhausted. Trying OpenRouter…");
+    return callOpenRouter(systemPrompt, contents);
   }
 
   const url =
@@ -81,7 +155,7 @@ async function callGemini(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": GEMINI_API_KEY,
+        "x-goog-api-key": apiKey,
       },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -92,54 +166,42 @@ async function callGemini(
       }),
     });
   } catch (fetchErr) {
-    // Network-level error (DNS, timeout, etc.)
     console.error(`[PAWS-GW] Network error calling ${model}:`, fetchErr);
     if (model !== FALLBACK_MODEL) {
       console.warn(`[PAWS-GW] Trying fallback model (${FALLBACK_MODEL})…`);
-      return callGemini(FALLBACK_MODEL, systemPrompt, contents, 1);
+      return callGemini(FALLBACK_MODEL, systemPrompt, contents, 1, usedKeys);
     }
-    return { reply: STATIC_FALLBACK };
+    return callOpenRouter(systemPrompt, contents);
   }
 
-  // 404 = model name wrong/deprecated → skip retries, go straight to fallback
+  // 404 = model not found → switch model immediately
   if (res.status === 404) {
     if (model !== FALLBACK_MODEL) {
-      console.warn(
-        `[PAWS-GW] Model not found: ${model} (404). ` +
-          `Switching immediately to fallback: ${FALLBACK_MODEL}`,
-      );
-      return callGemini(FALLBACK_MODEL, systemPrompt, contents, 1);
+      console.warn(`[PAWS-GW] Model 404: ${model} → switching to ${FALLBACK_MODEL}`);
+      return callGemini(FALLBACK_MODEL, systemPrompt, contents, 1, usedKeys);
     }
-    // Fallback also 404'd — serve static message
-    console.error("[PAWS-GW] Fallback model also 404. Serving static response.");
-    return { reply: STATIC_FALLBACK };
+    return callOpenRouter(systemPrompt, contents);
   }
 
-  // 503 / 429 = transient overload — retry with exponential back-off + jitter
-  if (res.status === 503 || res.status === 429) {
+  // 429 = quota exhausted → mark this key, rotate to next key
+  if (res.status === 429) {
+    console.warn(`[PAWS-GW] Key quota exhausted (429). Rotating to next key…`);
+    exhaustedKeys.add(apiKey);
+    usedKeys.add(apiKey);
+    return callGemini(model, systemPrompt, contents, 1, usedKeys);
+  }
+
+  // 503 = transient overload → retry with back-off (same key)
+  if (res.status === 503) {
     if (attempt <= MAX_RETRIES) {
-      const jitter = Math.random() * 500; // add 0-500ms jitter
-      const delay = BASE_DELAY_MS * Math.pow(2, attempt - 1) + jitter;
-      console.warn(
-        `[PAWS-GW] ${model} returned ${res.status} (attempt ${attempt}/${MAX_RETRIES}). ` +
-          `Retrying in ${Math.round(delay)}ms…`,
-      );
+      const delay = BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.random() * 400;
+      console.warn(`[PAWS-GW] 503 (attempt ${attempt}/${MAX_RETRIES}). Retrying in ${Math.round(delay)}ms…`);
       await sleep(delay);
-      return callGemini(model, systemPrompt, contents, attempt + 1);
+      return callGemini(model, systemPrompt, contents, attempt + 1, usedKeys);
     }
-
-    // Primary exhausted → try fallback model (fresh retries)
-    if (model !== FALLBACK_MODEL) {
-      console.warn(
-        `[PAWS-GW] Primary model (${model}) exhausted after ${MAX_RETRIES} retries. ` +
-          `Switching to fallback: ${FALLBACK_MODEL}`,
-      );
-      return callGemini(FALLBACK_MODEL, systemPrompt, contents, 1);
-    }
-
-    // Both models exhausted → static fallback
-    console.error("[PAWS-GW] All models exhausted. Serving static fallback.");
-    return { reply: STATIC_FALLBACK };
+    // Try next key on repeated 503s
+    usedKeys.add(apiKey);
+    return callGemini(model, systemPrompt, contents, 1, usedKeys);
   }
 
   const data = await res.json();
@@ -156,10 +218,7 @@ async function callGemini(
     .trim();
 
   if (!reply) {
-    return { error: "Gemini returned no text response.", _raw: data } as {
-      reply?: string;
-      error?: string;
-    };
+    return { error: "Gemini returned no text response." };
   }
 
   return { reply };

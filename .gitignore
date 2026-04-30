@@ -5,7 +5,7 @@
 node_modules/
 dist/
 
-# SEC-01: SECRETS & CONFIG (DO NOT REMOVE)
+# SECRETS
 .env
 .env.*
 !.env.example
@@ -16,5 +16,6 @@ docs/config.js
 # Supabase
 supabase/.temp/
 supabase/functions/.env
-.env
-.env
+*.pem
+*.key
+secrets/
