@@ -11,22 +11,36 @@
   --gold:#c9a84c; --gold2:#e8c96a; --text:#e8eaf0;
   --muted:#8a9bb5; --bubble-user:#1a3a6e; --bubble-ai:#0f2044;
   --border:rgba(201,168,76,0.18); --radius:14px;
+  --red:#e05555;
 }
 html,body { height:100%; background:var(--navy); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:15px; line-height:1.6; }
 .app { display:flex; flex-direction:column; height:100vh; max-width:780px; margin:0 auto; }
 
+/* ── Header ── */
 header { display:flex; align-items:center; gap:14px; padding:18px 20px 14px; border-bottom:1px solid var(--border); background:var(--navy2); flex-shrink:0; }
 .logo { width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,var(--gold) 0%,#8a6a20 100%); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; box-shadow:0 0 0 2px rgba(201,168,76,0.3); }
 .header-text h1 { font-size:17px; font-weight:700; color:var(--gold2); letter-spacing:0.04em; }
-.header-text p { font-size:12px; color:var(--muted); margin-top:1px; }
+.header-text p  { font-size:12px; color:var(--muted); margin-top:1px; }
+
+/* header right controls */
+.header-controls { margin-left:auto; display:flex; align-items:center; gap:8px; }
+.tts-toggle { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); cursor:pointer; user-select:none; }
+.tts-toggle input[type=checkbox] { display:none; }
+.toggle-track { width:32px; height:18px; border-radius:9px; background:var(--blue); border:1px solid var(--border); position:relative; transition:background 0.2s; flex-shrink:0; }
+.toggle-track::after { content:''; position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%; background:var(--muted); transition:transform 0.2s, background 0.2s; }
+.tts-toggle input:checked + .toggle-track { background:var(--gold); border-color:var(--gold); }
+.tts-toggle input:checked + .toggle-track::after { transform:translateX(14px); background:#fff; }
+
 .status-dot { width:8px; height:8px; border-radius:50%; background:#3ddc84; display:inline-block; margin-right:5px; box-shadow:0 0 6px #3ddc84aa; animation:pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
+/* ── Role bar ── */
 .role-bar { padding:10px 20px; background:var(--navy2); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-wrap:wrap; flex-shrink:0; }
 .role-bar label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; white-space:nowrap; }
 .role-bar select { background:var(--blue); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:5px 10px; font-size:13px; cursor:pointer; outline:none; }
 .role-bar select:focus { border-color:var(--gold); }
 
+/* ── Messages ── */
 .messages { flex:1; overflow-y:auto; padding:20px 16px; display:flex; flex-direction:column; gap:14px; scroll-behavior:smooth; }
 .messages::-webkit-scrollbar { width:5px; }
 .messages::-webkit-scrollbar-thumb { background:var(--border); border-radius:10px; }
@@ -34,55 +48,97 @@ header { display:flex; align-items:center; gap:14px; padding:18px 20px 14px; bor
 .msg { display:flex; gap:10px; max-width:92%; animation:fadeUp 0.25s ease; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 .msg.user { align-self:flex-end; flex-direction:row-reverse; }
-.msg.ai { align-self:flex-start; }
+.msg.ai   { align-self:flex-start; }
 
 .avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; margin-top:2px; }
 .msg.user .avatar { background:var(--blue); }
-.msg.ai .avatar { background:linear-gradient(135deg,var(--gold) 0%,#8a6a20 100%); }
+.msg.ai   .avatar { background:linear-gradient(135deg,var(--gold) 0%,#8a6a20 100%); transition:box-shadow 0.3s; }
+.msg.ai.speaking .avatar { box-shadow:0 0 0 3px var(--gold), 0 0 14px var(--gold); animation:speakPulse 1s ease-in-out infinite; }
+@keyframes speakPulse { 0%,100%{box-shadow:0 0 0 3px var(--gold),0 0 10px var(--gold)} 50%{box-shadow:0 0 0 5px var(--gold2),0 0 22px var(--gold2)} }
 
 .bubble { padding:11px 15px; border-radius:var(--radius); font-size:14px; line-height:1.65; max-width:100%; word-break:break-word; white-space:pre-wrap; }
 .msg.user .bubble { background:var(--bubble-user); border:1px solid rgba(255,255,255,0.07); border-top-right-radius:4px; color:var(--text); }
-.msg.ai .bubble { background:var(--bubble-ai); border:1px solid var(--border); border-top-left-radius:4px; color:var(--text); }
+.msg.ai   .bubble { background:var(--bubble-ai);  border:1px solid var(--border); border-top-left-radius:4px; color:var(--text); }
 
-/* Streaming cursor blink */
+/* Streaming cursor */
 .cursor { display:inline-block; width:2px; height:1em; background:var(--gold); margin-left:2px; vertical-align:text-bottom; animation:blink 0.8s steps(1) infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
+/* Typing dots */
 .typing-dots { display:flex; gap:5px; align-items:center; padding:6px 0; }
 .typing-dots span { width:7px; height:7px; border-radius:50%; background:var(--gold); animation:bounce 1.2s infinite ease-in-out; }
 .typing-dots span:nth-child(2){animation-delay:0.2s}
 .typing-dots span:nth-child(3){animation-delay:0.4s}
 @keyframes bounce { 0%,80%,100%{transform:translateY(0);opacity:0.4} 40%{transform:translateY(-6px);opacity:1} }
 
+/* ── Input bar ── */
 .input-bar { padding:14px 16px; border-top:1px solid var(--border); background:var(--navy2); display:flex; gap:10px; align-items:flex-end; flex-shrink:0; }
 textarea { flex:1; background:var(--blue); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:14px; padding:11px 14px; resize:none; outline:none; min-height:44px; max-height:130px; line-height:1.5; font-family:inherit; transition:border-color 0.2s; }
 textarea:focus { border-color:var(--gold); }
 textarea::placeholder { color:var(--muted); }
+textarea.listening { border-color:var(--red); box-shadow:0 0 0 2px rgba(224,85,85,0.25); }
+
+/* Mic button */
+button#mic {
+  width:44px; height:44px; border-radius:50%; border:none;
+  background:var(--blue); color:var(--text);
+  font-size:19px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:transform 0.15s, background 0.2s, box-shadow 0.2s;
+  border:1px solid var(--border);
+}
+button#mic:hover { transform:scale(1.08); background:var(--navy2); }
+button#mic.recording {
+  background:var(--red);
+  border-color:var(--red);
+  animation:micPulse 1s ease-in-out infinite;
+}
+@keyframes micPulse { 0%,100%{box-shadow:0 0 0 0 rgba(224,85,85,0.5)} 50%{box-shadow:0 0 0 8px rgba(224,85,85,0)} }
+button#mic:disabled { opacity:0.35; cursor:not-allowed; }
+
+/* Send button */
 button#send { width:44px; height:44px; border-radius:50%; border:none; background:linear-gradient(135deg,var(--gold) 0%,#8a6a20 100%); color:var(--navy); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform 0.15s,opacity 0.15s; box-shadow:0 2px 10px rgba(201,168,76,0.3); }
 button#send:hover { transform:scale(1.08); }
 button#send:active { transform:scale(0.95); }
 button#send:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
 
-.watermark { text-align:center; font-size:11px; color:var(--muted); padding:6px; opacity:0.6; }
+/* STT transcript preview */
+#transcript-bar { display:none; padding:6px 20px; background:rgba(224,85,85,0.1); border-top:1px solid rgba(224,85,85,0.25); font-size:12px; color:var(--red); flex-shrink:0; }
+#transcript-bar span { color:var(--text); }
 
+.watermark { text-align:center; font-size:11px; color:var(--muted); padding:6px; opacity:0.6; }
 .welcome { text-align:center; padding:40px 20px 20px; color:var(--muted); }
 .welcome .paws-icon { font-size:48px; margin-bottom:12px; }
 .welcome h2 { font-size:20px; color:var(--gold2); margin-bottom:8px; }
-.welcome p { font-size:13px; max-width:400px; margin:0 auto; line-height:1.7; }
+.welcome p  { font-size:13px; max-width:400px; margin:0 auto; line-height:1.7; }
+
+/* No-support notice */
+.no-support { font-size:11px; color:var(--muted); text-align:center; padding:4px; display:none; }
 
 @media(max-width:500px){header{padding:14px 14px 10px}.messages{padding:14px 10px}.input-bar{padding:10px}}
 </style>
 </head>
 <body>
 <div class="app">
+
+  <!-- ── Header ── -->
   <header>
     <div class="logo">🐾</div>
     <div class="header-text">
       <h1>PAWS-OS</h1>
       <p><span class="status-dot"></span>Partnership for Animal Work &amp; Service — AI Interface</p>
     </div>
+    <div class="header-controls">
+      <label class="tts-toggle" title="Toggle voice replies">
+        🔊
+        <input type="checkbox" id="ttsToggle" checked />
+        <span class="toggle-track"></span>
+        Voice
+      </label>
+    </div>
   </header>
 
+  <!-- ── Role bar ── -->
   <div class="role-bar">
     <label>I am a:</label>
     <select id="role">
@@ -98,6 +154,7 @@ button#send:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
     </select>
   </div>
 
+  <!-- ── Messages ── -->
   <div class="messages" id="messages">
     <div class="welcome" id="welcome">
       <div class="paws-icon">🐾</div>
@@ -106,40 +163,243 @@ button#send:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
     </div>
   </div>
 
+  <!-- STT live transcript preview -->
+  <div id="transcript-bar">🎙️ Hearing: <span id="transcript-text"></span></div>
+
+  <!-- ── Input bar ── -->
   <div class="input-bar">
     <textarea id="input" placeholder="Ask PAWS-OS anything..." rows="1"></textarea>
+    <button id="mic" title="Hold to speak">🎙️</button>
     <button id="send" title="Send">&#10148;</button>
   </div>
+
   <div class="watermark">PAWS-OS · Work in Progress · Operation PAWS</div>
 </div>
 
 <script>
+/* ═══════════════════════════════════════════════════════════════
+   PAWS-OS  —  Voice + Streaming Chat
+   • Speech-to-Text  : Web Speech API (SpeechRecognition)
+   • Text-to-Speech  : Web Speech API (SpeechSynthesis)
+   • Streaming reply : Gemini SSE via Supabase Edge Function
+═══════════════════════════════════════════════════════════════ */
+
 var ENDPOINT = 'https://dorihyvbgbhsxvdrtqqr.supabase.co/functions/v1/paws-chat';
 
-var messagesEl = document.getElementById('messages');
-var inputEl    = document.getElementById('input');
-var sendBtn    = document.getElementById('send');
-var roleEl     = document.getElementById('role');
-var welcomeEl  = document.getElementById('welcome');
+var messagesEl     = document.getElementById('messages');
+var inputEl        = document.getElementById('input');
+var sendBtn        = document.getElementById('send');
+var micBtn         = document.getElementById('mic');
+var roleEl         = document.getElementById('role');
+var welcomeEl      = document.getElementById('welcome');
+var ttsToggle      = document.getElementById('ttsToggle');
+var transcriptBar  = document.getElementById('transcript-bar');
+var transcriptText = document.getElementById('transcript-text');
 
-// Conversation history
-var messages = [];
+var messages = [];            // conversation history
+var currentSpeakingMsg = null; // the .msg element currently being spoken
 
-// ── Auto-resize textarea ──────────────────────────────────────────────────────
+/* ──────────────────────────────────────────────────────────────
+   TEXT-TO-SPEECH
+────────────────────────────────────────────────────────────── */
+var TTS_SUPPORTED = 'speechSynthesis' in window;
+var preferredVoice = null;
+
+function loadVoices() {
+  if (!TTS_SUPPORTED) return;
+  var voices = speechSynthesis.getVoices();
+  // Priority: English voices — prefer ones with "Google" or natural names
+  var enVoices = voices.filter(function(v){ return v.lang.startsWith('en'); });
+  preferredVoice =
+    enVoices.find(function(v){ return /google/i.test(v.name); }) ||
+    enVoices.find(function(v){ return /natural|premium|enhanced/i.test(v.name); }) ||
+    enVoices[0] ||
+    null;
+}
+
+if (TTS_SUPPORTED) {
+  loadVoices();
+  speechSynthesis.addEventListener('voiceschanged', loadVoices);
+}
+
+function speak(text, msgEl) {
+  if (!TTS_SUPPORTED || !ttsToggle.checked) return;
+  speechSynthesis.cancel(); // stop any previous speech
+
+  // Strip markdown-like noise for clean audio
+  var clean = text
+    .replace(/\*\*/g, '').replace(/\*/g, '')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/\n+/g, '. ')
+    .trim();
+
+  var utter = new SpeechSynthesisUtterance(clean);
+  if (preferredVoice) utter.voice = preferredVoice;
+  utter.lang  = 'en';
+  utter.rate  = 1.0;
+  utter.pitch = 1.0;
+
+  // Visual feedback — glow the paws avatar while speaking
+  if (msgEl) {
+    msgEl.classList.add('speaking');
+    currentSpeakingMsg = msgEl;
+  }
+
+  utter.onend = utter.onerror = function() {
+    if (currentSpeakingMsg) {
+      currentSpeakingMsg.classList.remove('speaking');
+      currentSpeakingMsg = null;
+    }
+  };
+
+  // Chrome bug: long utterances cut off — chunk by sentence
+  var sentences = clean.match(/[^.!?]+[.!?]*/g) || [clean];
+  var idx = 0;
+
+  function speakNext() {
+    if (idx >= sentences.length) {
+      if (msgEl) msgEl.classList.remove('speaking');
+      return;
+    }
+    var u = new SpeechSynthesisUtterance(sentences[idx].trim());
+    if (preferredVoice) u.voice = preferredVoice;
+    u.lang = 'en'; u.rate = 1.0; u.pitch = 1.0;
+    u.onend = function() { idx++; speakNext(); };
+    u.onerror = function() { idx++; speakNext(); };
+    speechSynthesis.speak(u);
+    idx++;
+  }
+
+  // Reset and kick off sentence-by-sentence
+  if (msgEl) msgEl.classList.add('speaking');
+  speechSynthesis.cancel();
+  // Small delay so cancel() settles before speaking
+  setTimeout(function() {
+    var u0 = new SpeechSynthesisUtterance(sentences[0] ? sentences[0].trim() : clean);
+    if (preferredVoice) u0.voice = preferredVoice;
+    u0.lang = 'en'; u0.rate = 1.0; u0.pitch = 1.0;
+    u0.onend = function() {
+      idx = 1;
+      speakNext();
+    };
+    u0.onerror = function() {
+      idx = 1;
+      speakNext();
+    };
+    speechSynthesis.speak(u0);
+  }, 80);
+}
+
+// Stop speaking if TTS toggled off mid-speech
+ttsToggle.addEventListener('change', function() {
+  if (!ttsToggle.checked) {
+    speechSynthesis.cancel();
+    if (currentSpeakingMsg) {
+      currentSpeakingMsg.classList.remove('speaking');
+      currentSpeakingMsg = null;
+    }
+  }
+});
+
+/* ──────────────────────────────────────────────────────────────
+   SPEECH-TO-TEXT
+────────────────────────────────────────────────────────────── */
+var STT_SUPPORTED = ('SpeechRecognition' in window) || ('webkitSpeechRecognition' in window);
+var recognition   = null;
+var isListening   = false;
+
+if (!STT_SUPPORTED) {
+  micBtn.disabled = true;
+  micBtn.title = 'Voice input not supported in this browser';
+}
+
+function setupRecognition() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'en';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = function() {
+    isListening = true;
+    micBtn.classList.add('recording');
+    micBtn.textContent = '⏹️';
+    inputEl.classList.add('listening');
+    inputEl.placeholder = 'Listening…';
+    transcriptBar.style.display = 'block';
+    transcriptText.textContent = '';
+    // Stop TTS while user is speaking
+    speechSynthesis.cancel();
+  };
+
+  recognition.onresult = function(e) {
+    var interim = '';
+    var final   = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        final += e.results[i][0].transcript;
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+    transcriptText.textContent = final || interim;
+    if (final) inputEl.value = (inputEl.value + ' ' + final).trim();
+  };
+
+  recognition.onerror = function(e) {
+    console.warn('[STT] error:', e.error);
+    stopListening();
+  };
+
+  recognition.onend = function() {
+    stopListening();
+    // Auto-send if there's captured text
+    if (inputEl.value.trim()) send();
+  };
+}
+
+function startListening() {
+  if (!STT_SUPPORTED) return;
+  if (!recognition) setupRecognition();
+  try { recognition.start(); } catch(e) { /* already started */ }
+}
+
+function stopListening() {
+  isListening = false;
+  micBtn.classList.remove('recording');
+  micBtn.textContent = '🎙️';
+  inputEl.classList.remove('listening');
+  inputEl.placeholder = 'Ask PAWS-OS anything…';
+  transcriptBar.style.display = 'none';
+  transcriptText.textContent = '';
+  try { if (recognition) recognition.stop(); } catch(e) {}
+}
+
+micBtn.addEventListener('click', function() {
+  if (isListening) {
+    stopListening();
+  } else {
+    startListening();
+  }
+});
+
+/* ──────────────────────────────────────────────────────────────
+   UI HELPERS
+────────────────────────────────────────────────────────────── */
 inputEl.addEventListener('input', function() {
   inputEl.style.height = 'auto';
   inputEl.style.height = Math.min(inputEl.scrollHeight, 130) + 'px';
 });
-
 inputEl.addEventListener('keydown', function(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
 });
-
 sendBtn.addEventListener('click', send);
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 function hideWelcome() {
-  if (welcomeEl) { welcomeEl.style.display = 'none'; }
+  if (welcomeEl) welcomeEl.style.display = 'none';
+}
+function scrollBottom() {
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
 function appendUserMsg(text) {
@@ -152,7 +412,6 @@ function appendUserMsg(text) {
   scrollBottom();
 }
 
-// Creates an AI bubble that we can stream text into; returns the bubble element
 function createAiBubble() {
   hideWelcome();
   var msg = document.createElement('div');
@@ -160,19 +419,15 @@ function createAiBubble() {
   msg.innerHTML = '<div class="avatar">🐾</div><div class="bubble"><span class="cursor"></span></div>';
   messagesEl.appendChild(msg);
   scrollBottom();
-  return msg.querySelector('.bubble');
+  return { bubble: msg.querySelector('.bubble'), msg: msg };
 }
 
-// Append a chunk of text into a streaming bubble (cursor stays at end)
 function appendChunk(bubble, chunk) {
   var cursor = bubble.querySelector('.cursor');
-  // Insert text node before the cursor
-  var tn = document.createTextNode(chunk);
-  bubble.insertBefore(tn, cursor);
+  bubble.insertBefore(document.createTextNode(chunk), cursor);
   scrollBottom();
 }
 
-// Remove cursor once streaming is done
 function finishBubble(bubble) {
   var cursor = bubble.querySelector('.cursor');
   if (cursor) cursor.remove();
@@ -187,28 +442,29 @@ function showTypingDots() {
   messagesEl.appendChild(msg);
   scrollBottom();
 }
-
 function removeTypingDots() {
   var el = document.getElementById('typing');
   if (el) el.remove();
 }
 
-function scrollBottom() {
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-
-// ── Main send function ────────────────────────────────────────────────────────
+/* ──────────────────────────────────────────────────────────────
+   MAIN SEND FUNCTION
+────────────────────────────────────────────────────────────── */
 async function send() {
   var text = inputEl.value.trim();
   if (!text) return;
+
+  // Stop any ongoing speech before new message
+  speechSynthesis.cancel();
+  if (currentSpeakingMsg) { currentSpeakingMsg.classList.remove('speaking'); currentSpeakingMsg = null; }
 
   appendUserMsg(text);
   inputEl.value = '';
   inputEl.style.height = 'auto';
   sendBtn.disabled = true;
+  micBtn.disabled  = true;
 
   messages.push({ role: 'user', content: text });
-
   showTypingDots();
 
   try {
@@ -221,69 +477,63 @@ async function send() {
     removeTypingDots();
 
     if (!res.ok) {
-      var errBubble = createAiBubble();
-      appendChunk(errBubble, 'PAWS-OS is having a moment — please try again shortly.');
-      finishBubble(errBubble);
-      sendBtn.disabled = false;
-      inputEl.focus();
-      return;
+      var _r = createAiBubble();
+      var errText = 'PAWS-OS is having a moment — please try again shortly.';
+      appendChunk(_r.bubble, errText);
+      finishBubble(_r.bubble);
+      speak(errText, _r.msg);
+      sendBtn.disabled = false; micBtn.disabled = false; inputEl.focus(); return;
     }
 
     var contentType = res.headers.get('content-type') || '';
 
-    // ── Streaming path (SSE / text stream) ───────────────────────────────────
+    /* ── Streaming SSE path ─────────────────────────────────── */
     if (contentType.includes('text/event-stream') || contentType.includes('text/plain')) {
-      var bubble = createAiBubble();
+      var _c = createAiBubble();
+      var bubble = _c.bubble, msgEl = _c.msg;
       var fullReply = '';
       var reader = res.body.getReader();
       var decoder = new TextDecoder();
-      var buffer = '';
+      var buf = '';
 
       while (true) {
-        var _ref = await reader.read();
-        var done = _ref.done, value = _ref.value;
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-
-        // Process complete SSE lines
-        var lines = buffer.split('\n');
-        buffer = lines.pop(); // keep incomplete last line
+        var _rd = await reader.read();
+        if (_rd.done) break;
+        buf += decoder.decode(_rd.value, { stream: true });
+        var lines = buf.split('\n');
+        buf = lines.pop();
 
         for (var i = 0; i < lines.length; i++) {
           var line = lines[i].trim();
-          if (!line) continue;
-
-          // SSE format: "data: <text>"
-          if (line.startsWith('data: ')) {
-            var chunk = line.slice(6);
-            if (chunk === '[DONE]') break;
-            appendChunk(bubble, chunk);
-            fullReply += chunk;
-          }
+          if (!line || !line.startsWith('data: ')) continue;
+          var chunk = line.slice(6);
+          if (chunk === '[DONE]') break;
+          appendChunk(bubble, chunk);
+          fullReply += chunk;
         }
       }
 
       finishBubble(bubble);
       messages.push({ role: 'assistant', content: fullReply });
+      speak(fullReply, msgEl);  // 🔊 speak the complete reply
 
-    // ── Non-streaming fallback (regular JSON) ─────────────────────────────────
+    /* ── Non-streaming JSON fallback ────────────────────────── */
     } else {
       var data = await res.json();
       var reply = data.reply || data.message || data.text || JSON.stringify(data);
-      var bubble2 = createAiBubble();
+      var _c2 = createAiBubble();
+      var bubble2 = _c2.bubble, msgEl2 = _c2.msg;
 
-      // Animate the text character by character for a streaming feel
-      var i = 0;
+      var ci = 0;
       var speed = Math.max(8, Math.min(20, Math.floor(4000 / reply.length)));
       function typeNext() {
-        if (i < reply.length) {
-          appendChunk(bubble2, reply[i]);
-          i++;
+        if (ci < reply.length) {
+          appendChunk(bubble2, reply[ci++]);
           setTimeout(typeNext, speed);
         } else {
           finishBubble(bubble2);
           messages.push({ role: 'assistant', content: reply });
+          speak(reply, msgEl2);  // 🔊 speak after typewriter finishes
         }
       }
       typeNext();
@@ -291,14 +541,17 @@ async function send() {
 
   } catch (e) {
     removeTypingDots();
-    var errBubble2 = createAiBubble();
-    appendChunk(errBubble2, 'Could not reach PAWS-OS right now. Check your connection and try again.');
-    finishBubble(errBubble2);
+    var _re = createAiBubble();
+    var errMsg = 'Could not reach PAWS-OS right now. Check your connection and try again.';
+    appendChunk(_re.bubble, errMsg);
+    finishBubble(_re.bubble);
+    speak(errMsg, _re.msg);
   }
 
   sendBtn.disabled = false;
+  micBtn.disabled  = STT_SUPPORTED ? false : true;
   inputEl.focus();
 }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f4896f6e91a4ec6',t:'MTc3NzU3MzUzMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f48a8540fa78739',t:'MTc3NzU3NDI0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
