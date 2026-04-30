@@ -95,20 +95,22 @@
   <div class="watermark">PAWS-OS · Work in Progress · Operation PAWS</div>
 </div>
 <script>
-  const ENDPOINT = 'https://dorihyvbgbhsxvdrtqqr.supabase.co/functions/v1/paws-chat';
-  const messagesEl = document.getElementById('messages');
-  const inputEl = document.getElementById('input');
-  const sendBtn = document.getElementById('send');
-  const roleEl = document.getElementById('role');
-  const welcomeEl = document.getElementById('welcome');
-  const history = [];
+  var ENDPOINT = 'https://dorihyvbgbhsxvdrtqqr.supabase.co/functions/v1/paws-chat';
+  var messagesEl = document.getElementById('messages');
+  var inputEl = document.getElementById('input');
+  var sendBtn = document.getElementById('send');
+  var roleEl = document.getElementById('role');
+  var welcomeEl = document.getElementById('welcome');
 
-  inputEl.addEventListener('input', () => {
+  // Conversation history in the format the function expects: [{role, content}]
+  var messages = [];
+
+  inputEl.addEventListener('input', function() {
     inputEl.style.height = 'auto';
     inputEl.style.height = Math.min(inputEl.scrollHeight, 130) + 'px';
   });
 
-  inputEl.addEventListener('keydown', (e) => {
+  inputEl.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
 
@@ -116,73 +118,85 @@
 
   function appendMsg(role, text) {
     if (welcomeEl) welcomeEl.style.display = 'none';
-    const msg = document.createElement('div');
+    var msg = document.createElement('div');
     msg.className = 'msg ' + role;
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.textContent = role === 'user' ? '👤' : '🐾';
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = text;
-    msg.appendChild(avatar);
-    msg.appendChild(bubble);
+    var av = document.createElement('div');
+    av.className = 'avatar';
+    av.textContent = role === 'user' ? '👤' : '🐾';
+    var b = document.createElement('div');
+    b.className = 'bubble';
+    b.textContent = text;
+    msg.appendChild(av);
+    msg.appendChild(b);
     messagesEl.appendChild(msg);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
   function appendTyping() {
     if (welcomeEl) welcomeEl.style.display = 'none';
-    const msg = document.createElement('div');
+    var msg = document.createElement('div');
     msg.className = 'msg ai';
-    msg.id = 'typing-indicator';
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.textContent = '🐾';
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
-    msg.appendChild(avatar);
-    msg.appendChild(bubble);
+    msg.id = 'typing';
+    var av = document.createElement('div');
+    av.className = 'avatar';
+    av.textContent = '🐾';
+    var b = document.createElement('div');
+    b.className = 'bubble';
+    b.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+    msg.appendChild(av);
+    msg.appendChild(b);
     messagesEl.appendChild(msg);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
   function removeTyping() {
-    const el = document.getElementById('typing-indicator');
+    var el = document.getElementById('typing');
     if (el) el.remove();
   }
 
   async function send() {
-    const text = inputEl.value.trim();
+    var text = inputEl.value.trim();
     if (!text) return;
+
     appendMsg('user', text);
     inputEl.value = '';
     inputEl.style.height = 'auto';
     sendBtn.disabled = true;
-    history.push({ role: 'user', parts: [{ text }] });
+
+    // Add user message to history in the format the function expects
+    messages.push({ role: 'user', content: text });
+
     appendTyping();
+
     try {
-      const res = await fetch(ENDPOINT, {
+      var res = await fetch(ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, role: roleEl.value, history: history.slice(-10) })
+        body: JSON.stringify({
+          messages: messages,   // full conversation history
+          role: roleEl.value    // stakeholder role
+        })
       });
+
       removeTyping();
+
       if (!res.ok) {
         appendMsg('ai', 'PAWS-OS is having a moment - please try again shortly.');
       } else {
-        const data = await res.json();
-        const reply = data.reply || data.message || data.text || JSON.stringify(data);
+        var data = await res.json();
+        var reply = data.reply || data.message || data.text || JSON.stringify(data);
         appendMsg('ai', reply);
-        history.push({ role: 'model', parts: [{ text: reply }] });
+        // Add assistant reply to history
+        messages.push({ role: 'assistant', content: reply });
       }
-    } catch (err) {
+    } catch(e) {
       removeTyping();
       appendMsg('ai', 'Could not reach PAWS-OS right now. Check your connection and try again.');
     }
+
     sendBtn.disabled = false;
     inputEl.focus();
   }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f4813059a8f0ade',t:'MTc3NzU2ODEyOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f486740bcdd738b',t:'MTc3NzU3MTU3OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
